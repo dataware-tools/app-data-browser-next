@@ -1,0 +1,11 @@
+{
+  "recommendations": [
+    "mgmcdermott.vscode-language-babel",
+    "ms-azuretools.vscode-docker",
+    "editorconfig.editorconfig",
+    "dbaeumer.vscode-eslint",
+    "stylelint.vscode-stylelint",
+    "esbenp.prettier-vscode",
+    "aaron-bond.better-comments"
+  ]
+}
