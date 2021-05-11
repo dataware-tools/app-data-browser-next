@@ -1,7 +1,5 @@
 import { AppState, Auth0Provider } from "@auth0/auth0-react";
-import { PageWrapper } from "../components/organisms/PageWrapper";
-
-import { AUTH_CONFIG } from "@dataware-tools/app-common";
+import { AUTH_CONFIG, PageWrapper } from "@dataware-tools/app-common";
 
 type SafeHydrateProps = {
   children: JSX.Element | JSX.Element[];

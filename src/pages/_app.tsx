@@ -6,10 +6,10 @@ import { ThemeProvider, StylesProvider } from "@material-ui/core/styles";
 import dynamic from "next/dynamic";
 import theme from "../theme";
 import { SWRConfig } from "swr";
-import { SwrOptions } from "../utils/index";
+import { SwrOptions, APP_ROUTE } from "../utils/index";
 import "./scrollbar.global.css";
 
-const App = ({ Component, pageProps }: AppProps): JSX.Element => {
+const App = ({ Component, pageProps, router }: AppProps): JSX.Element => {
   useEffect(() => {
     // Remove the server-side injected CSS.
     const jssStyles = document.querySelector("#jss-server-side");
@@ -17,6 +17,12 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
       jssStyles?.parentElement?.removeChild(jssStyles);
     }
   }, []);
+
+  useEffect(() => {
+    if (router.pathname === APP_ROUTE.HOME) {
+      router.replace(APP_ROUTE.DATABASES);
+    }
+  }, [router]);
 
   const SafeHydrate = dynamic(() => import("./_app_csr"), { ssr: false });
   return (
