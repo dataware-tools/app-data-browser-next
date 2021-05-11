@@ -1,9 +1,9 @@
 {
-  "name": "@dataware-tools/app-template-nextjs",
+  "name": "@dataware-tools/app-data-browser",
   "version": "0.1.0",
   "private": true,
-  "repository": "https://github.com/dataware-tools/app-template-nextjs.git",
-  "homepage": "/app-template-nextjs",
+  "repository": "https://github.com/dataware-tools/app-data-browser-next.git",
+  "homepage": "/data-browser",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
