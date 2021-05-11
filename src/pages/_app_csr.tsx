@@ -1,5 +1,6 @@
 import { AppState, Auth0Provider } from "@auth0/auth0-react";
 import { AUTH_CONFIG, PageWrapper } from "@dataware-tools/app-common";
+import { repository } from "../../package.json";
 
 type SafeHydrateProps = {
   children: JSX.Element | JSX.Element[];
@@ -27,7 +28,7 @@ const SafeHydrate = (props: SafeHydrateProps): JSX.Element => {
       redirectUri={redirectUri}
       onRedirectCallback={onRedirectCallback}
     >
-      <PageWrapper>{props.children}</PageWrapper>
+      <PageWrapper repository={repository}>{props.children}</PageWrapper>
     </Auth0Provider>
   );
 };
