@@ -4,7 +4,7 @@ import CssBaseline from "@material-ui/core/CssBaseline";
 import Head from "next/head";
 import { ThemeProvider, StylesProvider } from "@material-ui/core/styles";
 import dynamic from "next/dynamic";
-import theme from "../theme";
+import { theme } from "@dataware-tools/app-common";
 import { SWRConfig } from "swr";
 import { SwrOptions, APP_ROUTE } from "../utils/index";
 import "./scrollbar.global.css";

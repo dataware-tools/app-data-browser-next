@@ -8,7 +8,7 @@ import { Auth0Provider } from "@auth0/auth0-react";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import React from "react";
 import { ThemeProvider, StylesProvider } from "@material-ui/core/styles";
-import theme from "../src/theme";
+import { theme } from "@dataware-tools/app-common";
 import { SWRConfig } from "swr";
 import { SwrOptions } from "../src/utils";
 
