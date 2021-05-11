@@ -1,4 +1,4 @@
-import { databaseStore } from "@dataware-tools/app-common";
+import { metaStore } from "@dataware-tools/app-common";
 import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import StorageIcon from "@material-ui/icons/Storage";
@@ -8,7 +8,7 @@ import { useRouter } from "next/dist/client/router";
 type Props = { onClick: () => void } & ContainerProps;
 
 type ContainerProps = {
-  database: databaseStore.DatabaseModel;
+  database: metaStore.DatabaseModel;
 };
 
 const Component = ({ database, onClick }: Props): JSX.Element => {
@@ -17,7 +17,12 @@ const Component = ({ database, onClick }: Props): JSX.Element => {
       <ListItemIcon>
         <StorageIcon />
       </ListItemIcon>
-      <ListItemText primary={database.name} secondary={database.description} />
+      <ListItemText
+        primary={database.name ? database.name : "No name"}
+        secondary={
+          database.description ? database.description : "No description..."
+        }
+      />
     </ListItem>
   );
 };
