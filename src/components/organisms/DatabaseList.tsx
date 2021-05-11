@@ -1,19 +1,21 @@
-import { databaseStore } from "@dataware-tools/app-common";
+import { metaStore } from "@dataware-tools/app-common";
 import { DatabaseListItem } from "components/organisms/DatabaseListItem";
 import List from "@material-ui/core/List";
 
 type Props = ContainerProps;
 
 type ContainerProps = {
-  databases: Required<databaseStore.DatabaseListModel>;
+  databases: metaStore.DatabaseModel[];
 };
 
 const Component = ({ databases }: Props): JSX.Element => {
   return (
     <List>
-      {databases.databases.map((database) => (
-        <DatabaseListItem key={database.database_id} database={database} />
-      ))}
+      {databases.map((database) => {
+        return (
+          <DatabaseListItem key={database.database_id} database={database} />
+        );
+      })}
     </List>
   );
 };
