@@ -3,20 +3,20 @@
 FROM node:14 AS deps
 WORKDIR /app
 RUN wget -O /bin/jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 && chmod +x /bin/jq
-COPY ./package.json ./.npm* ./
+COPY ./package.json ./package-lock.json  ./.npm* ./
 RUN mkdir -p -m 0600 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
 RUN npm -g config set user root && npm -g config set unsafe-perm true
 RUN --mount=type=ssh --mount=type=secret,id=npmrc,target=/root/.npmrc npm install
 
 # Rebuild the source code only when needed
-FROM node:alpine AS builder
+FROM node:14-alpine AS builder
 WORKDIR /app
 COPY . .
 COPY --from=deps /app/node_modules ./node_modules
 RUN npm run build
 
 # Production image, copy all the files and run next
-FROM node:alpine AS runner
+FROM node:14-alpine AS runner
 WORKDIR /app
 
 ENV NODE_ENV production
