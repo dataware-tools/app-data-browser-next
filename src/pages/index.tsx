@@ -1,5 +1,5 @@
 import Container from "@material-ui/core/Container";
-import { Sample } from "../components/molecules/Sample";
+import { Sample } from "components/molecules/Sample";
 const Page = (): JSX.Element => {
   return (
     <Container>
