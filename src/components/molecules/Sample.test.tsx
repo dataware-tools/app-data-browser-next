@@ -6,7 +6,7 @@ describe("SampleComponent", () => {
   test("is rendered", async () => {
     render(
       <TestAuthProvider>
-        <Sample />
+        <Sample sample="sample" />
       </TestAuthProvider>
     );
     // Auth0 contain async logic, so you should use findBy~ not getBy~.
