@@ -3,7 +3,7 @@ import { Sample } from "components/molecules/Sample";
 const Page = (): JSX.Element => {
   return (
     <Container>
-      <Sample />
+      <Sample sample="sample" />
     </Container>
   );
 };
