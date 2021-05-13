@@ -1,31 +1,20 @@
-import {
-  TabBar,
-  TabBarProps,
-  metaStore,
-  ToolBar,
-  Spacer,
-} from "@dataware-tools/app-common";
+import { TabBar, TabBarProps, Spacer } from "@dataware-tools/app-common";
 import { makeStyles } from "@material-ui/core/styles";
 import Dialog from "@material-ui/core/Dialog";
-import Table from "@material-ui/core/Table";
-import TableBody from "@material-ui/core/TableBody";
-import TableCell from "@material-ui/core/TableCell";
-import TableRow from "@material-ui/core/TableRow";
-import CloseIcon from "@material-ui/icons/Close";
 import { useState } from "react";
 import { FileList, FileListProps } from "./FileList";
+import { DialogCloseButton } from "components/atoms/DialogCloseButton";
+import { RecordDetailModalToolBar } from "components/molecules/RecordDetailModalToolBar";
+import { RecordInfo, RecordInfoProps } from "components/organisms/RecordInfo";
 
 type Props = {
   classes: ReturnType<typeof useStyles>;
+  title: string;
   tabProps: TabBarProps;
-  record: metaStore.RecordModel;
-  files: metaStore.FileModel[];
-  fileListProps: {
-    onPreview: FileListProps["onPreview"];
-    onDelete: FileListProps["onDelete"];
-    onEdit: FileListProps["onEdit"];
-    onDownload: FileListProps["onDownload"];
-  };
+  onAddFile: () => void;
+  onEditRecord: () => void;
+  recordInfoProps: RecordInfoProps;
+  fileListProps: FileListProps;
 } & ContainerProps;
 
 type ContainerProps = {
@@ -36,65 +25,38 @@ type ContainerProps = {
 const Component = ({
   classes,
   open,
+  title,
   tabProps,
-  record,
   onClose,
-  files,
   fileListProps,
+  recordInfoProps,
+  onAddFile,
+  onEditRecord,
 }: Props): JSX.Element => {
   const tab = tabProps.tabNames[tabProps.value];
-
-  const Main = (): JSX.Element | null =>
-    tab === "Info" ? (
-      <Table>
-        <TableBody>
-          {Object.keys(record).map((key) => {
-            // TODO: implement
-            if (key === "contents") {
-              return (
-                <TableRow key={key}>
-                  <TableCell>{key}</TableCell>
-                  <TableCell>{JSON.stringify(record.contents)}</TableCell>
-                </TableRow>
-              );
-            } else {
-              return (
-                <TableRow key={key}>
-                  <TableCell>{key}</TableCell>
-                  <TableCell>{record[key]}</TableCell>
-                </TableRow>
-              );
-            }
-          })}
-        </TableBody>
-      </Table>
-    ) : tab === "Files" ? (
-      <FileList files={files} {...fileListProps} />
-    ) : null;
 
   return (
     <Dialog open={open} fullWidth maxWidth="xl" onClose={onClose}>
       <div className={classes.root}>
-        <div className={classes.header}>
-          <ToolBar>
-            <CloseIcon
-              className={classes.closeButton}
-              onClick={() => {
-                onClose();
-              }}
-              fontSize="large"
-            />
-          </ToolBar>
-        </div>
+        <DialogCloseButton onClick={onClose} />
+        <div className={classes.title}>{title}</div>
+        <Spacer direction="vertical" size="2vh" />
         <div className={classes.bodyContainer}>
           <div className={classes.tabBarContainer}>
             <TabBar {...tabProps} />
           </div>
           <div className={classes.mainContainer}>
-            <Main />
+            {tab === "Info" ? (
+              <RecordInfo {...recordInfoProps} />
+            ) : tab === "Files" ? (
+              <FileList {...fileListProps} />
+            ) : null}
           </div>
         </div>
-        <Spacer direction="vertical" size="2vh" />
+        <RecordDetailModalToolBar
+          onClickAddFile={onAddFile}
+          onClickEditRecord={onEditRecord}
+        />
       </div>
     </Dialog>
   );
@@ -105,23 +67,36 @@ const useStyles = makeStyles({
     display: "flex",
     flexDirection: "column",
     height: "90vh",
-  },
-  header: {
-    zIndex: 1,
+    padding: "10px",
   },
   closeButton: {
     cursor: "pointer",
   },
+  title: {
+    fontSize: "1.5rem",
+    marginLeft: "3vw",
+  },
   bodyContainer: {
     display: "flex",
+    flex: 1,
     flexDirection: "row",
-    height: "100%",
+    overflow: "auto",
   },
   tabBarContainer: {
     flex: 0,
   },
   mainContainer: {
+    display: "flex",
     flex: 1,
+    flexDirection: "column",
+    overflow: "auto",
+  },
+  mainListContainer: {
+    flex: 1,
+    overflow: "auto",
+  },
+  ToolBarContainer: {
+    padding: "5px",
   },
 });
 
@@ -179,18 +154,28 @@ const Container = ({ ...delegated }: ContainerProps): JSX.Element => {
   // ! this is dummy func
   // TODO: implement method
   const fileListProps: Props["fileListProps"] = {
+    files: files,
     onPreview: (file) => window.alert(`preview: ${JSON.stringify(file)}`),
     onEdit: (file) => window.alert(`edit: ${JSON.stringify(file)}`),
     onDelete: (file) => window.alert(`delete: ${JSON.stringify(file)}`),
     onDownload: (file) => window.alert(`download: ${JSON.stringify(file)}`),
   };
+  const onAddFile: Props["onAddFile"] = () =>
+    window.alert(`add file:${JSON.stringify(record)}`);
+  const onEditRecord: Props["onEditRecord"] = () =>
+    window.alert(`edit record:${JSON.stringify(record)}`);
+  const recordInfoProps: Props["recordInfoProps"] = {
+    record: record,
+  };
 
   return (
     <Component
       classes={classes}
+      title={record.record_id}
+      onAddFile={onAddFile}
+      onEditRecord={onEditRecord}
       tabProps={{ value: tab, onChange: onChangeTab, tabNames: tabNames }}
-      record={record}
-      files={files}
+      recordInfoProps={recordInfoProps}
       fileListProps={fileListProps}
       {...delegated}
     />
