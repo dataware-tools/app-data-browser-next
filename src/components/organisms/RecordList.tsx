@@ -15,6 +15,7 @@ const Component = ({ records, onClickRow }: Props): JSX.Element => {
       columns={[{ field: "record_id" }, { field: "description" }]}
       onClickRow={onClickRow}
       stickyHeader
+      disableHoverCell
     />
   );
 };
