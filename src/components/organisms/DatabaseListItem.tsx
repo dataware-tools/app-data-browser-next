@@ -3,17 +3,17 @@ import ListItem from "@material-ui/core/ListItem";
 import ListItemIcon from "@material-ui/core/ListItemIcon";
 import StorageIcon from "@material-ui/icons/Storage";
 import ListItemText from "@material-ui/core/ListItemText";
-import { useRouter } from "next/dist/client/router";
 
-type Props = { onClick: () => void } & ContainerProps;
+type Props = ContainerProps;
 
 type ContainerProps = {
   database: metaStore.DatabaseModel;
+  onClick: (database: metaStore.DatabaseModel) => void;
 };
 
 const Component = ({ database, onClick }: Props): JSX.Element => {
   return (
-    <ListItem button onClick={onClick}>
+    <ListItem button onClick={() => onClick(database)}>
       <ListItemIcon>
         <StorageIcon />
       </ListItemIcon>
@@ -28,11 +28,7 @@ const Component = ({ database, onClick }: Props): JSX.Element => {
 };
 
 const Container = ({ database, ...delegated }: ContainerProps): JSX.Element => {
-  const router = useRouter();
-  const onClick = () => {
-    router.push(`/databases/${database.database_id}/records`);
-  };
-  return <Component onClick={onClick} database={database} {...delegated} />;
+  return <Component database={database} {...delegated} />;
 };
 
 export { Container as DatabaseListItem };

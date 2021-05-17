@@ -14,4 +14,5 @@ Default.args = {
     { database_id: "2", name: "test2", description: "test2" },
     { database_id: "3" },
   ],
+  onSelectDatabase: (database) => window.alert(`${database.name} is selected!`),
 };
