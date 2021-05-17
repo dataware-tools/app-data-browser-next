@@ -1,19 +1,27 @@
 import { metaStore } from "@dataware-tools/app-common";
-import { DatabaseListItem } from "components/organisms/DatabaseListItem";
+import {
+  DatabaseListItem,
+  DatabaseListItemProps,
+} from "components/organisms/DatabaseListItem";
 import List from "@material-ui/core/List";
 
 type Props = ContainerProps;
 
 type ContainerProps = {
   databases: metaStore.DatabaseModel[];
+  onSelectDatabase: DatabaseListItemProps["onClick"];
 };
 
-const Component = ({ databases }: Props): JSX.Element => {
+const Component = ({ databases, onSelectDatabase }: Props): JSX.Element => {
   return (
     <List>
       {databases.map((database) => {
         return (
-          <DatabaseListItem key={database.database_id} database={database} />
+          <DatabaseListItem
+            key={database.database_id}
+            database={database}
+            onClick={onSelectDatabase}
+          />
         );
       })}
     </List>
