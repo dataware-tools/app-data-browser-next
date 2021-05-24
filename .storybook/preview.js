@@ -1,8 +1,4 @@
-import {
-  authConfig,
-  onRedirectCallback,
-  redirectUri,
-} from "../src/pages/_app_csr";
+import { authConfig, onRedirectCallback, redirectUri } from "../src/utils";
 
 import { Auth0Provider } from "@auth0/auth0-react";
 import CssBaseline from "@material-ui/core/CssBaseline";
