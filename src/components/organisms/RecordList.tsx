@@ -4,16 +4,21 @@ type Props = ContainerProps;
 
 type ContainerProps = {
   records: metaStore.RecordModel[];
-  onClickRow: TableProps["onClickRow"];
+  onSelectRecord: TableProps["onClickRow"];
+  columns: TableProps["columns"];
 };
 
-const Component = ({ records, onClickRow }: Props): JSX.Element => {
+const Component = ({
+  records,
+  onSelectRecord,
+  columns,
+}: Props): JSX.Element => {
   return (
     <Table
       rows={records}
-      // columns should passed by parent component to customize showing columns
-      columns={[{ field: "record_id" }, { field: "description" }]}
-      onClickRow={onClickRow}
+      // TODO: columns should passed by parent component to customize showing columns
+      columns={columns}
+      onClickRow={onSelectRecord}
       stickyHeader
       disableHoverCell
     />

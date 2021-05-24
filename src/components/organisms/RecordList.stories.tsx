@@ -23,8 +23,12 @@ Default.args = {
       end_timestamp: 4,
     },
   ],
-  onClickRow: (targetDetail) => {
-    window.alert(`should open modal showing records detail!
-    this is target records summary: ${JSON.stringify(targetDetail)}`);
+  onSelectRecord: (targetDetail) => {
+    window.alert(
+      `Should open modal showing records detail! ${JSON.stringify(
+        targetDetail
+      )}`
+    );
   },
+  columns: [{ field: "description" }, { field: "record_id" }],
 };

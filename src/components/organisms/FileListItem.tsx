@@ -33,7 +33,9 @@ const Component = ({
   onEdit,
   onDelete,
   onDownload,
-}: Props): JSX.Element => {
+}: Props): JSX.Element | null => {
+  if (file.path == null) return null;
+
   return (
     <ListItem
       button
