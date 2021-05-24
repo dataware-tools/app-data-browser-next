@@ -1,5 +1,6 @@
 import Container from "@material-ui/core/Container";
 import { Sample } from "components/molecules/Sample";
+
 const Page = (): JSX.Element => {
   return (
     <Container>
@@ -8,4 +9,4 @@ const Page = (): JSX.Element => {
   );
 };
 
-export default Page;
+export { Page as SamplePage };

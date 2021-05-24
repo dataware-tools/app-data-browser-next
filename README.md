@@ -52,6 +52,14 @@ Open http://localhost:3000/{basePath} with your browser to see the result.
 
 You can start editing the page by modifying `pages/*.tsx`. The page auto-updates as you edit the file.
 
+## Caution
+
+This Template is configured for creating SPA with Next.js.
+
+So, if you want to implement multi page site, you should configure to do it. (e.g. rename [[...app]].tsx to index.tsx etc...)
+
+Otherwise, you should not use next/router and next/link and file-system based routing.
+
 ## Major library introduction
 
 ### Production
