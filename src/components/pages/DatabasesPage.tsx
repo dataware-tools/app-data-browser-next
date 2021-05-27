@@ -9,6 +9,7 @@ import {
   SearchForm,
   Spacer,
   ToolBar,
+  PerPageSelect,
 } from "@dataware-tools/app-common";
 import { makeStyles } from "@material-ui/core/styles";
 
@@ -38,8 +39,6 @@ const Page = (): JSX.Element => {
   const [searchText, setSearchText] = useState(
     getQueryString("searchText") || ""
   );
-  // @ts-expect-error foo
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [perPage, setPerPage] = useState(
     Number(getQueryString("perPage")) || 20
   );
@@ -86,8 +85,11 @@ const Page = (): JSX.Element => {
             />
           </div>
           <Spacer direction="horizontal" size="15px" />
-          {/* <PerPageSelect perPage={perPage} setPerPage={setPerPage} /> */}
-          <div style={{ flexShrink: 0 }}>| per page select |</div>
+          <PerPageSelect
+            perPage={perPage}
+            setPerPage={setPerPage}
+            values={[10, 20, 50, 100]}
+          />
         </ToolBar>
       </div>
       <Spacer direction="vertical" size="3vh" />

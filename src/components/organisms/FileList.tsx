@@ -16,6 +16,7 @@ type ContainerProps = {
 };
 
 const Component = ({ files, ...delegated }: Props): JSX.Element => {
+  console.log(files);
   return (
     <List>
       {files.map((file) => {
