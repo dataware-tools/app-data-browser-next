@@ -1,40 +1,22 @@
-import { ToolBar } from "@dataware-tools/app-common";
-import { makeStyles } from "@material-ui/core/styles";
 import Dialog from "@material-ui/core/Dialog";
 import { DialogCloseButton } from "components/atoms/DialogCloseButton";
 import { useState, useEffect } from "react";
 import LoadingButton from "@material-ui/lab/LoadingButton";
 import { usePrevious } from "../../utils/index";
 import { DisplayConfigList } from "components/organisms/DisplayConfigList";
+import AddCircleIcon from "@material-ui/icons/AddCircle";
+import { SquareIconButton } from "components/atoms/SquareIconButton";
+import { DialogTitle } from "components/atoms/DialogTitle";
+import { TextCenteringSpan } from "components/atoms/TextCenteringSpan";
+import { DialogBody } from "components/atoms/DialogBody";
+import { DialogContainer } from "components/atoms/DialogContainer";
+import { DialogToolBar } from "components/atoms/DialogToolBar";
 
 type ContainerProps = {
   open: boolean;
   onClose: () => void;
+  configName: "recordDisplayConfig";
 };
-
-const useStyles = makeStyles({
-  root: {
-    display: "flex",
-    flexDirection: "column",
-    height: "90vh",
-    padding: "10px",
-  },
-  bodyContainer: {
-    display: "flex",
-    flex: 1,
-    flexDirection: "column",
-    overflow: "auto",
-  },
-  label: {
-    fontSize: "1.5rem",
-  },
-  inputContainer: {
-    padding: "0 3vw",
-  },
-  ToolBarContainer: {
-    padding: "5px",
-  },
-});
 
 // TODO: fetch from server
 const getDatabaseConfigRes = {
@@ -49,12 +31,18 @@ const getDatabaseConfigRes = {
   recordDisplayConfig: ["record name", "description"],
 };
 
-const Container = ({ open, onClose }: ContainerProps): JSX.Element => {
-  const classes = useStyles();
+const title = { recordDisplayConfig: "Record Display Fields" };
 
+const Container = ({
+  open,
+  onClose,
+  configName,
+}: ContainerProps): JSX.Element => {
   const [isSaving, setIsSaving] = useState(false);
   // TODO: initialize state after success fetching
-  const [databaseConfig, setDatabaseConfig] = useState(getDatabaseConfigRes);
+  const [config, setConfig] = useState(
+    configName in getDatabaseConfigRes ? getDatabaseConfigRes[configName] : null
+  );
 
   const initializeState = () => {
     setIsSaving(false);
@@ -74,31 +62,37 @@ const Container = ({ open, onClose }: ContainerProps): JSX.Element => {
     onClose();
   };
 
+  const onAdd = () =>
+    setConfig((prev) => {
+      return prev ? [...prev, ""] : [""];
+    });
+
+  const options =
+    getDatabaseConfigRes.recordInputConfig?.map((config) => config.name) || [];
+
   return (
     <Dialog open={open} maxWidth="xl" onClose={onClose}>
-      <div className={classes.root}>
+      <DialogContainer>
         <DialogCloseButton onClick={onClose} />
-        <div className={classes.bodyContainer}>
+        <DialogTitle>
+          <TextCenteringSpan>{title[configName] + " "}</TextCenteringSpan>
+          <SquareIconButton onClick={onAdd} icon={<AddCircleIcon />} />
+        </DialogTitle>
+        <DialogBody>
           <DisplayConfigList
-            value={databaseConfig.recordDisplayConfig || []}
-            onChange={(newValue) =>
-              setDatabaseConfig({
-                ...databaseConfig,
-                recordDisplayConfig: newValue,
-              })
-            }
-            options={
-              databaseConfig.recordInputConfig?.map((config) => config.name) ||
-              []
-            }
+            value={config || []}
+            onChange={(newValue) => setConfig(newValue)}
+            options={options}
           />
-        </div>
-        <ToolBar>
-          <LoadingButton pending={isSaving} onClick={onSave}>
-            Save
-          </LoadingButton>
-        </ToolBar>
-      </div>
+        </DialogBody>
+        <DialogToolBar
+          right={
+            <LoadingButton pending={isSaving} onClick={onSave}>
+              Save
+            </LoadingButton>
+          }
+        />
+      </DialogContainer>
     </Dialog>
   );
 };

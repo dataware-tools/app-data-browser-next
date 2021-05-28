@@ -71,9 +71,7 @@ const Container = ({ file, ...delegated }: ContainerProps): JSX.Element => {
   };
   const onMenuClose = () => {
     setMenuAnchorEl(null);
-    console.log("close!");
   };
-  console.log(menuAnchorEl);
 
   return (
     <Component

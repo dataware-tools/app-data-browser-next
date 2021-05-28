@@ -5,6 +5,7 @@ import MenuItem from "@material-ui/core/MenuItem";
 import { Spacer } from "@dataware-tools/app-common";
 import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from "@material-ui/icons/Delete";
+import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
 
 type InputConfig = { name: string; necessity: string };
 
@@ -18,17 +19,11 @@ const useStyles = makeStyles({
   root: {
     display: "flex",
     flexDirection: "row",
+    justifyContent: "space-between",
   },
-  name: {
-    fontSize: "1.5rem",
-  },
-  necessity: {
-    padding: "0 3vw",
-  },
-  iconButtonContainer: {
-    alignItems: "center",
+  left: {
     display: "flex",
-    justifyContent: "center",
+    flexDirection: "row",
   },
 });
 
@@ -36,33 +31,35 @@ const Component = ({ classes, value, onChange }: Props): JSX.Element => {
   // TODO: use useMemo
   return (
     <div className={classes.root}>
-      <TextField
-        value={value.name}
-        onChange={(event) =>
-          onChange("change", { ...value, name: event.target.value })
-        }
-      />
-      <Spacer direction="horizontal" size="10px" />
-      <Select
-        value={value.necessity}
-        onChange={(event) =>
-          onChange("change", {
-            ...value,
-            necessity: event.target.value as string,
-          })
-        }
-        variant="outlined"
-      >
-        <MenuItem value="required">Required</MenuItem>
-        <MenuItem value="recommended">Recommended</MenuItem>
-        <MenuItem value="optional">Optional</MenuItem>
-      </Select>
-      <Spacer direction="horizontal" size="10px" />
-      <div className={classes.iconButtonContainer}>
+      <div className={classes.left}>
+        <TextField
+          value={value.name}
+          onChange={(event) =>
+            onChange("change", { ...value, name: event.target.value })
+          }
+        />
+        <Spacer direction="horizontal" size="10px" />
+        <Select
+          value={value.necessity}
+          onChange={(event) =>
+            onChange("change", {
+              ...value,
+              necessity: event.target.value as string,
+            })
+          }
+          variant="outlined"
+        >
+          <MenuItem value="required">Required</MenuItem>
+          <MenuItem value="recommended">Recommended</MenuItem>
+          <MenuItem value="optional">Optional</MenuItem>
+        </Select>
+        <Spacer direction="horizontal" size="10px" />
+      </div>
+      <ElemCenteringFlexDiv>
         <IconButton onClick={() => onChange("delete", { ...value })}>
           <DeleteIcon />
         </IconButton>
-      </div>
+      </ElemCenteringFlexDiv>
     </div>
   );
 };

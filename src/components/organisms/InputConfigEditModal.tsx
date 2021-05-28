@@ -1,5 +1,3 @@
-import { ToolBar, Spacer } from "@dataware-tools/app-common";
-import { makeStyles } from "@material-ui/core/styles";
 import Dialog from "@material-ui/core/Dialog";
 import { DialogCloseButton } from "components/atoms/DialogCloseButton";
 import { useState, useEffect } from "react";
@@ -7,40 +5,18 @@ import LoadingButton from "@material-ui/lab/LoadingButton";
 import { usePrevious } from "../../utils/index";
 import { InputConfigList } from "components/organisms/InputConfigList";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
+import { SquareIconButton } from "components/atoms/SquareIconButton";
+import { DialogTitle } from "components/atoms/DialogTitle";
+import { TextCenteringSpan } from "components/atoms/TextCenteringSpan";
+import { DialogContainer } from "components/atoms/DialogContainer";
+import { DialogBody } from "components/atoms/DialogBody";
+import { DialogToolBar } from "components/atoms/DialogToolBar";
 
 type ContainerProps = {
   open: boolean;
   onClose: () => void;
+  configName: "recordInputConfig";
 };
-
-const useStyles = makeStyles({
-  root: {
-    display: "flex",
-    flexDirection: "column",
-    height: "90vh",
-    padding: "10px",
-  },
-  title: {
-    fontSize: "1.5rem",
-    marginLeft: "3vw",
-  },
-  bodyContainer: {
-    display: "flex",
-    flex: 1,
-    flexDirection: "column",
-    overflow: "auto",
-    padding: "0 2vw",
-  },
-  label: {
-    fontSize: "1.5rem",
-  },
-  inputContainer: {
-    padding: "0 3vw",
-  },
-  ToolBarContainer: {
-    padding: "5px",
-  },
-});
 
 // TODO: fetch from server
 const getDatabaseConfigRes = {
@@ -55,12 +31,18 @@ const getDatabaseConfigRes = {
   recordDisplayConfig: ["name", "description"],
 };
 
-const Container = ({ open, onClose }: ContainerProps): JSX.Element => {
-  const classes = useStyles();
+const title = { recordInputConfig: "Record Input Fields" };
 
+const Container = ({
+  open,
+  onClose,
+  configName,
+}: ContainerProps): JSX.Element => {
   const [isSaving, setIsSaving] = useState(false);
   // TODO: initialize state after success fetching
-  const [databaseConfig, setDatabaseConfig] = useState(getDatabaseConfigRes);
+  const [config, setConfig] = useState(
+    configName in getDatabaseConfigRes ? getDatabaseConfigRes[configName] : null
+  );
 
   const initializeState = () => {
     setIsSaving(false);
@@ -80,56 +62,35 @@ const Container = ({ open, onClose }: ContainerProps): JSX.Element => {
     onClose();
   };
 
+  const onAdd = () =>
+    setConfig((prev) => {
+      return prev
+        ? [...prev, { name: "", necessity: "recommended" }]
+        : [{ name: "", necessity: "recommended" }];
+    });
+
   return (
     <Dialog open={open} maxWidth="xl" onClose={onClose}>
-      <div className={classes.root}>
+      <DialogContainer>
         <DialogCloseButton onClick={onClose} />
-        <div className={classes.title}>
-          Record Input Fields{" "}
-          <AddCircleIcon
-            onClick={() =>
-              setDatabaseConfig((prev) => {
-                console.log(`prev add: ${prev.recordInputConfig.length}`);
-                const newValue = { ...prev };
-                newValue.recordInputConfig.push({
-                  name: "",
-                  necessity: "required",
-                });
-                console.log(`next add: ${newValue.recordInputConfig.length}`);
-                return newValue;
-              })
-            }
-          />
-        </div>
-        <Spacer direction="vertical" size="2vh" />
-        <div className={classes.bodyContainer}>
+        <DialogTitle>
+          <TextCenteringSpan>{title[configName] + " "}</TextCenteringSpan>
+          <SquareIconButton onClick={onAdd} icon={<AddCircleIcon />} />
+        </DialogTitle>
+        <DialogBody>
           <InputConfigList
-            // @ts-expect-error bug tracking
-            value={
-              Boolean(
-                console.log(
-                  `in InputConfigEditModal: ${databaseConfig.recordInputConfig.length}`
-                )
-              ) ||
-              databaseConfig.recordInputConfig || [
-                { name: "Record name", necessity: "required" },
-              ]
-            }
-            onChange={(newValue) =>
-              setDatabaseConfig((prev) => {
-                console.log(`prev delete: ${prev.recordInputConfig.length}`);
-                console.log(`next delete: ${newValue.length}`);
-                return { ...prev, recordInputConfig: newValue };
-              })
-            }
+            value={config || [{ name: "Record name", necessity: "required" }]}
+            onChange={(newValue) => setConfig(newValue)}
           />
-        </div>
-        <ToolBar>
-          <LoadingButton pending={isSaving} onClick={onSave}>
-            Save
-          </LoadingButton>
-        </ToolBar>
-      </div>
+        </DialogBody>
+        <DialogToolBar
+          right={
+            <LoadingButton pending={isSaving} onClick={onSave}>
+              Save
+            </LoadingButton>
+          }
+        />
+      </DialogContainer>
     </Dialog>
   );
 };

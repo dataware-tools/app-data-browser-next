@@ -8,7 +8,6 @@ import {
   LoadingIndicator,
   SearchForm,
   Spacer,
-  ToolBar,
   PerPageSelect,
 } from "@dataware-tools/app-common";
 import { makeStyles } from "@material-ui/core/styles";
@@ -23,18 +22,25 @@ import { RecordDetailModal } from "components/organisms/RecordDetailModal";
 import Button from "@material-ui/core/Button";
 import AddCircle from "@material-ui/icons/AddCircle";
 import { RecordEditModal } from "components/organisms/RecordEditModal";
-import { InputConfigEditModal } from "components/organisms/InputConfigEditModal";
 import {
   DatabaseConfigButton,
   DatabaseConfigButtonProps,
 } from "components/molecules/DatabaseConfigButton";
-import { DisplayConfigEditModal } from "components/organisms/DisplayConfigEditModal";
+import {
+  DatabaseConfigModal,
+  DatabaseConfigNameType,
+} from "components/organisms/DatabaseConfigModal";
+import { TextCenteringSpan } from "components/atoms/TextCenteringSpan";
+import { PageContainer } from "components/atoms/PageContainer";
+import { PageToolBar } from "components/atoms/PageToolBar";
+import { PageBody } from "components/atoms/PageBody";
+import { Link } from "react-router-dom";
+import HomeIcon from "@material-ui/icons/Home";
+import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
 
 const useStyles = makeStyles(() => ({
-  paginationContainer: {
-    alignItems: "center",
-    display: "flex",
-    justifyContent: "center",
+  fixedFlexShrink: {
+    flexShrink: 0,
   },
 }));
 
@@ -56,13 +62,9 @@ const Page = (): JSX.Element => {
   const [isRecordDetailModalOpen, setIsRecordDetailModalOpen] = useState(false);
   const [isRecordEditModalOpen, setIsRecordEditModalOpen] = useState(false);
   const [
-    isRecordInputConfigEditModalOpen,
-    setIsRecordInputConfigEditModalOpen,
-  ] = useState(false);
-  const [
-    isRecordDisplayConfigEditModalOpen,
-    setIsRecordDisplayConfigEditModalOpen,
-  ] = useState(false);
+    editingConfigName,
+    setEditingConfigName,
+  ] = useState<DatabaseConfigNameType | null>(null);
   const [currentSelectedRecordId, setCurrentSelectedRecordId] = useState<
     string | null
   >(null);
@@ -92,7 +94,7 @@ const Page = (): JSX.Element => {
 
   useEffect(() => {
     addQueryString({ page, perPage, searchText }, "replace");
-  }, []);
+  }, [page, perPage, searchText]);
 
   const onSelectRecord: RecordListProps["onSelectRecord"] = (record) => {
     if (listRecordsRes) {
@@ -101,7 +103,7 @@ const Page = (): JSX.Element => {
     }
   };
 
-  const databaseConfigMenu = [
+  const databaseConfigMenu: DatabaseConfigButtonProps["menu"] = [
     {
       label: "Change input fields for record",
       value: "recordInputConfig",
@@ -114,105 +116,109 @@ const Page = (): JSX.Element => {
   const onSelectDatabaseConfig: DatabaseConfigButtonProps["onMenuSelect"] = (
     targetValue
   ) => {
-    switch (targetValue) {
-      case "recordInputConfig":
-        setIsRecordInputConfigEditModalOpen(true);
-        break;
-      case "recordDisplayConfig":
-        setIsRecordDisplayConfigEditModalOpen(true);
-        break;
-    }
+    setEditingConfigName(targetValue);
   };
 
   return (
     <>
-      <div style={{ padding: "0 10vw" }}>
-        {listRecordsError ? (
-          <ErrorMessage
-            reason={JSON.stringify(listRecordsError)}
-            instruction="please reload this page"
-          />
-        ) : listRecordsRes ? (
-          <div>
-            <Spacer direction="vertical" size="3vh" />
-            <div style={{ overflow: "auto" }}>
-              <ToolBar>
-                <div style={{ flexShrink: 0 }}>
-                  <SearchForm
-                    onSearch={(newSearchText) => setSearchText(newSearchText)}
-                    defaultValue={searchText}
-                  />
-                </div>
-                <Spacer direction="horizontal" size="15px" />
-                <PerPageSelect
-                  perPage={perPage}
-                  setPerPage={setPerPage}
-                  values={[10, 20, 50, 100]}
+      <PageContainer>
+        <PageToolBar
+          left={
+            <Link to="/">
+              <ElemCenteringFlexDiv>
+                <HomeIcon />
+                Home
+              </ElemCenteringFlexDiv>
+            </Link>
+          }
+          right={
+            <>
+              <div className={classes.fixedFlexShrink}>
+                <SearchForm
+                  onSearch={(newSearchText) => setSearchText(newSearchText)}
+                  defaultValue={searchText}
                 />
-                <Spacer direction="horizontal" size="15px" />
-                <Button
-                  onClick={() => setIsRecordEditModalOpen(true)}
-                  startIcon={<AddCircle />}
-                  style={{ flexShrink: 0 }}
-                >
-                  <div style={{ paddingTop: "0.1rem" }}>Record</div>
-                </Button>
-                <Spacer direction="horizontal" size="15px" />
-                <DatabaseConfigButton
-                  onMenuSelect={onSelectDatabaseConfig}
-                  menu={databaseConfigMenu}
-                />
-              </ToolBar>
-            </div>
-            <Spacer direction="vertical" size="3vh" />
-            <RecordList
-              columns={[{ field: "record name" }, { field: "description" }]}
-              records={listRecordsRes.data}
-              onSelectRecord={onSelectRecord}
-            />
-            <Spacer direction="vertical" size="3vh" />
-            <div className={classes.paginationContainer}>
-              <Pagination
-                count={Math.ceil(listRecordsRes.number_of_pages)}
-                page={page}
-                onChange={(_, newPage) => setPage(newPage)}
+              </div>
+              <Spacer direction="horizontal" size="15px" />
+              <PerPageSelect
+                perPage={perPage}
+                setPerPage={setPerPage}
+                values={[10, 20, 50, 100]}
               />
-            </div>
-            {currentSelectedRecordId ? (
-              <RecordDetailModal
-                open={isRecordDetailModalOpen}
-                recordId={currentSelectedRecordId}
+              <Spacer direction="horizontal" size="15px" />
+              <Button
+                onClick={() => setIsRecordEditModalOpen(true)}
+                startIcon={<AddCircle />}
+                className={classes.fixedFlexShrink}
+              >
+                <TextCenteringSpan>Record</TextCenteringSpan>
+              </Button>
+              <Spacer direction="horizontal" size="15px" />
+              <DatabaseConfigButton
+                onMenuSelect={onSelectDatabaseConfig}
+                menu={databaseConfigMenu}
+              />
+            </>
+          }
+        />
+        <PageBody>
+          {listRecordsError ? (
+            <ErrorMessage
+              reason={JSON.stringify(listRecordsError)}
+              instruction="please reload this page"
+            />
+          ) : listRecordsRes ? (
+            <>
+              <RecordList
+                columns={[{ field: "record name" }, { field: "description" }]}
+                records={listRecordsRes.data}
+                onSelectRecord={onSelectRecord}
+              />
+              {currentSelectedRecordId ? (
+                <RecordDetailModal
+                  open={isRecordDetailModalOpen}
+                  recordId={currentSelectedRecordId}
+                  databaseId={databaseId}
+                  onClose={() => {
+                    setIsRecordDetailModalOpen(false);
+                    mutate(listRecordsURL);
+                  }}
+                />
+              ) : null}
+              <RecordEditModal
+                open={isRecordEditModalOpen}
+                onClose={() => setIsRecordEditModalOpen(false)}
                 databaseId={databaseId}
-                onClose={() => {
-                  setIsRecordDetailModalOpen(false);
-                  mutate(listRecordsURL);
+                onSubmitSucceeded={(newRecord) => {
+                  const newRecordList = { ...listRecordsRes };
+                  newRecordList.data.push(newRecord);
+                  setCurrentSelectedRecordId(newRecord.record_id);
+                  setIsRecordDetailModalOpen(true);
                 }}
               />
-            ) : null}
-            <RecordEditModal
-              open={isRecordEditModalOpen}
-              onClose={() => setIsRecordEditModalOpen(false)}
-              databaseId={databaseId}
-              onSubmitSucceeded={(newRecord) => {
-                const newRecordList = { ...listRecordsRes };
-                newRecordList.data.push(newRecord);
-                setCurrentSelectedRecordId(newRecord.record_id);
-                setIsRecordDetailModalOpen(true);
-              }}
+              {editingConfigName ? (
+                <DatabaseConfigModal
+                  open={Boolean(editingConfigName)}
+                  onClose={() => setEditingConfigName(null)}
+                  configName={editingConfigName}
+                />
+              ) : null}
+            </>
+          ) : (
+            <LoadingIndicator />
+          )}
+        </PageBody>
+        <Spacer direction="vertical" size="3vh" />
+        {listRecordsRes ? (
+          <ElemCenteringFlexDiv>
+            <Pagination
+              count={Math.ceil(listRecordsRes.number_of_pages)}
+              page={page}
+              onChange={(_, newPage) => setPage(newPage)}
             />
-            <InputConfigEditModal
-              open={isRecordInputConfigEditModalOpen}
-              onClose={() => setIsRecordInputConfigEditModalOpen(false)}
-            />
-            <DisplayConfigEditModal
-              open={isRecordDisplayConfigEditModalOpen}
-              onClose={() => setIsRecordDisplayConfigEditModalOpen(false)}
-            />
-          </div>
-        ) : (
-          <LoadingIndicator />
-        )}
-      </div>
+          </ElemCenteringFlexDiv>
+        ) : null}
+      </PageContainer>
     </>
   );
 };

@@ -5,7 +5,6 @@ import {
   API_ROUTE,
   ErrorMessage,
   LoadingIndicator,
-  ToolBar,
 } from "@dataware-tools/app-common";
 import { makeStyles } from "@material-ui/core/styles";
 import Dialog from "@material-ui/core/Dialog";
@@ -24,6 +23,10 @@ import {
 import UploadIcon from "@material-ui/icons/Upload";
 import EditIcon from "@material-ui/icons/Edit";
 import Button from "@material-ui/core/Button";
+import { DialogContainer } from "components/atoms/DialogContainer";
+import { DialogTitle } from "components/atoms/DialogTitle";
+import { DialogBody } from "components/atoms/DialogBody";
+import { DialogToolBar } from "components/atoms/DialogToolBar";
 
 type ContainerProps = {
   open: boolean;
@@ -33,22 +36,6 @@ type ContainerProps = {
 };
 
 const useStyles = makeStyles({
-  root: {
-    display: "flex",
-    flexDirection: "column",
-    height: "90vh",
-    padding: "10px",
-  },
-  title: {
-    fontSize: "1.5rem",
-    marginLeft: "3vw",
-  },
-  bodyContainer: {
-    display: "flex",
-    flex: 1,
-    flexDirection: "row",
-    overflow: "auto",
-  },
   tabBarContainer: {
     flex: 0,
   },
@@ -196,7 +183,7 @@ const Container = ({
   const title = getRecordRes?.["record name"] || getRecordRes?.record_id;
   return (
     <Dialog open={open} fullWidth maxWidth="xl" onClose={onClose}>
-      <div className={classes.root}>
+      <DialogContainer>
         <DialogCloseButton onClick={onClose} />
         {getRecordError || listFilesError ? (
           <ErrorMessage
@@ -207,11 +194,14 @@ const Container = ({
           <>
             {title && (
               <>
-                <div className={classes.title}>{title}</div>
-                <Spacer direction="vertical" size="2vh" />
+                <DialogTitle>
+                  <Spacer direction="horizontal" size="3vw" />
+                  {title}
+                </DialogTitle>
               </>
             )}
-            <div className={classes.bodyContainer}>
+            <Spacer direction="vertical" size="2vh" />
+            <DialogBody>
               <div className={classes.tabBarContainer}>
                 <TabBar
                   onChange={onChangeTab}
@@ -241,20 +231,24 @@ const Container = ({
                   )
                 ) : null}
               </div>
-            </div>
-            <ToolBar>
-              <FileUploadButton
-                onFileChange={onAddFile}
-                startIcon={<UploadIcon />}
-                pending={isAddingFile}
-              >
-                Add File
-              </FileUploadButton>
-              <Spacer direction="horizontal" size="10px" />
-              <Button onClick={onEditRecord} startIcon={<EditIcon />}>
-                Edit Record
-              </Button>
-            </ToolBar>
+            </DialogBody>
+            <DialogToolBar
+              right={
+                <>
+                  <FileUploadButton
+                    onFileChange={onAddFile}
+                    startIcon={<UploadIcon />}
+                    pending={isAddingFile}
+                  >
+                    Add File
+                  </FileUploadButton>
+                  <Spacer direction="horizontal" size="10px" />
+                  <Button onClick={onEditRecord} startIcon={<EditIcon />}>
+                    Edit Record
+                  </Button>
+                </>
+              }
+            />
             <RecordEditModal
               databaseId={databaseId}
               recordId={recordId}
@@ -264,7 +258,7 @@ const Container = ({
             />
           </>
         )}
-      </div>
+      </DialogContainer>
     </Dialog>
   );
 };

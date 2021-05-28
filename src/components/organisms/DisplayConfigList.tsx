@@ -63,6 +63,7 @@ const Component = ({
 const useStyles = makeStyles({
   root: {
     display: "flex",
+    flex: 1,
     flexDirection: "column",
   },
 });

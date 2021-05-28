@@ -1,16 +1,15 @@
-import {
-  ErrorMessage,
-  LoadingIndicator,
-  ToolBar,
-} from "@dataware-tools/app-common";
-import { makeStyles } from "@material-ui/core/styles";
+import { ErrorMessage, LoadingIndicator } from "@dataware-tools/app-common";
 import Dialog from "@material-ui/core/Dialog";
 import { DialogCloseButton } from "components/atoms/DialogCloseButton";
 import useSWR from "swr";
 import { useState, useEffect } from "react";
 import LoadingButton from "@material-ui/lab/LoadingButton";
 import { usePrevious } from "../../utils/index";
-import { MetadataInputFields } from "components/organisms/MetadataInputFields";
+import { MetadataInputFieldList } from "components/organisms/MetadataInputFieldList";
+import { DialogContainer } from "components/atoms/DialogContainer";
+import { DialogBody } from "components/atoms/DialogBody";
+import { DialogToolBar } from "components/atoms/DialogToolBar";
+import { DialogTitle } from "components/atoms/DialogTitle";
 
 type ContainerProps = {
   open: boolean;
@@ -20,30 +19,6 @@ type ContainerProps = {
   getMetadataURL: string;
   onSubmit: (newRecordInfo: Record<string, unknown>) => Promise<boolean>;
 };
-
-const useStyles = makeStyles({
-  root: {
-    display: "flex",
-    flexDirection: "column",
-    height: "90vh",
-    padding: "10px",
-  },
-  bodyContainer: {
-    display: "flex",
-    flex: 1,
-    flexDirection: "column",
-    overflow: "auto",
-  },
-  label: {
-    fontSize: "1.5rem",
-  },
-  inputContainer: {
-    padding: "0 3vw",
-  },
-  ToolBarContainer: {
-    padding: "5px",
-  },
-});
 
 // TODO: inputFields should be fetched from server
 const inputFields = [
@@ -62,8 +37,6 @@ const Container = ({
   getMetadata,
   onSubmit,
 }: ContainerProps): JSX.Element => {
-  const classes = useStyles();
-
   const [isSaving, setIsSaving] = useState(false);
   const [nonFilledRequiredsFields, setNonFilledRequireds] = useState<string[]>(
     []
@@ -147,9 +120,10 @@ const Container = ({
   };
 
   return (
-    <Dialog open={open} fullWidth maxWidth="xl" onClose={onClose}>
-      <div className={classes.root}>
+    <Dialog open={open} maxWidth="xl" onClose={onClose}>
+      <DialogContainer>
         <DialogCloseButton onClick={onClose} />
+        <DialogTitle>{recordId ? "Edit" : "Add"} Record</DialogTitle>
         {getRecordError ? (
           <ErrorMessage
             reason={JSON.stringify(getRecordError)}
@@ -157,23 +131,25 @@ const Container = ({
           />
         ) : getRecordRes || !recordId ? (
           <>
-            <div className={classes.bodyContainer}>
-              <MetadataInputFields
+            <DialogBody>
+              <MetadataInputFieldList
                 data={getRecordRes}
                 inputFields={inputFields}
                 nonFilledRequiredFields={nonFilledRequiredsFields}
               />
-            </div>
-            <ToolBar>
-              <LoadingButton pending={isSaving} onClick={onSave}>
-                Save
-              </LoadingButton>
-            </ToolBar>
+            </DialogBody>
+            <DialogToolBar
+              right={
+                <LoadingButton pending={isSaving} onClick={onSave}>
+                  Save
+                </LoadingButton>
+              }
+            />
           </>
         ) : (
           <LoadingIndicator />
         )}
-      </div>
+      </DialogContainer>
     </Dialog>
   );
 };

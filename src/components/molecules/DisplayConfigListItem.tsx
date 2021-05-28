@@ -1,19 +1,35 @@
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
-import { Spacer } from "@dataware-tools/app-common";
 import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from "@material-ui/icons/Delete";
+import { makeStyles } from "@material-ui/core/styles";
+import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
 
-type Props = {
+type Props = { classes: ReturnType<typeof useStyles> } & ContainerProps;
+
+type ContainerProps = {
   value: string;
   onChange: (action: "change" | "delete", newValue: string) => void;
   options: string[];
 };
 
-const Component = ({ value, onChange, options }: Props): JSX.Element => {
+const useStyles = makeStyles({
+  root: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+});
+
+const Component = ({
+  classes,
+  value,
+  onChange,
+  options,
+}: Props): JSX.Element => {
   // TODO: use useMemo
   return (
-    <div>
+    <div className={classes.root}>
       <Select
         value={value}
         onChange={(event) => onChange("change", event.target.value as string)}
@@ -24,14 +40,20 @@ const Component = ({ value, onChange, options }: Props): JSX.Element => {
             {option}
           </MenuItem>
         ))}
-        <Spacer direction="horizontal" size="10px" />
       </Select>
-      <IconButton onClick={() => onChange("delete", "")}>
-        <DeleteIcon />
-      </IconButton>
+      <ElemCenteringFlexDiv>
+        <IconButton onClick={() => onChange("delete", "")}>
+          <DeleteIcon />
+        </IconButton>
+      </ElemCenteringFlexDiv>
     </div>
   );
 };
 
-export { Component as DisplayConfigListItem };
-export type { Props as DisplayConfigListItemProps };
+const Container = ({ ...delegated }: ContainerProps): JSX.Element => {
+  const classes = useStyles();
+  return <Component classes={classes} {...delegated} />;
+};
+
+export { Container as DisplayConfigListItem };
+export type { ContainerProps as DisplayConfigListItemProps };

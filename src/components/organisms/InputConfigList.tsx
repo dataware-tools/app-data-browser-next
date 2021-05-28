@@ -19,7 +19,6 @@ const Component = ({
   onChange,
   classes,
 }: ComponentProps): JSX.Element => {
-  console.log(`in InputConfigListComponent: ${value.length}`);
   return (
     <>
       <div className={classes.root}>
@@ -59,12 +58,12 @@ const Component = ({
 const useStyles = makeStyles({
   root: {
     display: "flex",
+    flex: 1,
     flexDirection: "column",
   },
 });
 
 const Container = ({ ...delegated }: ContainerProps): JSX.Element => {
-  console.log(`in InputConfigListContainer: ${delegated.value.length}`);
   const classes = useStyles();
   return <Component {...delegated} classes={classes} />;
 };

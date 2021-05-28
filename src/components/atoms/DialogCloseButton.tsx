@@ -1,17 +1,17 @@
 import { ToolBar } from "@dataware-tools/app-common";
 import CloseIcon from "@material-ui/icons/Close";
+import { SquareIconButton } from "components/atoms/SquareIconButton";
 
 type ComponentProps = { onClick: () => void };
 const Component = ({ onClick }: ComponentProps): JSX.Element => (
-  <ToolBar>
-    <CloseIcon
-      style={{ cursor: "pointer" }}
-      onClick={() => {
-        onClick();
-      }}
-      fontSize="large"
-    />
-  </ToolBar>
+  <ToolBar
+    right={
+      <SquareIconButton
+        onClick={onClick}
+        icon={<CloseIcon fontSize="large" />}
+      />
+    }
+  />
 );
 
 export { Component as DialogCloseButton };

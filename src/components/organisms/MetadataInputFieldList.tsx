@@ -9,6 +9,10 @@ type ComponentProps = {
 };
 
 const useStyles = makeStyles({
+  root: {
+    display: "flex",
+    flexDirection: "column",
+  },
   label: {
     fontSize: "1.5rem",
   },
@@ -24,7 +28,7 @@ const Component = ({
 }: ComponentProps): JSX.Element => {
   const classes = useStyles();
   return (
-    <>
+    <div className={classes.root}>
       {inputFields.map((inputField) => {
         const name = inputField.name;
         const necessity = inputField.necessity;
@@ -38,9 +42,7 @@ const Component = ({
               className={classes.label}
               style={required ? { fontWeight: "bold" } : undefined}
             >
-              {`${name}${
-                required ? " (required)" : recommended ? " (recommended)" : ""
-              }`}
+              {name}
             </label>
             <div className={classes.inputContainer}>
               <TextField
@@ -49,13 +51,16 @@ const Component = ({
                 id={id}
                 defaultValue={data?.[name]}
                 error={nonFilledRequiredFields.includes(name)}
+                helperText={
+                  required || recommended ? `This is ${necessity}` : undefined
+                }
               />
             </div>
             <Spacer direction="vertical" size="3vh" />
           </div>
         );
       })}
-    </>
+    </div>
   );
 };
-export { Component as MetadataInputFields };
+export { Component as MetadataInputFieldList };
