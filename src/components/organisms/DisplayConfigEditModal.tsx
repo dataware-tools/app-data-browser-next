@@ -2,7 +2,7 @@ import Dialog from "@material-ui/core/Dialog";
 import { DialogCloseButton } from "components/atoms/DialogCloseButton";
 import { useState, useEffect } from "react";
 import LoadingButton from "@material-ui/lab/LoadingButton";
-import { usePrevious } from "../../utils/index";
+import { usePrevious } from "utils/index";
 import { DisplayConfigList } from "components/organisms/DisplayConfigList";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import { SquareIconButton } from "components/atoms/SquareIconButton";
