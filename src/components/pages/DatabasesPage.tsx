@@ -1,8 +1,6 @@
 import {
   metaStore,
-  API_ROUTE,
   getQueryString,
-  ObjToQueryString,
   addQueryString,
   ErrorMessage,
   LoadingIndicator,
@@ -11,7 +9,6 @@ import {
   PerPageSelect,
 } from "@dataware-tools/app-common";
 import { useAuth0 } from "@auth0/auth0-react";
-import useSWR from "swr";
 import { DatabaseList } from "components/organisms/DatabaseList";
 import { useEffect, useState } from "react";
 import Pagination from "@material-ui/core/Pagination";
@@ -20,9 +17,10 @@ import { PageContainer } from "components/atoms/PageContainer";
 import { PageToolBar } from "components/atoms/PageToolBar";
 import { PageBody } from "components/atoms/PageBody";
 import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
+import { useListDatabases } from "utils";
 
 const Page = (): JSX.Element => {
-  const { getAccessTokenSilently } = useAuth0();
+  const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const history = useHistory();
   const [searchText, setSearchText] = useState(
     getQueryString("searchText") || ""
@@ -32,27 +30,10 @@ const Page = (): JSX.Element => {
   );
   const [page, setPage] = useState(Number(getQueryString("page")) || 1);
 
-  const listDatabasesQuery = ObjToQueryString({
-    page: page,
-    per_page: perPage,
-    search_text: searchText,
-  });
-  const URL = `${API_ROUTE.META.BASE}/databases${listDatabasesQuery}`;
-  const fetchAPI = async () => {
-    metaStore.OpenAPI.TOKEN = await getAccessTokenSilently();
-    metaStore.OpenAPI.BASE = API_ROUTE.META.BASE;
-    const listDatabasesRes = await metaStore.DatabaseService.listDatabases(
-      perPage,
-      page,
-      undefined,
-      searchText
-    );
-    return listDatabasesRes;
-  };
-  const { data: listDatabasesRes, error: listDatabasesError } = useSWR(
-    URL,
-    fetchAPI
-  );
+  const [
+    listDatabasesRes,
+    listDatabasesError,
+  ] = useListDatabases(getAccessToken, { page, perPage, search: searchText });
 
   useEffect(() => {
     addQueryString({ page, perPage, searchText }, "replace");

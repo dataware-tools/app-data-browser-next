@@ -1,11 +1,13 @@
 import { ErrorMessage, LoadingIndicator } from "@dataware-tools/app-common";
 import Dialog from "@material-ui/core/Dialog";
 import { DialogCloseButton } from "components/atoms/DialogCloseButton";
-import useSWR from "swr";
 import { useState, useEffect } from "react";
 import LoadingButton from "@material-ui/lab/LoadingButton";
-import { usePrevious } from "../../utils/index";
-import { MetadataInputFieldList } from "components/organisms/MetadataInputFieldList";
+import { usePrevious } from "utils/index";
+import {
+  MetadataInputFieldList,
+  MetadataInputFieldListProps,
+} from "components/organisms/MetadataInputFieldList";
 import { DialogContainer } from "components/atoms/DialogContainer";
 import { DialogBody } from "components/atoms/DialogBody";
 import { DialogToolBar } from "components/atoms/DialogToolBar";
@@ -14,9 +16,9 @@ import { DialogTitle } from "components/atoms/DialogTitle";
 type ContainerProps = {
   open: boolean;
   onClose: () => void;
-  recordId?: string;
-  getMetadata: () => Promise<any>;
-  getMetadataURL: string;
+  create?: boolean;
+  data?: MetadataInputFieldListProps["data"];
+  error: any;
   onSubmit: (newRecordInfo: Record<string, unknown>) => Promise<boolean>;
 };
 
@@ -32,9 +34,9 @@ const inputFields = [
 const Container = ({
   open,
   onClose,
-  recordId,
-  getMetadataURL,
-  getMetadata,
+  create,
+  data,
+  error,
   onSubmit,
 }: ContainerProps): JSX.Element => {
   const [isSaving, setIsSaving] = useState(false);
@@ -54,15 +56,11 @@ const Container = ({
     }
   }, [open, prevOpen]);
 
-  const { data: getRecordRes, error: getRecordError } = useSWR(
-    getMetadataURL,
-    getMetadata
-  );
-
   const onSave = async () => {
     setIsSaving(true);
     // TODO: fixAPI
-    const newRecordInfo = recordId ? {} : { record_id: Date.now().toString() };
+    // const newRecordInfo = recordId ? {} : { record_id: Date.now().toString() };
+    const newRecordInfo = {};
 
     const nonFilledRequireds: string[] = [];
     const nonFilledRecommends: string[] = [];
@@ -123,17 +121,17 @@ const Container = ({
     <Dialog open={open} maxWidth="xl" onClose={onClose}>
       <DialogContainer>
         <DialogCloseButton onClick={onClose} />
-        <DialogTitle>{recordId ? "Edit" : "Add"} Record</DialogTitle>
-        {getRecordError ? (
+        <DialogTitle>{create ? "Add" : "Edit"} Record</DialogTitle>
+        {error ? (
           <ErrorMessage
-            reason={JSON.stringify(getRecordError)}
+            reason={JSON.stringify(error)}
             instruction="please reload this page"
           />
-        ) : getRecordRes || !recordId ? (
+        ) : data || create ? (
           <>
             <DialogBody>
               <MetadataInputFieldList
-                data={getRecordRes}
+                data={data}
                 inputFields={inputFields}
                 nonFilledRequiredFields={nonFilledRequiredsFields}
               />

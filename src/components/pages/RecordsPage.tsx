@@ -1,8 +1,5 @@
 import {
-  metaStore,
-  API_ROUTE,
   getQueryString,
-  ObjToQueryString,
   addQueryString,
   ErrorMessage,
   LoadingIndicator,
@@ -13,7 +10,7 @@ import {
 import { makeStyles } from "@material-ui/core/styles";
 
 import { useAuth0 } from "@auth0/auth0-react";
-import useSWR, { mutate } from "swr";
+import { mutate } from "swr";
 import { useEffect, useState } from "react";
 import Pagination from "@material-ui/core/Pagination";
 import { useParams } from "react-router";
@@ -37,6 +34,7 @@ import { PageBody } from "components/atoms/PageBody";
 import { Link } from "react-router-dom";
 import HomeIcon from "@material-ui/icons/Home";
 import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
+import { useListRecords } from "utils";
 
 const useStyles = makeStyles(() => ({
   fixedFlexShrink: {
@@ -47,7 +45,7 @@ const useStyles = makeStyles(() => ({
 type ParamType = { databaseId: string };
 
 const Page = (): JSX.Element => {
-  const { getAccessTokenSilently } = useAuth0();
+  const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const classes = useStyles();
   const { databaseId } = useParams<ParamType>();
 
@@ -69,28 +67,16 @@ const Page = (): JSX.Element => {
     string | null
   >(null);
 
-  const listRecordsQuery = ObjToQueryString({
-    page: page,
-    per_page: perPage,
-    search_text: searchText,
+  const [
+    listRecordsRes,
+    listRecordsError,
+    listRecordsCacheKey,
+  ] = useListRecords(getAccessToken, {
+    databaseId,
+    perPage,
+    page,
+    search: searchText,
   });
-  const listRecordsURL = `${API_ROUTE.META.BASE}/databases/${databaseId}/records${listRecordsQuery}`;
-  const listRecords = async () => {
-    metaStore.OpenAPI.TOKEN = await getAccessTokenSilently();
-    metaStore.OpenAPI.BASE = API_ROUTE.META.BASE;
-    const listRecordsRes = await metaStore.RecordService.listRecords(
-      databaseId,
-      perPage,
-      page,
-      undefined,
-      searchText
-    );
-    return listRecordsRes;
-  };
-  const { data: listRecordsRes, error: listRecordsError } = useSWR(
-    listRecordsURL,
-    listRecords
-  );
 
   useEffect(() => {
     addQueryString({ page, perPage, searchText }, "replace");
@@ -181,7 +167,7 @@ const Page = (): JSX.Element => {
                   databaseId={databaseId}
                   onClose={() => {
                     setIsRecordDetailModalOpen(false);
-                    mutate(listRecordsURL);
+                    mutate(listRecordsCacheKey);
                   }}
                 />
               ) : null}
@@ -212,7 +198,7 @@ const Page = (): JSX.Element => {
         {listRecordsRes ? (
           <ElemCenteringFlexDiv>
             <Pagination
-              count={Math.ceil(listRecordsRes.number_of_pages)}
+              count={Math.ceil(listRecordsRes.total / listRecordsRes.per_page)}
               page={page}
               onChange={(_, newPage) => setPage(newPage)}
             />

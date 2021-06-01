@@ -64,3 +64,4 @@ const Component = ({
   );
 };
 export { Component as MetadataInputFieldList };
+export type { ComponentProps as MetadataInputFieldListProps };

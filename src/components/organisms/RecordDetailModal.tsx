@@ -2,7 +2,6 @@ import {
   TabBar,
   Spacer,
   metaStore,
-  API_ROUTE,
   ErrorMessage,
   LoadingIndicator,
 } from "@dataware-tools/app-common";
@@ -12,9 +11,9 @@ import { useState, useEffect } from "react";
 import { FileList } from "./FileList";
 import { DialogCloseButton } from "components/atoms/DialogCloseButton";
 import { RecordInfo } from "components/organisms/RecordInfo";
-import useSWR, { mutate } from "swr";
+import { mutate } from "swr";
 import { useAuth0 } from "@auth0/auth0-react";
-import { usePrevious } from "../../utils/index";
+import { fetchAPI, useGetRecord, useListFiles, usePrevious } from "utils/index";
 import { RecordEditModal } from "components/organisms/RecordEditModal";
 import {
   FileUploadButton,
@@ -53,7 +52,7 @@ const Container = ({
   databaseId,
   recordId,
 }: ContainerProps): JSX.Element => {
-  const { getAccessTokenSilently } = useAuth0();
+  const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const classes = useStyles();
   const [tab, setTab] = useState(0);
   const [isRecordEditModalOpen, setIsRecordEditModalOpen] = useState(false);
@@ -72,36 +71,22 @@ const Container = ({
     }
   }, [open, prevOpen]);
 
-  const getRecordURL = `${API_ROUTE.META.BASE}/databases/${databaseId}/records/${recordId}`;
-  const getRecord = async () => {
-    metaStore.OpenAPI.TOKEN = await getAccessTokenSilently();
-    metaStore.OpenAPI.BASE = API_ROUTE.META.BASE;
-    const listRecordsRes = await metaStore.RecordService.getRecord(
+  const [getRecordRes, getRecordError, getRecordCacheKey] = useGetRecord(
+    getAccessToken,
+    {
+      databaseId,
       recordId,
-      databaseId
-    );
-    return listRecordsRes;
-  };
-  const { data: getRecordRes, error: getRecordError } = useSWR(
-    getRecordURL,
-    getRecord
+    }
   );
 
-  const listFilesURL = `${API_ROUTE.META.BASE}/databases/${databaseId}/records/${recordId}/files`;
-  const listFiles = async () => {
-    metaStore.OpenAPI.TOKEN = await getAccessTokenSilently();
-    metaStore.OpenAPI.BASE = API_ROUTE.META.BASE;
-    // TODO: Fix API
-    const listFilesRes = await metaStore.FileService.listFiles(
+  const [listFilesRes, listFilesError, listFilesCacheKey] = useListFiles(
+    getAccessToken,
+    {
       databaseId,
-      recordId
-    );
-    return listFilesRes;
-  };
-  const { data: listFilesRes, error: listFilesError } = useSWR(
-    listFilesURL,
-    listFiles
+      recordId,
+    }
   );
+
   const onChangeTab = (tabNum: number) => setTab(tabNum);
   const tabNames = ["Info", "Files"];
 
@@ -115,25 +100,24 @@ const Container = ({
   const onDeleteFile = async (file: metaStore.FileModel) => {
     if (!window.confirm("Are you sure you want to delete file?")) return;
 
-    metaStore.OpenAPI.TOKEN = await getAccessTokenSilently();
-    metaStore.OpenAPI.BASE = API_ROUTE.META.BASE;
-    const deleteFileRes = await metaStore.FileService.deleteFile(
-      file.path.replace(/^\//g, ""),
-      databaseId,
-      recordId
-      // TODO: show error message
-    ).catch(() => "__failed");
+    const [deleteFileRes] = await fetchAPI(
+      getAccessToken,
+      metaStore.FileService.deleteFile,
+      {
+        databaseId,
+        uuid: file.uuid,
+      }
+    );
 
-    if (deleteFileRes !== "__failed") {
+    if (deleteFileRes) {
       // @ts-expect-error fix API
       const newFiles = listFilesRes.data.filter((oldFile) => {
-        return oldFile.path !== file.path;
+        return oldFile.uuid !== deleteFileRes.uuid;
       });
       const newListFilesRes = { ...listFilesRes };
-      // @ts-expect-error fix API
       newListFilesRes.data = newFiles;
 
-      mutate(listFilesURL, newListFilesRes, false);
+      mutate(listFilesCacheKey, newListFilesRes, false);
     }
   };
 
@@ -153,26 +137,26 @@ const Container = ({
     }
     setIsAddingFile(true);
 
-    metaStore.OpenAPI.TOKEN = await getAccessTokenSilently();
-    metaStore.OpenAPI.BASE = API_ROUTE.META.BASE;
-    // TODO: fix API
-    const createFileRes = await metaStore.FileService.createFile(
-      databaseId,
-      recordId,
+    const [createFileRes] = await fetchAPI(
+      getAccessToken,
+      metaStore.FileService.createFile,
       {
-        path: files[0].name,
-        // @ts-expect-error this is test
-        description: "this is file creating test",
+        databaseId,
+        requestBody: {
+          // @ts-expect-error fix API
+          record_id: recordId,
+          path: files[0].name,
+          description: "this is file creating test",
+        },
       }
-      // TODO: show error message
-    ).catch(() => undefined);
+    );
 
     if (createFileRes) {
       const newFileList = { ...listFilesRes };
       // @ts-expect-error fix API
       newFileList.data.push(createFileRes);
 
-      mutate(listFilesURL, newFileList, false);
+      mutate(listFilesCacheKey, newFileList, false);
     }
     // TODO: add file uploading process
     setIsAddingFile(false);
@@ -219,7 +203,6 @@ const Container = ({
                 ) : tabNames[tab] === "Files" ? (
                   listFilesRes ? (
                     <FileList
-                      // @ts-expect-error this is API bug!
                       files={listFilesRes.data}
                       onPreview={onPreviewFile}
                       onDownload={onDownloadFile}
@@ -254,7 +237,9 @@ const Container = ({
               recordId={recordId}
               open={isRecordEditModalOpen}
               onClose={() => setIsRecordEditModalOpen(false)}
-              onSubmitSucceeded={(newRecord) => mutate(getRecordURL, newRecord)}
+              onSubmitSucceeded={(newRecord) =>
+                mutate(getRecordCacheKey, newRecord)
+              }
             />
           </>
         )}
