@@ -5,13 +5,8 @@ import Head from "next/head";
 import { ThemeProvider, StylesProvider } from "@material-ui/core/styles";
 import { theme, PageWrapper } from "@dataware-tools/app-common";
 import { SWRConfig } from "swr";
-import {
-  SwrOptions,
-  authConfig,
-  redirectUri,
-  onRedirectCallback,
-} from "../utils/index";
-import { Auth0Provider } from "@auth0/auth0-react";
+import { SwrOptions, authConfig, redirectUri } from "utils/index";
+import { AppState, Auth0Provider } from "@auth0/auth0-react";
 import { repository } from "../../package.json";
 import "./scrollbar.global.css";
 
@@ -22,6 +17,16 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
       jssStyles?.parentElement?.removeChild(jssStyles);
     }
   }, []);
+
+  const onRedirectCallback = (appState: AppState): void => {
+    const nonQueryParamURL =
+      appState && appState.returnTo
+        ? appState.returnTo
+        : typeof window === "undefined"
+        ? null
+        : window.location.origin;
+    history.replaceState(null, "", nonQueryParamURL);
+  };
 
   return (
     <>
