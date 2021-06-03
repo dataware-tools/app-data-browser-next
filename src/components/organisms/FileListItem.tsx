@@ -13,10 +13,10 @@ type Props = {
     open: boolean;
     anchorEl: HTMLDivElement | null;
   };
-  onMenuOpen: (event: MouseEvent<HTMLDivElement>) => void;
+  onMenuOpen: (event: MouseEvent<HTMLDivElement>) => void | Promise<void>;
 } & ContainerProps;
 
-type onMenuClick = (file: metaStore.FileModel) => void;
+type onMenuClick = (file: metaStore.FileModel) => void | Promise<void>;
 type ContainerProps = {
   onPreview: onMenuClick;
   onEdit: onMenuClick;
@@ -53,10 +53,10 @@ const Component = ({
       <ListItemSecondaryAction>
         <FileMenu
           {...menuProps}
-          onPreview={() => onPreview(file)}
-          onEdit={() => onEdit(file)}
-          onDelete={() => onDelete(file)}
-          onDownload={() => onDownload(file)}
+          onPreview={async () => await onPreview(file)}
+          onEdit={async () => await onEdit(file)}
+          onDelete={async () => await onDelete(file)}
+          onDownload={async () => await onDownload(file)}
         />
       </ListItemSecondaryAction>
     </ListItem>

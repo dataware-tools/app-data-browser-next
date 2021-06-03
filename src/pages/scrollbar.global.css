@@ -1,5 +1,5 @@
 ::-webkit-scrollbar {
-  height: 5px;
+  height: 10px;
   width: 10px;
 }
 
@@ -9,4 +9,8 @@
 
 ::-webkit-scrollbar-track {
   background-color: hsla(200, 10%, 98%);
+}
+
+::-webkit-scrollbar-track:hover {
+  background-color: hsla(200, 10%, 90%);
 }

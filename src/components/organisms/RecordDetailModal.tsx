@@ -2,21 +2,30 @@ import {
   TabBar,
   Spacer,
   metaStore,
-  API_ROUTE,
   ErrorMessage,
   LoadingIndicator,
 } from "@dataware-tools/app-common";
 import { makeStyles } from "@material-ui/core/styles";
 import Dialog from "@material-ui/core/Dialog";
 import { useState, useEffect } from "react";
-import { FileList } from "../organisms/FileList";
+import { FileList } from "./FileList";
 import { DialogCloseButton } from "components/atoms/DialogCloseButton";
-import { RecordDetailModalToolBar } from "components/molecules/RecordDetailModalToolBar";
 import { RecordInfo } from "components/organisms/RecordInfo";
-import useSWR, { mutate } from "swr";
+import { mutate } from "swr";
 import { useAuth0 } from "@auth0/auth0-react";
-import { RecordEditModal } from "components/pages/RecordEditModal";
-import { usePrevious } from "../../utils/index";
+import { fetchAPI, useGetRecord, useListFiles, usePrevious } from "utils/index";
+import { RecordEditModal } from "components/organisms/RecordEditModal";
+import {
+  FileUploadButton,
+  FileUploadButtonProps,
+} from "components/atoms/FileUploadButton";
+import UploadIcon from "@material-ui/icons/Upload";
+import EditIcon from "@material-ui/icons/Edit";
+import Button from "@material-ui/core/Button";
+import { DialogContainer } from "components/atoms/DialogContainer";
+import { DialogTitle } from "components/atoms/DialogTitle";
+import { DialogBody } from "components/atoms/DialogBody";
+import { DialogToolBar } from "components/atoms/DialogToolBar";
 
 type ContainerProps = {
   open: boolean;
@@ -26,22 +35,6 @@ type ContainerProps = {
 };
 
 const useStyles = makeStyles({
-  root: {
-    display: "flex",
-    flexDirection: "column",
-    height: "90vh",
-    padding: "10px",
-  },
-  title: {
-    fontSize: "1.5rem",
-    marginLeft: "3vw",
-  },
-  bodyContainer: {
-    display: "flex",
-    flex: 1,
-    flexDirection: "row",
-    overflow: "auto",
-  },
   tabBarContainer: {
     flex: 0,
   },
@@ -51,13 +44,6 @@ const useStyles = makeStyles({
     flexDirection: "column",
     overflow: "auto",
   },
-  mainListContainer: {
-    flex: 1,
-    overflow: "auto",
-  },
-  ToolBarContainer: {
-    padding: "5px",
-  },
 });
 
 const Container = ({
@@ -66,14 +52,16 @@ const Container = ({
   databaseId,
   recordId,
 }: ContainerProps): JSX.Element => {
-  const { getAccessTokenSilently } = useAuth0();
+  const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const classes = useStyles();
   const [tab, setTab] = useState(0);
   const [isRecordEditModalOpen, setIsRecordEditModalOpen] = useState(false);
+  const [isAddingFile, setIsAddingFile] = useState(false);
 
   const initializeState = () => {
     setTab(0);
     setIsRecordEditModalOpen(false);
+    setIsAddingFile(false);
   };
   // See: https://stackoverflow.com/questions/58209791/set-initial-state-for-material-ui-dialog
   const prevOpen = usePrevious(open);
@@ -83,36 +71,22 @@ const Container = ({
     }
   }, [open, prevOpen]);
 
-  const getRecordURL = `${API_ROUTE.META.BASE}/databases/${databaseId}/records/${recordId}`;
-  const getRecord = async () => {
-    metaStore.OpenAPI.TOKEN = await getAccessTokenSilently();
-    metaStore.OpenAPI.BASE = API_ROUTE.META.BASE;
-    const listRecordsRes = await metaStore.RecordService.getRecord(
+  const [getRecordRes, getRecordError, getRecordCacheKey] = useGetRecord(
+    getAccessToken,
+    {
+      databaseId,
       recordId,
-      databaseId
-    );
-    return listRecordsRes;
-  };
-  const { data: getRecordRes, error: getRecordError } = useSWR(
-    getRecordURL,
-    getRecord
+    }
   );
 
-  const listFilesURL = `${API_ROUTE.META.BASE}/databases/${databaseId}/records/${recordId}/files`;
-  const listFiles = async () => {
-    metaStore.OpenAPI.TOKEN = await getAccessTokenSilently();
-    metaStore.OpenAPI.BASE = API_ROUTE.META.BASE;
-    // TODO: Fix API
-    const listFilesRes = await metaStore.FileService.listFiles(
+  const [listFilesRes, listFilesError, listFilesCacheKey] = useListFiles(
+    getAccessToken,
+    {
       databaseId,
-      recordId
-    );
-    return listFilesRes;
-  };
-  const { data: listFilesRes, error: listFilesError } = useSWR(
-    listFilesURL,
-    listFiles
+      recordId,
+    }
   );
+
   const onChangeTab = (tabNum: number) => setTab(tabNum);
   const tabNames = ["Info", "Files"];
 
@@ -122,18 +96,77 @@ const Container = ({
     window.alert(`preview: ${JSON.stringify(file)}`);
   const onEditFile = (file: metaStore.FileModel) =>
     window.alert(`edit: ${JSON.stringify(file)}`);
-  const onDeleteFile = (file: metaStore.FileModel) =>
-    window.alert(`delete: ${JSON.stringify(file)}`);
+
+  const onDeleteFile = async (file: metaStore.FileModel) => {
+    if (!window.confirm("Are you sure you want to delete file?")) return;
+
+    const [deleteFileRes] = await fetchAPI(
+      getAccessToken,
+      metaStore.FileService.deleteFile,
+      {
+        databaseId,
+        uuid: file.uuid,
+      }
+    );
+
+    if (deleteFileRes) {
+      // @ts-expect-error fix API
+      const newFiles = listFilesRes.data.filter((oldFile) => {
+        return oldFile.uuid !== deleteFileRes.uuid;
+      });
+      const newListFilesRes = { ...listFilesRes };
+      newListFilesRes.data = newFiles;
+
+      mutate(listFilesCacheKey, newListFilesRes, false);
+    }
+  };
+
   const onDownloadFile = (file: metaStore.FileModel) =>
     window.alert(`download: ${JSON.stringify(file)}`);
 
-  const onAddFile = () => window.alert("add File");
+  const onAddFile: FileUploadButtonProps["onFileChange"] = async (files) => {
+    if (!files || !files[0]) {
+      return;
+    }
+    if (
+      !window.confirm(
+        `Are you sure you want to upload file: ${files[0].name} ?`
+      )
+    ) {
+      return;
+    }
+    setIsAddingFile(true);
+
+    const [createFileRes] = await fetchAPI(
+      getAccessToken,
+      metaStore.FileService.createFile,
+      {
+        databaseId,
+        requestBody: {
+          record_id: recordId,
+          path: files[0].name,
+          description: "this is file creating test",
+        },
+      }
+    );
+
+    if (createFileRes) {
+      const newFileList = { ...listFilesRes };
+      // @ts-expect-error fix API
+      newFileList.data.push(createFileRes);
+
+      mutate(listFilesCacheKey, newFileList, false);
+    }
+    // TODO: add file uploading process
+    setIsAddingFile(false);
+  };
+
   const onEditRecord = () => setIsRecordEditModalOpen(true);
 
   const title = getRecordRes?.["record name"] || getRecordRes?.record_id;
   return (
     <Dialog open={open} fullWidth maxWidth="xl" onClose={onClose}>
-      <div className={classes.root}>
+      <DialogContainer>
         <DialogCloseButton onClick={onClose} />
         {getRecordError || listFilesError ? (
           <ErrorMessage
@@ -144,11 +177,14 @@ const Container = ({
           <>
             {title && (
               <>
-                <div className={classes.title}>{title}</div>
-                <Spacer direction="vertical" size="2vh" />
+                <DialogTitle>
+                  <Spacer direction="horizontal" size="3vw" />
+                  {title}
+                </DialogTitle>
               </>
             )}
-            <div className={classes.bodyContainer}>
+            <Spacer direction="vertical" size="2vh" />
+            <DialogBody>
               <div className={classes.tabBarContainer}>
                 <TabBar
                   onChange={onChangeTab}
@@ -166,7 +202,6 @@ const Container = ({
                 ) : tabNames[tab] === "Files" ? (
                   listFilesRes ? (
                     <FileList
-                      // @ts-expect-error this is API bug!
                       files={listFilesRes.data}
                       onPreview={onPreviewFile}
                       onDownload={onDownloadFile}
@@ -178,21 +213,36 @@ const Container = ({
                   )
                 ) : null}
               </div>
-            </div>
-            <RecordDetailModalToolBar
-              onClickAddFile={onAddFile}
-              onClickEditRecord={onEditRecord}
+            </DialogBody>
+            <DialogToolBar
+              right={
+                <>
+                  <FileUploadButton
+                    onFileChange={onAddFile}
+                    startIcon={<UploadIcon />}
+                    pending={isAddingFile}
+                  >
+                    Add File
+                  </FileUploadButton>
+                  <Spacer direction="horizontal" size="10px" />
+                  <Button onClick={onEditRecord} startIcon={<EditIcon />}>
+                    Edit Record
+                  </Button>
+                </>
+              }
             />
             <RecordEditModal
               databaseId={databaseId}
               recordId={recordId}
               open={isRecordEditModalOpen}
               onClose={() => setIsRecordEditModalOpen(false)}
-              onSaveSucceeded={(newRecord) => mutate(getRecordURL, newRecord)}
+              onSubmitSucceeded={(newRecord) =>
+                mutate(getRecordCacheKey, newRecord)
+              }
             />
           </>
         )}
-      </div>
+      </DialogContainer>
     </Dialog>
   );
 };
