@@ -11,7 +11,11 @@ type ComponentProps = {
 
 type ContainerProps = {
   value: InputConfigListItemProps["value"][];
-  onChange: (newConfigList: InputConfigListItemProps["value"][]) => void;
+  onChange: (
+    index: number,
+    action: "change" | "delete",
+    newConfig: InputConfigListItemProps["value"]
+  ) => void;
 };
 
 const Component = ({
@@ -28,22 +32,7 @@ const Component = ({
               <InputConfigListItem
                 value={config}
                 onChange={(action, newConfig) => {
-                  switch (action) {
-                    case "change":
-                      onChange(
-                        value.map((oldConfig, i) =>
-                          i === index ? newConfig : oldConfig
-                        )
-                      );
-                      break;
-
-                    case "delete":
-                      onChange(value.filter((_, i) => i !== index));
-                      break;
-
-                    default:
-                      break;
-                  }
+                  onChange(index, action, newConfig);
                 }}
               />
               <Spacer direction="vertical" size="3vh" />
