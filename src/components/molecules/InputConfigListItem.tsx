@@ -1,4 +1,3 @@
-import TextField from "@material-ui/core/TextField";
 import { makeStyles } from "@material-ui/core/styles";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
@@ -6,8 +5,12 @@ import { Spacer } from "@dataware-tools/app-common";
 import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from "@material-ui/icons/Delete";
 import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
+import React from "react";
+import { DataBrowserInputConfigType } from "utils";
 
-type InputConfig = { name: string; necessity: string };
+type InputConfig = {
+  display_name: string;
+} & DataBrowserInputConfigType[number];
 
 type Props = { classes: ReturnType<typeof useStyles> } & ContainerProps;
 type ContainerProps = {
@@ -25,26 +28,29 @@ const useStyles = makeStyles({
     display: "flex",
     flexDirection: "row",
   },
+  right: {
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "flex-end",
+  },
 });
 
 const Component = ({ classes, value, onChange }: Props): JSX.Element => {
-  // TODO: use useMemo
   return (
     <div className={classes.root}>
-      <div className={classes.left}>
-        <TextField
-          value={value.name}
-          onChange={(event) =>
-            onChange("change", { ...value, name: event.target.value })
-          }
-        />
+      <ElemCenteringFlexDiv>
+        {value.name}
+        <br />
+        {`(display name: ${value.display_name})`}
+      </ElemCenteringFlexDiv>
+      <div className={classes.right}>
         <Spacer direction="horizontal" size="10px" />
         <Select
           value={value.necessity}
           onChange={(event) =>
             onChange("change", {
               ...value,
-              necessity: event.target.value as string,
+              necessity: event.target.value,
             })
           }
           variant="outlined"
@@ -54,20 +60,22 @@ const Component = ({ classes, value, onChange }: Props): JSX.Element => {
           <MenuItem value="optional">Optional</MenuItem>
         </Select>
         <Spacer direction="horizontal" size="10px" />
+        <ElemCenteringFlexDiv>
+          <IconButton onClick={() => onChange("delete", { ...value })}>
+            <DeleteIcon />
+          </IconButton>
+        </ElemCenteringFlexDiv>
       </div>
-      <ElemCenteringFlexDiv>
-        <IconButton onClick={() => onChange("delete", { ...value })}>
-          <DeleteIcon />
-        </IconButton>
-      </ElemCenteringFlexDiv>
     </div>
   );
 };
 
-const Container = ({ ...delegated }: ContainerProps): JSX.Element => {
-  const classes = useStyles();
-  return <Component classes={classes} {...delegated} />;
-};
+const Container = React.memo(
+  ({ ...delegated }: ContainerProps): JSX.Element => {
+    const classes = useStyles();
+    return <Component classes={classes} {...delegated} />;
+  }
+);
 
 export { Container as InputConfigListItem };
 export type { ContainerProps as InputConfigListItemProps, InputConfig };
