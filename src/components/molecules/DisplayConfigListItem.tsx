@@ -4,13 +4,21 @@ import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from "@material-ui/icons/Delete";
 import { makeStyles } from "@material-ui/core/styles";
 import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
+import React from "react";
 
-type Props = { classes: ReturnType<typeof useStyles> } & ContainerProps;
+type Props = {
+  classes: ReturnType<typeof useStyles>;
+} & ContainerProps;
 
 type ContainerProps = {
   value: string;
-  onChange: (action: "change" | "delete", newValue: string) => void;
-  options: string[];
+  onChange: (
+    action: "change" | "delete",
+    newValue: string,
+    oldValue: string
+  ) => void;
+  options: { label: string; value: string }[];
+  usedOptions: string[];
 };
 
 const useStyles = makeStyles({
@@ -26,23 +34,31 @@ const Component = ({
   value,
   onChange,
   options,
+  usedOptions,
 }: Props): JSX.Element => {
-  // TODO: use useMemo
+  console.log(value);
   return (
     <div className={classes.root}>
       <Select
         value={value}
-        onChange={(event) => onChange("change", event.target.value as string)}
+        onChange={(event) =>
+          onChange("change", event.target.value as string, value)
+        }
         variant="outlined"
       >
-        {options.map((option, index) => (
-          <MenuItem key={index} value={option}>
-            {option}
-          </MenuItem>
-        ))}
+        <MenuItem value={value}>
+          {options.find((option) => option.value === value)?.label || value}
+        </MenuItem>
+        {options.map((option, index) =>
+          usedOptions.includes(option.value) ? null : (
+            <MenuItem key={index} value={option.value}>
+              {option.label}
+            </MenuItem>
+          )
+        )}
       </Select>
       <ElemCenteringFlexDiv>
-        <IconButton onClick={() => onChange("delete", "")}>
+        <IconButton onClick={() => onChange("delete", "", value)}>
           <DeleteIcon />
         </IconButton>
       </ElemCenteringFlexDiv>
@@ -50,10 +66,12 @@ const Component = ({
   );
 };
 
-const Container = ({ ...delegated }: ContainerProps): JSX.Element => {
-  const classes = useStyles();
-  return <Component classes={classes} {...delegated} />;
-};
+const Container = React.memo(
+  ({ ...delegated }: ContainerProps): JSX.Element => {
+    const classes = useStyles();
+    return <Component classes={classes} {...delegated} />;
+  }
+);
 
 export { Container as DisplayConfigListItem };
 export type { ContainerProps as DisplayConfigListItemProps };
