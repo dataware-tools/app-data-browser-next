@@ -7,7 +7,7 @@ const useStyles = makeStyles(() => ({
   div: {
     display: "flex",
     flexDirection: "column",
-    height: "80vh",
+    height: "75vh",
     padding: "0 10vw",
   },
 }));
