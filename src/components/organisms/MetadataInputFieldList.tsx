@@ -4,7 +4,7 @@ import { makeStyles } from "@material-ui/core/styles";
 
 type ComponentProps = {
   data?: Record<string, unknown>;
-  inputFields: { name: string; necessity: string }[];
+  inputFields: { name: string; necessity: string; display_name: string }[];
   nonFilledRequiredFields: string[];
 };
 
@@ -31,6 +31,7 @@ const Component = ({
     <div className={classes.root}>
       {inputFields.map((inputField) => {
         const name = inputField.name;
+        const displayName = inputField.display_name;
         const necessity = inputField.necessity;
         const required = necessity === "required";
         const recommended = necessity === "recommended";
@@ -42,7 +43,7 @@ const Component = ({
               className={classes.label}
               style={required ? { fontWeight: "bold" } : undefined}
             >
-              {name}
+              {displayName}
             </label>
             <div className={classes.inputContainer}>
               <TextField
