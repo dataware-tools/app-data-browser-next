@@ -11,15 +11,20 @@ const Component = ({
   onClickAddFile,
   onClickEditRecord,
 }: ComponentProps): JSX.Element => (
-  <ToolBar>
-    <Button onClick={onClickAddFile} startIcon={<UploadIcon />}>
-      Add File
-    </Button>
-    <Spacer direction="horizontal" size="10px" />
-    <Button onClick={onClickEditRecord} startIcon={<EditIcon />}>
-      Edit Record
-    </Button>
-  </ToolBar>
+  <ToolBar
+    right={
+      <>
+        {" "}
+        <Button onClick={onClickAddFile} startIcon={<UploadIcon />}>
+          Add File
+        </Button>
+        <Spacer direction="horizontal" size="10px" />
+        <Button onClick={onClickEditRecord} startIcon={<EditIcon />}>
+          Edit Record
+        </Button>
+      </>
+    }
+  />
 );
 
 export { Component as RecordDetailModalToolBar };

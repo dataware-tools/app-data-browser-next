@@ -16,7 +16,6 @@ const Component = ({
   return (
     <Table
       rows={records}
-      // TODO: columns should passed by parent component to customize showing columns
       columns={columns}
       onClickRow={onSelectRecord}
       stickyHeader

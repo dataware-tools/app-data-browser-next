@@ -1,18 +1,16 @@
-import {
-  theme as themeInstance,
-  databaseStore,
-} from "@dataware-tools/app-common";
+import { theme as themeInstance } from "@dataware-tools/app-common";
 import { makeStyles } from "@material-ui/core/styles";
 
 import { Button } from "@material-ui/core";
 
 import { useAuth0 } from "@auth0/auth0-react";
-import useSWR, { mutate } from "swr";
+import { mutate } from "swr";
+import { useListDatabases } from "utils/index";
 
 type Props = {
   classes: ReturnType<typeof useStyles>;
   user: any;
-  URL: string;
+  onRevalidate: () => void;
   error: any;
   data: any;
 } & ContainerProps;
@@ -23,7 +21,7 @@ type ContainerProps = {
 
 const Component = ({
   classes,
-  URL,
+  onRevalidate,
   user,
   error,
   data,
@@ -33,13 +31,7 @@ const Component = ({
     <div>
       <h1 className={classes.sample}>Hello {user ? user.name : "world"}</h1>
       <div>this is {sample}</div>
-      <Button
-        onClick={() => {
-          mutate(URL);
-        }}
-      >
-        revalidate API
-      </Button>
+      <Button onClick={onRevalidate}>revalidate API</Button>
       {error ? (
         <div>error: {JSON.stringify(error)}</div>
       ) : data ? (
@@ -58,18 +50,12 @@ const useStyles = makeStyles((theme: typeof themeInstance) => ({
 }));
 
 const Container = ({ ...delegated }: ContainerProps): JSX.Element => {
-  const apiUrlBase =
-    process.env.NEXT_PUBLIC_BACKEND_API_PREFIX || "/api/latest";
-  const { user, getAccessTokenSilently } = useAuth0();
-  const fetchAPI = async () => {
-    databaseStore.OpenAPI.TOKEN = await getAccessTokenSilently();
-    databaseStore.OpenAPI.BASE = apiUrlBase;
-    const Res = await databaseStore.DatabaseService.listDatabases();
-    return Res;
-  };
-  const URL = `${apiUrlBase}/databases`;
-  const { data, error } = useSWR(URL, fetchAPI);
   const classes = useStyles();
+  const { user, getAccessTokenSilently: getAccessToken } = useAuth0();
+  const [data, error, cacheKey] = useListDatabases(getAccessToken, {});
+  const onRevalidate = () => {
+    mutate(cacheKey);
+  };
 
   return (
     <Component
@@ -77,7 +63,7 @@ const Container = ({ ...delegated }: ContainerProps): JSX.Element => {
       user={user}
       data={data}
       error={error}
-      URL={URL}
+      onRevalidate={onRevalidate}
       {...delegated}
     />
   );
