@@ -34,7 +34,7 @@ import { PageBody } from "components/atoms/PageBody";
 import { Link } from "react-router-dom";
 import HomeIcon from "@material-ui/icons/Home";
 import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
-import { useListRecords } from "utils";
+import { useListRecords, useGetConfig, DatabaseConfigType } from "utils";
 
 const useStyles = makeStyles(() => ({
   fixedFlexShrink: {
@@ -78,6 +78,22 @@ const Page = (): JSX.Element => {
     search: searchText,
   });
 
+  const [getConfigRes, getConfigError] = (useGetConfig(getAccessToken, {
+    databaseId,
+  }) as unknown) as [
+    data: DatabaseConfigType | undefined,
+    error: any,
+    cacheKey: string
+  ];
+
+  const displayColumns = getConfigRes?.data_browser_config?.record_display_config?.map(
+    (value) => ({
+      field: value,
+      label: getConfigRes.columns.find((column) => column.name === value)
+        ?.display_name,
+    })
+  );
+
   useEffect(() => {
     addQueryString({ page, perPage, searchText }, "replace");
   }, [page, perPage, searchText]);
@@ -92,11 +108,11 @@ const Page = (): JSX.Element => {
   const databaseConfigMenu: DatabaseConfigButtonProps["menu"] = [
     {
       label: "Change input fields for record",
-      value: "recordInputConfig",
+      value: "record_input_config",
     },
     {
       label: "Change display fields for record",
-      value: "recordDisplayConfig",
+      value: "record_display_config",
     },
   ];
   const onSelectDatabaseConfig: DatabaseConfigButtonProps["onMenuSelect"] = (
@@ -105,6 +121,7 @@ const Page = (): JSX.Element => {
     setEditingConfigName(targetValue);
   };
 
+  const fetchError = listRecordsError || getConfigError;
   return (
     <>
       <PageContainer>
@@ -119,92 +136,109 @@ const Page = (): JSX.Element => {
           }
           right={
             <>
-              <div className={classes.fixedFlexShrink}>
-                <SearchForm
-                  onSearch={(newSearchText) => setSearchText(newSearchText)}
-                  defaultValue={searchText}
+              {!listRecordsError ? (
+                <>
+                  <div className={classes.fixedFlexShrink}>
+                    <SearchForm
+                      onSearch={(newSearchText) => setSearchText(newSearchText)}
+                      defaultValue={searchText}
+                    />
+                  </div>
+                  <Spacer direction="horizontal" size="15px" />
+                  <PerPageSelect
+                    perPage={perPage}
+                    setPerPage={setPerPage}
+                    values={[10, 20, 50, 100]}
+                  />
+                  <Spacer direction="horizontal" size="15px" />
+                  <Button
+                    onClick={() => setIsRecordEditModalOpen(true)}
+                    startIcon={<AddCircle />}
+                    className={classes.fixedFlexShrink}
+                  >
+                    <TextCenteringSpan>Record</TextCenteringSpan>
+                  </Button>
+                  <Spacer direction="horizontal" size="15px" />
+                </>
+              ) : null}
+              {!getConfigError ? (
+                <DatabaseConfigButton
+                  onMenuSelect={onSelectDatabaseConfig}
+                  menu={databaseConfigMenu}
                 />
-              </div>
-              <Spacer direction="horizontal" size="15px" />
-              <PerPageSelect
-                perPage={perPage}
-                setPerPage={setPerPage}
-                values={[10, 20, 50, 100]}
-              />
-              <Spacer direction="horizontal" size="15px" />
-              <Button
-                onClick={() => setIsRecordEditModalOpen(true)}
-                startIcon={<AddCircle />}
-                className={classes.fixedFlexShrink}
-              >
-                <TextCenteringSpan>Record</TextCenteringSpan>
-              </Button>
-              <Spacer direction="horizontal" size="15px" />
-              <DatabaseConfigButton
-                onMenuSelect={onSelectDatabaseConfig}
-                menu={databaseConfigMenu}
-              />
+              ) : null}
             </>
           }
         />
         <PageBody>
-          {listRecordsError ? (
+          {fetchError ? (
             <ErrorMessage
-              reason={JSON.stringify(listRecordsError)}
+              reason={JSON.stringify(fetchError)}
               instruction="please reload this page"
             />
-          ) : listRecordsRes ? (
-            <>
-              <RecordList
-                columns={[{ field: "record name" }, { field: "description" }]}
-                records={listRecordsRes.data}
-                onSelectRecord={onSelectRecord}
+          ) : listRecordsRes && getConfigRes ? (
+            !displayColumns ? (
+              <ErrorMessage
+                reason="Display columns is not configured"
+                instruction="please report administrator this error"
               />
-              {currentSelectedRecordId ? (
-                <RecordDetailModal
-                  open={isRecordDetailModalOpen}
-                  recordId={currentSelectedRecordId}
-                  databaseId={databaseId}
-                  onClose={() => {
-                    setIsRecordDetailModalOpen(false);
-                    mutate(listRecordsCacheKey);
-                  }}
+            ) : (
+              <>
+                <RecordList
+                  columns={displayColumns}
+                  records={listRecordsRes.data}
+                  onSelectRecord={onSelectRecord}
                 />
-              ) : null}
-              <RecordEditModal
-                open={isRecordEditModalOpen}
-                onClose={() => setIsRecordEditModalOpen(false)}
-                databaseId={databaseId}
-                onSubmitSucceeded={(newRecord) => {
-                  const newRecordList = { ...listRecordsRes };
-                  newRecordList.data.push(newRecord);
-                  setCurrentSelectedRecordId(newRecord.record_id);
-                  setIsRecordDetailModalOpen(true);
-                }}
-              />
-              {editingConfigName ? (
-                <DatabaseConfigModal
-                  open={Boolean(editingConfigName)}
-                  onClose={() => setEditingConfigName(null)}
-                  configName={editingConfigName}
-                />
-              ) : null}
-            </>
+              </>
+            )
           ) : (
             <LoadingIndicator />
           )}
         </PageBody>
         <Spacer direction="vertical" size="3vh" />
-        {listRecordsRes ? (
-          <ElemCenteringFlexDiv>
-            <Pagination
-              count={Math.ceil(listRecordsRes.total / listRecordsRes.per_page)}
-              page={page}
-              onChange={(_, newPage) => setPage(newPage)}
-            />
-          </ElemCenteringFlexDiv>
-        ) : null}
       </PageContainer>
+      {listRecordsRes ? (
+        <ElemCenteringFlexDiv>
+          <Pagination
+            count={Math.ceil(listRecordsRes.total / listRecordsRes.per_page)}
+            page={page}
+            onChange={(_, newPage) => setPage(newPage)}
+          />
+        </ElemCenteringFlexDiv>
+      ) : null}
+      {listRecordsRes ? (
+        <RecordEditModal
+          open={isRecordEditModalOpen}
+          onClose={() => setIsRecordEditModalOpen(false)}
+          databaseId={databaseId}
+          onSubmitSucceeded={(newRecord) => {
+            const newRecordList = { ...listRecordsRes };
+            newRecordList.data.push(newRecord);
+            setCurrentSelectedRecordId(newRecord.record_id);
+            setIsRecordDetailModalOpen(true);
+          }}
+          create
+        />
+      ) : null}
+      {currentSelectedRecordId ? (
+        <RecordDetailModal
+          open={isRecordDetailModalOpen}
+          recordId={currentSelectedRecordId}
+          databaseId={databaseId}
+          onClose={() => {
+            setIsRecordDetailModalOpen(false);
+            mutate(listRecordsCacheKey);
+          }}
+        />
+      ) : null}
+      {editingConfigName ? (
+        <DatabaseConfigModal
+          databaseId={databaseId}
+          open={Boolean(editingConfigName)}
+          onClose={() => setEditingConfigName(null)}
+          configName={editingConfigName}
+        />
+      ) : null}
     </>
   );
 };
