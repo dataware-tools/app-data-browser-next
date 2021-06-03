@@ -8,14 +8,15 @@ import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
 import React from "react";
 import { DataBrowserInputConfigType } from "utils";
 
-type InputConfig = {
+type ValueType = {
   display_name: string;
 } & DataBrowserInputConfigType[number];
+type ActionType = "change" | "delete";
 
 type Props = { classes: ReturnType<typeof useStyles> } & ContainerProps;
 type ContainerProps = {
-  value: InputConfig;
-  onChange: (action: "change" | "delete", newValue: InputConfig) => void;
+  value: ValueType;
+  onChange: (action: ActionType, newValue: ValueType) => void;
 };
 
 const useStyles = makeStyles({
@@ -78,4 +79,8 @@ const Container = React.memo(
 );
 
 export { Container as InputConfigListItem };
-export type { ContainerProps as InputConfigListItemProps, InputConfig };
+export type {
+  ContainerProps as InputConfigListItemProps,
+  ValueType,
+  ActionType,
+};
