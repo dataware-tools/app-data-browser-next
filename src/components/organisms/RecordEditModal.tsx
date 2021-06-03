@@ -12,14 +12,14 @@ type ContainerProps = {
   recordId?: string;
   databaseId: string;
   onSubmitSucceeded: (newRecord: metaStore.RecordModel) => void;
+  create?: boolean;
 };
 
 const Container = ({
-  open,
-  onClose,
   recordId,
   databaseId,
   onSubmitSucceeded,
+  ...delegated
 }: ContainerProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
 
@@ -47,11 +47,11 @@ const Container = ({
 
   return (
     <MetadataEditModal
+      databaseId={databaseId}
       data={getRecordRes}
       error={getRecordError}
-      open={open}
-      onClose={onClose}
       onSubmit={onSubmit}
+      {...delegated}
     />
   );
 };
