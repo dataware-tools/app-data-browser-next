@@ -3,6 +3,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import {
   DisplayConfigListItem,
   DisplayConfigListItemProps,
+  ActionType,
 } from "components/molecules/DisplayConfigListItem";
 
 type ComponentProps = {
@@ -12,12 +13,12 @@ type ComponentProps = {
 type ContainerProps = {
   value: DisplayConfigListItemProps["value"][];
   onChange: (
-    action: "change" | "delete",
+    action: ActionType,
     index: number,
     newConfig: string,
     oldConfig: string
   ) => void;
-  usedOptions: DisplayConfigListItemProps["usedOptions"];
+  alreadySelectedOptions: DisplayConfigListItemProps["alreadySelectedOptions"];
   options: DisplayConfigListItemProps["options"];
 };
 
@@ -63,4 +64,4 @@ const Container = ({ ...delegated }: ContainerProps): JSX.Element => {
 };
 
 export { Container as DisplayConfigList };
-export type { ContainerProps as DisplayConfigListProps };
+export type { ContainerProps as DisplayConfigListProps, ActionType };

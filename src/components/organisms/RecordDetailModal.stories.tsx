@@ -10,4 +10,9 @@ const Template: Story<RecordDetailModalProps> = (args) => (
   <RecordDetailModal {...args} />
 );
 export const Default = Template.bind({});
-Default.args = { open: true, onClose: () => window.alert("close!") };
+Default.args = {
+  databaseId: "test1",
+  onClose: () => window.alert("close!"),
+  open: true,
+  recordId: "20210602-142444-783",
+};

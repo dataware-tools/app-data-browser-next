@@ -1,10 +1,10 @@
 import {
   InputConfigEditModal,
-  InputConfigEditModalProps,
+  ConfigNameType as InputConfigNameType,
 } from "components/organisms/InputConfigEditModal";
 import {
   DisplayConfigEditModal,
-  DisplayConfigEditModalProps,
+  ConfigNameType as DisplayConfigNameType,
 } from "./DisplayConfigEditModal";
 
 type ContainerProps = {
@@ -14,9 +14,7 @@ type ContainerProps = {
   configName: DatabaseConfigNameType;
 };
 
-type DatabaseConfigNameType =
-  | InputConfigEditModalProps["configName"]
-  | DisplayConfigEditModalProps["configName"];
+type DatabaseConfigNameType = InputConfigNameType | DisplayConfigNameType;
 
 const Container = ({
   configName,

@@ -19,23 +19,25 @@ type OptionType = {
   inputValue?: string;
 };
 
+type NewConfigType = {
+  name: string;
+  display_name: string;
+  necessity: DataBrowserInputConfigType[number]["necessity"];
+};
+
 type ContainerProps = {
   options: OptionType[];
   open: boolean;
   onClose: () => void;
-  onSave: (newInputField: {
-    name: string;
-    display_name: string;
-    necessity: DataBrowserInputConfigType[number]["necessity"];
-  }) => void;
-  blackListForDisplayName: string[];
+  onSave: (newConfig: NewConfigType) => void;
+  alreadyUsedDisplayNames: string[];
 };
 const Container = ({
   options,
   open,
   onClose,
   onSave,
-  blackListForDisplayName,
+  alreadyUsedDisplayNames,
 }: ContainerProps): JSX.Element => {
   const [name, setName] = useState<OptionType | null>(null);
   const [nameValidateError, setNameValidateError] = useState<string | null>(
@@ -84,7 +86,7 @@ const Container = ({
     if (displayName != null) {
       if (
         displayName !== name?.display_name &&
-        blackListForDisplayName.includes(displayName)
+        alreadyUsedDisplayNames.includes(displayName)
       ) {
         setDisplayNameValidateError("duplicated display name");
       } else if (displayName === "") {
@@ -93,7 +95,7 @@ const Container = ({
         setDisplayNameValidateError(null);
       }
     }
-  }, [displayName, blackListForDisplayName, name]);
+  }, [displayName, alreadyUsedDisplayNames, name]);
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth>
@@ -214,4 +216,4 @@ const Container = ({
 };
 
 export { Container as InputConfigAddModal };
-export type { ContainerProps as InputConfigAddModalProps };
+export type { ContainerProps as InputConfigAddModalProps, NewConfigType };

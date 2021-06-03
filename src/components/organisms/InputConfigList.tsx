@@ -3,6 +3,8 @@ import { makeStyles } from "@material-ui/core/styles";
 import {
   InputConfigListItem,
   InputConfigListItemProps,
+  ActionType,
+  ValueType,
 } from "components/molecules/InputConfigListItem";
 
 type ComponentProps = {
@@ -11,11 +13,7 @@ type ComponentProps = {
 
 type ContainerProps = {
   value: InputConfigListItemProps["value"][];
-  onChange: (
-    index: number,
-    action: "change" | "delete",
-    newConfig: InputConfigListItemProps["value"]
-  ) => void;
+  onChange: (index: number, action: ActionType, newValue: ValueType) => void;
 };
 
 const Component = ({
@@ -58,4 +56,4 @@ const Container = ({ ...delegated }: ContainerProps): JSX.Element => {
 };
 
 export { Container as InputConfigList };
-export type { ContainerProps as InputConfigListProps };
+export type { ContainerProps as InputConfigListProps, ActionType, ValueType };

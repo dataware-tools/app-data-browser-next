@@ -1,4 +1,3 @@
-import { metaStore } from "@dataware-tools/app-common";
 import {
   DatabaseListItem,
   DatabaseListItemProps,
@@ -8,7 +7,7 @@ import List from "@material-ui/core/List";
 type Props = ContainerProps;
 
 type ContainerProps = {
-  databases: metaStore.DatabaseModel[];
+  databases: DatabaseListItemProps["database"][];
   onSelectDatabase: DatabaseListItemProps["onClick"];
 };
 

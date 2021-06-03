@@ -2,10 +2,17 @@ import TextField from "@material-ui/core/TextField";
 import { Spacer } from "@dataware-tools/app-common";
 import { makeStyles } from "@material-ui/core/styles";
 
+type MetadataType = Record<string, unknown>;
+type InputConfigType = {
+  name: string;
+  necessity: string;
+  display_name: string;
+};
+
 type ComponentProps = {
-  data?: Record<string, unknown>;
-  inputFields: { name: string; necessity: string; display_name: string }[];
-  nonFilledRequiredFields: string[];
+  currentMetadata?: MetadataType;
+  inputConfig: InputConfigType[];
+  nonFilledRequiredFieldNames: string[];
 };
 
 const useStyles = makeStyles({
@@ -22,14 +29,14 @@ const useStyles = makeStyles({
 });
 
 const Component = ({
-  data,
-  inputFields,
-  nonFilledRequiredFields,
+  currentMetadata,
+  inputConfig,
+  nonFilledRequiredFieldNames,
 }: ComponentProps): JSX.Element => {
   const classes = useStyles();
   return (
     <div className={classes.root}>
-      {inputFields.map((inputField) => {
+      {inputConfig.map((inputField) => {
         const name = inputField.name;
         const displayName = inputField.display_name;
         const necessity = inputField.necessity;
@@ -50,8 +57,8 @@ const Component = ({
                 fullWidth
                 key={inputField.name}
                 id={id}
-                defaultValue={data?.[name]}
-                error={nonFilledRequiredFields.includes(name)}
+                defaultValue={currentMetadata?.[name]}
+                error={nonFilledRequiredFieldNames.includes(name)}
                 helperText={
                   required || recommended ? `This is ${necessity}` : undefined
                 }

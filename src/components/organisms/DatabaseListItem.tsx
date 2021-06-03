@@ -4,11 +4,12 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 import StorageIcon from "@material-ui/icons/Storage";
 import ListItemText from "@material-ui/core/ListItemText";
 
+type DatabaseType = metaStore.DatabaseModel;
 type Props = ContainerProps;
 
 type ContainerProps = {
-  database: metaStore.DatabaseModel;
-  onClick: (database: metaStore.DatabaseModel) => void;
+  database: DatabaseType;
+  onClick: (database: DatabaseType) => void;
 };
 
 const Component = ({ database, onClick }: Props): JSX.Element => {
@@ -32,4 +33,4 @@ const Container = ({ database, ...delegated }: ContainerProps): JSX.Element => {
 };
 
 export { Container as DatabaseListItem };
-export type { ContainerProps as DatabaseListItemProps };
+export type { ContainerProps as DatabaseListItemProps, DatabaseType };

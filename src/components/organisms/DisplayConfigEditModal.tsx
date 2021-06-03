@@ -25,11 +25,13 @@ import { ErrorMessage, metaStore } from "@dataware-tools/app-common";
 import { produce } from "immer";
 import { mutate } from "swr";
 
+type ConfigNameType = "record_display_config";
+
 type ContainerProps = {
   open: boolean;
   databaseId: string;
   onClose: () => void;
-  configName: "record_display_config";
+  configName: ConfigNameType;
 };
 
 const title = { record_display_config: "Record Display Fields" };
@@ -55,7 +57,9 @@ const Container = ({
   const [isSaving, setIsSaving] = useState(false);
   const [config, setConfig] = useState<DataBrowserDisplayConfigType>([]);
   const [options, setOptions] = useState<OptionType[] | null>(null);
-  const [usedOptions, setUsedOptions] = useState<string[]>([]);
+  const [alreadySelectedOptions, setAlreadySelectedOptions] = useState<
+    string[]
+  >([]);
 
   const [getConfigRes, getConfigError, getConfigCacheKey] = (useGetConfig(
     getAccessToken,
@@ -133,9 +137,9 @@ const Container = ({
         return newConfig;
       });
 
-      setUsedOptions((prev) => {
+      setAlreadySelectedOptions((prev) => {
         if (prev) {
-          const newUsedOptions = produce(prev, (draft) => {
+          const next = produce(prev, (draft) => {
             if (draft.includes(oldValue)) {
               draft.splice(draft.indexOf(oldValue), 1);
             }
@@ -144,7 +148,7 @@ const Container = ({
             }
           });
 
-          return newUsedOptions;
+          return next;
         }
         return [newValue];
       });
@@ -158,13 +162,13 @@ const Container = ({
         return newConfig;
       });
 
-      setUsedOptions((prev) => {
+      setAlreadySelectedOptions((prev) => {
         if (prev) {
           if (prev.includes(newValue)) {
-            const newUsedOptions = produce(prev, (draft) => {
+            const next = produce(prev, (draft) => {
               draft.splice(draft.indexOf(newValue));
             });
-            return newUsedOptions;
+            return next;
           } else {
             return prev;
           }
@@ -184,7 +188,7 @@ const Container = ({
         .sort(compareOption);
       setOptions(options.length > 0 ? options : null);
 
-      setUsedOptions(
+      setAlreadySelectedOptions(
         getConfigRes.data_browser_config?.record_display_config || []
       );
     }
@@ -218,7 +222,7 @@ const Container = ({
                   value={config}
                   onChange={onChange}
                   options={options}
-                  usedOptions={usedOptions}
+                  alreadySelectedOptions={alreadySelectedOptions}
                 />
               </DialogBody>
               <DialogToolBar
@@ -241,4 +245,4 @@ const Container = ({
 };
 
 export { Container as DisplayConfigEditModal };
-export type { ContainerProps as DisplayConfigEditModalProps };
+export type { ContainerProps as DisplayConfigEditModalProps, ConfigNameType };

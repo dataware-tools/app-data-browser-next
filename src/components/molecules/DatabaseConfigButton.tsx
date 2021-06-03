@@ -5,6 +5,7 @@ import {
   DatabaseConfigMenuProps,
 } from "components/molecules/DatabaseConfigMenu";
 import { SquareIconButton } from "components/atoms/SquareIconButton";
+import { DatabaseConfigNameType } from "components/organisms/DatabaseConfigModal";
 
 type Props = {
   onOpen: (event: MouseEvent<HTMLDivElement>) => void | Promise<void>;
@@ -14,8 +15,8 @@ type Props = {
 } & ContainerProps;
 
 type ContainerProps = {
-  onMenuSelect: DatabaseConfigMenuProps["onClick"];
-  menu: DatabaseConfigMenuProps["menu"];
+  onMenuSelect: (targetValue: DatabaseConfigNameType) => void;
+  menu: { label: string; value: DatabaseConfigNameType }[];
 };
 
 const Component = ({
@@ -26,7 +27,10 @@ const Component = ({
   return (
     <div>
       <SquareIconButton icon={<SettingsIcon />} onClick={onOpen} />
-      <DatabaseConfigMenu {...delegated} onClick={onMenuSelect} />
+      <DatabaseConfigMenu
+        {...delegated}
+        onClick={onMenuSelect as (value: string) => void}
+      />
     </div>
   );
 };
@@ -53,4 +57,7 @@ const Container = ({ ...delegated }: ContainerProps): JSX.Element => {
 };
 
 export { Container as DatabaseConfigButton };
-export type { ContainerProps as DatabaseConfigButtonProps };
+export type {
+  ContainerProps as DatabaseConfigButtonProps,
+  DatabaseConfigNameType,
+};

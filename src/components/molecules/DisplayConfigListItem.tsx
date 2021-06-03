@@ -6,19 +6,17 @@ import { makeStyles } from "@material-ui/core/styles";
 import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
 import React from "react";
 
+type ActionType = "change" | "delete";
+
 type Props = {
   classes: ReturnType<typeof useStyles>;
 } & ContainerProps;
 
 type ContainerProps = {
   value: string;
-  onChange: (
-    action: "change" | "delete",
-    newValue: string,
-    oldValue: string
-  ) => void;
+  onChange: (action: ActionType, newValue: string, oldValue: string) => void;
   options: { label: string; value: string }[];
-  usedOptions: string[];
+  alreadySelectedOptions: string[];
 };
 
 const useStyles = makeStyles({
@@ -34,7 +32,7 @@ const Component = ({
   value,
   onChange,
   options,
-  usedOptions,
+  alreadySelectedOptions,
 }: Props): JSX.Element => {
   console.log(value);
   return (
@@ -50,7 +48,7 @@ const Component = ({
           {options.find((option) => option.value === value)?.label || value}
         </MenuItem>
         {options.map((option, index) =>
-          usedOptions.includes(option.value) ? null : (
+          alreadySelectedOptions.includes(option.value) ? null : (
             <MenuItem key={index} value={option.value}>
               {option.label}
             </MenuItem>
@@ -74,4 +72,4 @@ const Container = React.memo(
 );
 
 export { Container as DisplayConfigListItem };
-export type { ContainerProps as DisplayConfigListItemProps };
+export type { ContainerProps as DisplayConfigListItemProps, ActionType };
