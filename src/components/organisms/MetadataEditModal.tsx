@@ -3,7 +3,7 @@ import Dialog from "@material-ui/core/Dialog";
 import { DialogCloseButton } from "components/atoms/DialogCloseButton";
 import { useState, useEffect } from "react";
 import LoadingButton from "@material-ui/lab/LoadingButton";
-import { DatabaseConfigType, useGetConfig, usePrevious } from "utils/index";
+import { usePrevious } from "utils/index";
 import {
   MetadataInputFieldList,
   MetadataInputFieldListProps,
@@ -12,57 +12,35 @@ import { DialogContainer } from "components/atoms/DialogContainer";
 import { DialogBody } from "components/atoms/DialogBody";
 import { DialogToolBar } from "components/atoms/DialogToolBar";
 import { DialogTitle } from "components/atoms/DialogTitle";
-import { useAuth0 } from "@auth0/auth0-react";
 
 type ContainerProps = {
   open: boolean;
   onClose: () => void;
   create?: boolean;
-  data?: MetadataInputFieldListProps["data"];
+  currentMetadata?: MetadataInputFieldListProps["currentMetadata"];
+  inputConfig: MetadataInputFieldListProps["inputConfig"] | null;
   error: any;
-  databaseId: string;
-  onSubmit: (newRecordInfo: Record<string, unknown>) => Promise<boolean>;
+  onSubmit: (newMetadata: Record<string, unknown>) => Promise<boolean>;
 };
 
 const Container = ({
   open,
   onClose,
   create,
-  data,
+  currentMetadata,
+  inputConfig,
   error,
-  databaseId,
   onSubmit,
 }: ContainerProps): JSX.Element => {
-  const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const [isSaving, setIsSaving] = useState(false);
-  const [nonFilledRequiredsFields, setNonFilledRequireds] = useState<string[]>(
-    []
-  );
-
-  const [getConfigRes, getConfigError] = (useGetConfig(getAccessToken, {
-    databaseId,
-  }) as unknown) as [
-    data: DatabaseConfigType | undefined,
-    error: any,
-    cacheKey: string
-  ];
-
-  const record_input_config =
-    getConfigRes?.data_browser_config?.record_input_config;
-  const columns = getConfigRes?.columns;
-  const inputFields =
-    record_input_config && columns
-      ? record_input_config.map((config) => ({
-          ...config,
-          display_name:
-            columns.find((column) => column.name === config.name)
-              ?.display_name || "",
-        }))
-      : null;
+  const [
+    nonFilledRequiredFieldNames,
+    setNonFilledRequiredFieldNames,
+  ] = useState<string[]>([]);
 
   const initializeState = () => {
     setIsSaving(false);
-    setNonFilledRequireds([]);
+    setNonFilledRequiredFieldNames([]);
   };
   // See: https://stackoverflow.com/questions/58209791/set-initial-state-for-material-ui-dialog
   const prevOpen = usePrevious(open);
@@ -73,30 +51,32 @@ const Container = ({
   }, [open, prevOpen]);
 
   const onSave = async () => {
-    if (inputFields) {
+    if (inputConfig) {
       setIsSaving(true);
       const newRecordInfo = {};
 
-      const nonFilledRequireds: string[] = [];
+      const nonFilledRequired: string[] = [];
       const nonFilledRecommends: string[] = [];
 
-      inputFields.forEach((inputField) => {
+      inputConfig.forEach((config) => {
         const inputEl = document.getElementById(
-          `RecordEditModalInputFields_${inputField.name.replace(/\s+/g, "")}`
+          `RecordEditModalInputFields_${config.name.replace(/\s+/g, "")}`
         ) as HTMLInputElement;
-        if (inputField.necessity === "required" && !inputEl.value) {
-          nonFilledRequireds.push(inputField.name);
+        if (config.necessity === "required" && !inputEl.value) {
+          nonFilledRequired.push(config.name);
         }
-        if (inputField.necessity === "recommended" && !inputEl.value) {
-          nonFilledRecommends.push(inputField.name);
+        if (config.necessity === "recommended" && !inputEl.value) {
+          nonFilledRecommends.push(config.name);
         }
       });
 
-      if (nonFilledRequireds.length > 0) {
-        window.alert(`${JSON.stringify(nonFilledRequireds)} is required`);
-        setNonFilledRequireds(nonFilledRequireds);
+      if (nonFilledRequired.length > 0) {
+        window.alert(`${JSON.stringify(nonFilledRequired)} is required`);
+        setNonFilledRequiredFieldNames(nonFilledRequired);
         setIsSaving(false);
         return;
+      } else {
+        setNonFilledRequiredFieldNames([]);
       }
 
       if (nonFilledRecommends.length > 0) {
@@ -112,17 +92,14 @@ const Container = ({
         }
       }
 
-      inputFields.forEach((inputField) => {
+      // ! do not to depend on id!
+      inputConfig.forEach((config) => {
         const inputEl = document.getElementById(
-          `RecordEditModalInputFields_${inputField.name.replace(/\s+/g, "")}`
+          `RecordEditModalInputFields_${config.name.replace(/\s+/g, "")}`
         ) as HTMLInputElement;
-        newRecordInfo[inputField.name] = inputEl.value;
+        newRecordInfo[config.name] = inputEl.value;
       });
 
-      // @ts-expect-error this is necessary process
-      if (!("path" in newRecordInfo)) newRecordInfo.path = "";
-
-      // * onSubmit
       const isSubmitSucceed = await onSubmit(newRecordInfo);
 
       if (!isSubmitSucceed) {
@@ -141,23 +118,23 @@ const Container = ({
       <DialogContainer>
         <DialogCloseButton onClick={onClose} />
         <DialogTitle>{create ? "Add" : "Edit"} Record</DialogTitle>
-        {error || getConfigError ? (
+        {error ? (
           <ErrorMessage
-            reason={JSON.stringify(error || getConfigError)}
+            reason={JSON.stringify(error)}
             instruction="please reload this page"
           />
-        ) : !inputFields || inputFields.length <= 0 ? (
+        ) : !inputConfig || inputConfig.length <= 0 ? (
           <ErrorMessage
             reason="Input fields is not configured"
             instruction="please report administrator this error"
           />
-        ) : data || create ? (
+        ) : currentMetadata || create ? (
           <>
             <DialogBody>
               <MetadataInputFieldList
-                data={data}
-                inputFields={inputFields}
-                nonFilledRequiredFields={nonFilledRequiredsFields}
+                currentMetadata={currentMetadata}
+                inputConfig={inputConfig}
+                nonFilledRequiredFieldNames={nonFilledRequiredFieldNames}
               />
             </DialogBody>
             <DialogToolBar
