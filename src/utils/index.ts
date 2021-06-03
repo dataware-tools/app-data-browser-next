@@ -29,6 +29,9 @@ const usePrevious = <T>(value: T): T | undefined => {
   return ref.current;
 };
 
-export { APP_ROUTE, SwrOptions, authConfig, redirectUri, usePrevious };
+const sleep = (ms: number): Promise<void> =>
+  new Promise((resolve) => setTimeout(resolve, ms));
+
+export { APP_ROUTE, SwrOptions, authConfig, redirectUri, usePrevious, sleep };
 export * from "./fetchClients";
 export * from "./utilTypes";
