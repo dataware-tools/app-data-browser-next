@@ -143,7 +143,6 @@ const Container = ({
       {
         databaseId,
         requestBody: {
-          // @ts-expect-error fix API
           record_id: recordId,
           path: files[0].name,
           description: "this is file creating test",
