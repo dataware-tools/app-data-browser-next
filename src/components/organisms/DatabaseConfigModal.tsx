@@ -1,22 +1,31 @@
-import { InputConfigEditModal } from "components/organisms/InputConfigEditModal";
-import { DisplayConfigEditModal } from "./DisplayConfigEditModal";
+import {
+  InputConfigEditModal,
+  InputConfigEditModalProps,
+} from "components/organisms/InputConfigEditModal";
+import {
+  DisplayConfigEditModal,
+  DisplayConfigEditModalProps,
+} from "./DisplayConfigEditModal";
 
 type ContainerProps = {
   open: boolean;
+  databaseId: string;
   onClose: () => void;
   configName: DatabaseConfigNameType;
 };
 
-type DatabaseConfigNameType = "recordInputConfig" | "recordDisplayConfig";
+type DatabaseConfigNameType =
+  | InputConfigEditModalProps["configName"]
+  | DisplayConfigEditModalProps["configName"];
 
 const Container = ({
   configName,
   ...delegated
 }: ContainerProps): JSX.Element => {
   switch (configName) {
-    case "recordInputConfig":
+    case "record_input_config":
       return <InputConfigEditModal {...delegated} configName={configName} />;
-    case "recordDisplayConfig":
+    case "record_display_config":
       return <DisplayConfigEditModal {...delegated} configName={configName} />;
   }
 };
