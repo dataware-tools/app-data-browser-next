@@ -7,5 +7,6 @@ export default {
 };
 
 const Template: Story<SampleProps> = (args) => <Sample {...args} />;
+
 export const Default = Template.bind({});
 Default.args = { sample: "sample" };
