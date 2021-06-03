@@ -12,8 +12,12 @@ type ComponentProps = {
 type ContainerProps = {
   value: DisplayConfigListItemProps["value"][];
   onChange: (
-    newDisplayConfigList: DisplayConfigListItemProps["value"][]
+    action: "change" | "delete",
+    index: number,
+    newConfig: string,
+    oldConfig: string
   ) => void;
+  usedOptions: DisplayConfigListItemProps["usedOptions"];
   options: DisplayConfigListItemProps["options"];
 };
 
@@ -21,7 +25,7 @@ const Component = ({
   classes,
   value,
   onChange,
-  options,
+  ...delegated
 }: ComponentProps): JSX.Element => {
   return (
     <>
@@ -31,25 +35,10 @@ const Component = ({
             <div key={index}>
               <DisplayConfigListItem
                 value={config}
-                options={options}
-                onChange={(action, newConfig) => {
-                  switch (action) {
-                    case "change":
-                      onChange(
-                        value.map((oldConfig, i) =>
-                          i === index ? newConfig : oldConfig
-                        )
-                      );
-                      break;
-
-                    case "delete":
-                      onChange(value.filter((_, i) => i !== index));
-                      break;
-
-                    default:
-                      break;
-                  }
+                onChange={(action, newValue, oldValue) => {
+                  onChange(action, index, newValue, oldValue);
                 }}
+                {...delegated}
               />
               <Spacer direction="vertical" size="3vh" />
             </div>
