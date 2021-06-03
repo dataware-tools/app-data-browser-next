@@ -26,14 +26,15 @@ import {
   InputConfigAddModalProps,
 } from "components/organisms/InputConfigAddModal";
 import { produce } from "immer";
-
 import { mutate } from "swr";
+
+type ConfigNameType = "record_input_config";
 
 type ContainerProps = {
   open: boolean;
   onClose: () => void;
   databaseId: string;
-  configName: "record_input_config";
+  configName: ConfigNameType;
 };
 
 const title = { record_input_config: "Record Input Fields" };
@@ -222,7 +223,7 @@ const Container = ({
       }
     }
   };
-  const blackListForDisplayName = [
+  const alreadyUsedDisplayNames = [
     ...new Set(getConfigRes?.columns.map((column) => column.display_name)),
   ];
 
@@ -264,7 +265,7 @@ const Container = ({
             open={openAddModal}
             onClose={() => setOpenAddModal(false)}
             onSave={(newConfig) => onAdd(newConfig)}
-            blackListForDisplayName={blackListForDisplayName}
+            alreadyUsedDisplayNames={alreadyUsedDisplayNames}
           />
         ) : null}
       </DialogContainer>
@@ -273,4 +274,4 @@ const Container = ({
 };
 
 export { Container as InputConfigEditModal };
-export type { ContainerProps as InputConfigEditModalProps };
+export type { ContainerProps as InputConfigEditModalProps, ConfigNameType };
