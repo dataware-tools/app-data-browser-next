@@ -20,7 +20,7 @@ const Component = ({
 }: ComponentProps): JSX.Element => {
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const fileUpload: LoadingButtonProps["onClick"] = (event) => {
+  const onFileUpload: LoadingButtonProps["onClick"] = (event) => {
     if (onClick) {
       onClick(event);
     }
@@ -39,7 +39,7 @@ const Component = ({
 
   return (
     <div>
-      <LoadingButton {...delegated} onClick={fileUpload}>
+      <LoadingButton {...delegated} onClick={onFileUpload}>
         {children}
       </LoadingButton>
       <input
