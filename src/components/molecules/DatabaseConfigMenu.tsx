@@ -1,10 +1,9 @@
 import Menu from "@material-ui/core/Menu";
 import { MenuItem } from "@material-ui/core";
-import { DatabaseConfigNameType } from "components/organisms/DatabaseConfigModal";
 
 type ComponentProps = {
-  menu: { label: string; value: DatabaseConfigNameType }[];
-  onClick: (targetValue: DatabaseConfigNameType) => void;
+  menu: { label: string; value: string }[];
+  onClick: (targetValue: string) => void;
   onClose: () => void;
   open: boolean;
   anchorEl: HTMLElement | null;
