@@ -7,6 +7,7 @@ import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import { MouseEvent, useState } from "react";
 import { FileMenu } from "components/molecules/FileMenu";
 
+type FileType = metaStore.FileModel;
 type Props = {
   menuProps: {
     onClose: () => void;
@@ -16,13 +17,13 @@ type Props = {
   onMenuOpen: (event: MouseEvent<HTMLDivElement>) => void | Promise<void>;
 } & ContainerProps;
 
-type onMenuClick = (file: metaStore.FileModel) => void | Promise<void>;
+type onMenuClick = (file: FileType) => void | Promise<void>;
 type ContainerProps = {
   onPreview: onMenuClick;
   onEdit: onMenuClick;
   onDelete: onMenuClick;
   onDownload: onMenuClick;
-  file: metaStore.FileModel;
+  file: FileType;
 };
 
 const Component = ({
@@ -88,4 +89,4 @@ const Container = ({ file, ...delegated }: ContainerProps): JSX.Element => {
 };
 
 export { Container as FileListItem };
-export type { ContainerProps as FileListItemProps };
+export type { ContainerProps as FileListItemProps, FileType };

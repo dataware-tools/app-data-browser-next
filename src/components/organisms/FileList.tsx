@@ -1,4 +1,3 @@
-import { metaStore } from "@dataware-tools/app-common";
 import {
   FileListItem,
   FileListItemProps,
@@ -8,7 +7,7 @@ import List from "@material-ui/core/List";
 type Props = ContainerProps;
 
 type ContainerProps = {
-  files: metaStore.FileModel[];
+  files: FileListItemProps["file"][];
   onPreview: FileListItemProps["onPreview"];
   onDelete: FileListItemProps["onDelete"];
   onEdit: FileListItemProps["onEdit"];
