@@ -109,8 +109,7 @@ const Container = ({
       }
     );
 
-    if (deleteFileRes) {
-      // @ts-expect-error fix API
+    if (deleteFileRes && listFilesRes) {
       const newFiles = listFilesRes.data.filter((oldFile) => {
         return oldFile.uuid !== deleteFileRes.uuid;
       });
@@ -150,9 +149,8 @@ const Container = ({
       }
     );
 
-    if (createFileRes) {
+    if (createFileRes && listFilesRes) {
       const newFileList = { ...listFilesRes };
-      // @ts-expect-error fix API
       newFileList.data.push(createFileRes);
 
       mutate(listFilesCacheKey, newFileList, false);
