@@ -1,7 +1,7 @@
 import {
   API_ROUTE,
   metaStore,
-  ObjToQueryString,
+  objToQueryString,
 } from "@dataware-tools/app-common";
 import useSWR from "swr";
 import { AwaitType } from "./utilTypes";
@@ -38,7 +38,7 @@ interface UseAPI<T extends (...args: any) => Promise<any>> {
 const useListDatabases: UseAPI<
   typeof metaStore.DatabaseService.listDatabases
 > = (token, { ...query }, shouldFetch = true) => {
-  const cacheQuery = ObjToQueryString({ ...query });
+  const cacheQuery = objToQueryString({ ...query });
   const cacheKey = `${API_ROUTE.META.BASE}/databases/${cacheQuery}`;
   const fetcher = async () => {
     metaStore.OpenAPI.TOKEN = token;
@@ -48,6 +48,30 @@ const useListDatabases: UseAPI<
   };
   // See: https://swr.vercel.app/docs/conditional-fetching
   const { data, error } = useSWR(shouldFetch ? cacheKey : null, fetcher);
+  return [data, error, cacheKey];
+};
+
+const useGetConfig: UseAPI<typeof metaStore.ConfigService.getConfig> = (
+  token,
+  { databaseId },
+  shouldFetch = true
+) => {
+  const cacheKey = `${API_ROUTE.META.BASE}/databases/${databaseId}/config`;
+  const fetcher = databaseId
+    ? async () => {
+        metaStore.OpenAPI.TOKEN = token;
+        metaStore.OpenAPI.BASE = API_ROUTE.META.BASE;
+        const res = await metaStore.ConfigService.getConfig({
+          databaseId,
+        });
+        return res;
+      }
+    : null;
+
+  const { data, error } = useSWR(
+    shouldFetch && databaseId ? cacheKey : null,
+    fetcher
+  );
   return [data, error, cacheKey];
 };
 
@@ -82,7 +106,7 @@ const useListRecords: UseAPI<typeof metaStore.RecordService.listRecords> = (
   { databaseId, ...query },
   shouldFetch = true
 ) => {
-  const cacheQuery = ObjToQueryString({ ...query });
+  const cacheQuery = objToQueryString({ ...query });
   const cacheKey = `${API_ROUTE.META.BASE}/databases/${databaseId}/records${cacheQuery}`;
   const listRecords = databaseId
     ? async () => {
@@ -129,6 +153,7 @@ const useListFiles: UseAPI<typeof metaStore.FileService.listFiles> = (
 
 export {
   useListDatabases,
+  useGetConfig,
   fetchAPI,
   useGetRecord,
   useListRecords,
