@@ -7,7 +7,7 @@ import {
   usePrevious,
   DatabaseConfigType,
   DataBrowserDisplayConfigType,
-  fetchAPI,
+  fetchMetaStore,
 } from "utils/index";
 import {
   DisplayConfigList,
@@ -98,7 +98,7 @@ const Container = ({
         }
       });
 
-      const [data, error] = await fetchAPI(
+      const [data, error] = await fetchMetaStore(
         getAccessToken,
         metaStore.ConfigService.updateConfig,
         {
