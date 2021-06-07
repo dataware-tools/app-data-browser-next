@@ -6,6 +6,10 @@ import {
   DisplayConfigEditModal,
   ConfigNameType as DisplayConfigNameType,
 } from "./DisplayConfigEditModal";
+import {
+  SearchConfigEditModal,
+  ConfigNameType as SearchConfigNameType,
+} from "./SearchConfigEditModal";
 
 type ContainerProps = {
   open: boolean;
@@ -14,7 +18,10 @@ type ContainerProps = {
   configName: DatabaseConfigNameType;
 };
 
-type DatabaseConfigNameType = InputConfigNameType | DisplayConfigNameType;
+type DatabaseConfigNameType =
+  | InputConfigNameType
+  | DisplayConfigNameType
+  | SearchConfigNameType;
 
 const Container = ({
   configName,
@@ -25,6 +32,8 @@ const Container = ({
       return <InputConfigEditModal {...delegated} configName={configName} />;
     case "record_display_config":
       return <DisplayConfigEditModal {...delegated} configName={configName} />;
+    case "record_search_config":
+      return <SearchConfigEditModal {...delegated} configName={configName} />;
   }
 };
 
