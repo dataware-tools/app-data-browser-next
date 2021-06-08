@@ -45,7 +45,7 @@ const Container = ({
 
   return (
     <Dialog open={open} maxWidth="xl" onClose={onClose}>
-      <DialogContainer>
+      <DialogContainer height="auto">
         <DialogCloseButton onClick={onClose} />
         <DialogTitle>
           <TextCenteringSpan>{title[configName] + " "}</TextCenteringSpan>
