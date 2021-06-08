@@ -5,7 +5,7 @@ import {
   MetadataEditModalProps,
 } from "components/organisms/MetadataEditModal";
 import {
-  fetchAPI,
+  fetchMetaStore,
   useGetRecord,
   DatabaseConfigType,
   useGetConfig,
@@ -60,7 +60,7 @@ const Container = ({
   ) => {
     if (create) {
       newRecordInfo.path = "";
-      const [saveRecordRes] = await fetchAPI(
+      const [saveRecordRes] = await fetchMetaStore(
         getAccessToken,
         metaStore.RecordService.createRecord,
         {
@@ -72,7 +72,7 @@ const Container = ({
       return Boolean(saveRecordRes);
     } else {
       if (recordId) {
-        const [saveRecordRes] = await fetchAPI(
+        const [saveRecordRes] = await fetchMetaStore(
           getAccessToken,
           metaStore.RecordService.updateRecord,
           {

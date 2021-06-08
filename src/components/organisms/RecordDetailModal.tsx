@@ -15,7 +15,13 @@ import { DialogCloseButton } from "components/atoms/DialogCloseButton";
 import { RecordInfo } from "components/organisms/RecordInfo";
 import { mutate } from "swr";
 import { useAuth0 } from "@auth0/auth0-react";
-import { fetchAPI, useGetRecord, useListFiles, usePrevious } from "utils/index";
+import {
+  fetchFileProvider,
+  fetchMetaStore,
+  useGetRecord,
+  useListFiles,
+  usePrevious,
+} from "utils/index";
 import { RecordEditModal } from "components/organisms/RecordEditModal";
 import {
   FileUploadButton,
@@ -102,7 +108,7 @@ const Container = ({
   const onDeleteFile = async (file: metaStore.FileModel) => {
     if (!window.confirm("Are you sure you want to delete file?")) return;
 
-    const [deleteFileRes] = await fetchAPI(
+    const [deleteFileRes] = await fetchMetaStore(
       getAccessToken,
       metaStore.FileService.deleteFile,
       {
@@ -154,16 +160,22 @@ const Container = ({
     }
     setIsAddingFile(true);
 
-    const [createFileRes] = await fetchAPI(
+    const contents = { description: "this is test file" };
+    const binaryJson = new Blob([JSON.stringify(contents)], {
+      type: "application/json",
+    });
+
+    const requestBody = new FormData();
+    requestBody.append("contents", binaryJson);
+    requestBody.append("file", files[0]);
+
+    const [createFileRes] = await fetchFileProvider(
       getAccessToken,
-      metaStore.FileService.createFile,
+      fileProvider.UploadService.uploadFile,
       {
         databaseId,
-        requestBody: {
-          record_id: recordId,
-          path: files[0].name,
-          description: "this is file creating test",
-        },
+        recordId,
+        requestBody,
       }
     );
 

@@ -6,7 +6,7 @@ import {
   DatabaseConfigType,
   useGetConfig,
   usePrevious,
-  fetchAPI,
+  fetchMetaStore,
 } from "utils/index";
 import {
   InputConfigList,
@@ -159,7 +159,7 @@ const Container = ({
         }
       });
 
-      const [data, error] = await fetchAPI(
+      const [data, error] = await fetchMetaStore(
         getAccessToken,
         metaStore.ConfigService.updateConfig,
         {

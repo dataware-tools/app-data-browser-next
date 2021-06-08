@@ -1,5 +1,6 @@
 import {
   API_ROUTE,
+  fileProvider,
   metaStore,
   objToQueryString,
 } from "@dataware-tools/app-common";
@@ -11,13 +12,9 @@ type Data<T> = T extends void | undefined | null
   : T | undefined;
 
 const fetchAPI = async <T, U>(
-  token: string | (() => Promise<string>),
   fetcher: (args: T) => Promise<U>,
   param: T
 ): Promise<[data: Data<U>, error: any]> => {
-  metaStore.OpenAPI.TOKEN = token;
-  metaStore.OpenAPI.BASE = API_ROUTE.META.BASE;
-
   try {
     const res = await fetcher(param);
     // See: https://miyauchi.dev/ja/posts/typescript-conditional-types#%E5%9E%8B%E5%AE%9A%E7%BE%A9%E3%81%A8-conditional-types
@@ -25,6 +22,26 @@ const fetchAPI = async <T, U>(
   } catch (error) {
     return [undefined as Data<U>, error];
   }
+};
+
+const fetchMetaStore = async <T, U>(
+  token: string | (() => Promise<string>),
+  fetcher: (args: T) => Promise<U>,
+  param: T
+): Promise<[data: Data<U>, error: any]> => {
+  metaStore.OpenAPI.BASE = API_ROUTE.META.BASE;
+  metaStore.OpenAPI.TOKEN = token;
+  return await fetchAPI(fetcher, param);
+};
+
+const fetchFileProvider = async <T, U>(
+  token: string | (() => Promise<string>),
+  fetcher: (args: T) => Promise<U>,
+  param: T
+): Promise<[data: Data<U>, error: any]> => {
+  fileProvider.OpenAPI.BASE = API_ROUTE.FILE.BASE;
+  metaStore.OpenAPI.TOKEN = token;
+  return await fetchAPI(fetcher, param);
 };
 
 interface UseAPI<T extends (...args: any) => Promise<any>> {
@@ -155,6 +172,8 @@ export {
   useListDatabases,
   useGetConfig,
   fetchAPI,
+  fetchMetaStore,
+  fetchFileProvider,
   useGetRecord,
   useListRecords,
   useListFiles,

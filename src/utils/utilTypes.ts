@@ -37,6 +37,7 @@ type DataBrowserInputConfigType = {
   necessity: "required" | "recommended" | "optional";
 }[];
 type DataBrowserDisplayConfigType = string[];
+type DataBrowserSearchConfigType = string[];
 
 type DatabaseConfigType = {
   columns: DatabaseColumnsConfigType;
@@ -44,6 +45,7 @@ type DatabaseConfigType = {
   data_browser_config?: {
     record_input_config?: DataBrowserInputConfigType;
     record_display_config?: DataBrowserDisplayConfigType;
+    record_search_config?: DataBrowserSearchConfigType;
   };
 };
 
@@ -54,4 +56,5 @@ export type {
   DatabaseIndexColumnsConfigType,
   DataBrowserInputConfigType,
   DataBrowserDisplayConfigType,
+  DataBrowserSearchConfigType,
 };
