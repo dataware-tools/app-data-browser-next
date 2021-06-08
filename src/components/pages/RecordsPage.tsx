@@ -86,7 +86,8 @@ const Page = (): JSX.Element => {
     databaseId,
     perPage,
     page,
-    search: `${searchColumn[0]}:${searchText}`,
+    search: searchText,
+    searchKey: searchColumn,
   });
 
   const displayColumns = getConfigRes?.data_browser_config?.record_display_config?.map(
