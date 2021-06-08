@@ -4,6 +4,8 @@ import {
   metaStore,
   ErrorMessage,
   LoadingIndicator,
+  fileProvider,
+  API_ROUTE,
 } from "@dataware-tools/app-common";
 import { makeStyles } from "@material-ui/core/styles";
 import Dialog from "@material-ui/core/Dialog";
@@ -120,8 +122,24 @@ const Container = ({
     }
   };
 
-  const onDownloadFile = (file: metaStore.FileModel) =>
-    window.alert(`download: ${JSON.stringify(file)}`);
+  const onDownloadFile = (file: metaStore.FileModel) => {
+    getAccessToken().then((accessToken: string) => {
+      fileProvider.OpenAPI.TOKEN = accessToken;
+      fileProvider.OpenAPI.BASE = API_ROUTE.FILE.BASE;
+      fileProvider.DownloadService.createJwtToDownloadFile({
+        requestBody: {
+          path: file.path,
+          content_type: file["content-type"],
+        },
+      })
+        .then((res: fileProvider.DownloadsPostedModel) => {
+          window.open(API_ROUTE.FILE.BASE + "/download/" + res.token, "_blank");
+        })
+        .catch((e) => {
+          alert("Failed to download the file: " + e);
+        });
+    });
+  };
 
   const onAddFile: FileUploadButtonProps["onFileChange"] = async (files) => {
     if (!files || !files[0]) {
