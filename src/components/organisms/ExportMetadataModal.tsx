@@ -153,9 +153,17 @@ const ContainerWithRequests = ({
 
   const exportAsCSV = () => {
     if (listRecordsRes) {
+      const flatData = listRecordsRes.data.map((item) => {
+        const metadata = {};
+        for (const [key, value] of Object.entries(item)) {
+          metadata[key] = '"' + JSON.stringify(value) + '"';
+        }
+        return metadata;
+      });
+
       // TODO: Support mapping column names to display-names
       downloadCSV({
-        datas: listRecordsRes.data,
+        datas: flatData,
       }).then((csv) => {
         const fileName = "metadata-" + databaseId + ".csv";
         const data = new Blob([String(csv)], {
