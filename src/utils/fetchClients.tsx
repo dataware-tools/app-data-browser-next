@@ -40,7 +40,7 @@ const fetchFileProvider = async <T, U>(
   param: T
 ): Promise<[data: Data<U>, error: any]> => {
   fileProvider.OpenAPI.BASE = API_ROUTE.FILE.BASE;
-  metaStore.OpenAPI.TOKEN = token;
+  fileProvider.OpenAPI.TOKEN = token;
   return await fetchAPI(fetcher, param);
 };
 
