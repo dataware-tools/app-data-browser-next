@@ -10,6 +10,10 @@ import {
   SearchConfigEditModal,
   ConfigNameType as SearchConfigNameType,
 } from "./SearchConfigEditModal";
+import {
+  ExportMetadataModal,
+  ConfigNameType as ExportMetadataNameType,
+} from "./ExportMetadataModal";
 
 type ContainerProps = {
   open: boolean;
@@ -21,7 +25,8 @@ type ContainerProps = {
 type DatabaseConfigNameType =
   | InputConfigNameType
   | DisplayConfigNameType
-  | SearchConfigNameType;
+  | SearchConfigNameType
+  | ExportMetadataNameType;
 
 const Container = ({
   configName,
@@ -34,6 +39,8 @@ const Container = ({
       return <DisplayConfigEditModal {...delegated} configName={configName} />;
     case "record_search_config":
       return <SearchConfigEditModal {...delegated} configName={configName} />;
+    case "export_metadata":
+      return <ExportMetadataModal {...delegated} configName={configName} />;
   }
 };
 
