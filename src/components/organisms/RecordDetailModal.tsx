@@ -4,7 +4,7 @@ import {
   metaStore,
   ErrorMessage,
   LoadingIndicator,
-  fileProvider,
+  API_ROUTE,
 } from "@dataware-tools/app-common";
 import { makeStyles } from "@material-ui/core/styles";
 import Dialog from "@material-ui/core/Dialog";
@@ -15,7 +15,6 @@ import { RecordInfo } from "components/organisms/RecordInfo";
 import { mutate } from "swr";
 import { useAuth0 } from "@auth0/auth0-react";
 import {
-  fetchFileProvider,
   fetchMetaStore,
   useGetRecord,
   useListFiles,
@@ -143,28 +142,34 @@ const Container = ({
     }
     setIsAddingFile(true);
 
-    const contents = { description: "this is test file" };
-    const binaryJson = new Blob([JSON.stringify(contents)], {
+    const contents = {
+      database_id: databaseId,
+      record_id: recordId,
+      description: "this is test file",
+    };
+    const binaryMetadata = new Blob([JSON.stringify(contents)], {
       type: "application/json",
     });
 
     const requestBody = new FormData();
-    requestBody.append("contents", binaryJson);
+    requestBody.append("contents", binaryMetadata);
     requestBody.append("file", files[0]);
 
-    const [createFileRes] = await fetchFileProvider(
-      getAccessToken,
-      fileProvider.UploadService.uploadFile,
+    // TODO: If openapi-typescript-codegen support multipart/formData schema, deprecate this func
+    // See: https://github.com/ferdikoomen/openapi-typescript-codegen/issues/257
+    const accessToken = await getAccessToken();
+    const createFileRes = await fetch(
+      `${API_ROUTE.FILE.BASE}/upload?database_id=${databaseId}&record_id=${recordId}`,
       {
-        databaseId,
-        recordId,
-        requestBody,
+        method: "POST",
+        body: requestBody,
+        headers: { Authorization: `Bearer ${accessToken}` },
       }
     );
 
-    if (createFileRes && listFilesRes) {
+    if (createFileRes.status === 201 && listFilesRes) {
       const newFileList = { ...listFilesRes };
-      newFileList.data.push(createFileRes);
+      newFileList.data.push(createFileRes.json());
 
       mutate(listFilesCacheKey, newFileList, false);
     }
