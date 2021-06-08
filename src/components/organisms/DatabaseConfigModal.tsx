@@ -40,7 +40,7 @@ const Container = ({
     case "record_search_config":
       return <SearchConfigEditModal {...delegated} configName={configName} />;
     case "export_metadata":
-      return <ExportMetadataModal {...delegated} configName={configName} />;
+      return <ExportMetadataModal {...delegated} />;
   }
 };
 
