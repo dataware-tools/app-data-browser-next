@@ -201,11 +201,7 @@ const Container = ({
         <DialogTitle>
           <TextCenteringSpan>{title[configName] + " "}</TextCenteringSpan>
           {getConfigRes ? (
-            <SquareIconButton
-              onClick={onAdd}
-              icon={<AddCircleIcon />}
-              disabled={config.length >= 1}
-            />
+            <SquareIconButton onClick={onAdd} icon={<AddCircleIcon />} />
           ) : null}
         </DialogTitle>
         {getConfigError ? (
