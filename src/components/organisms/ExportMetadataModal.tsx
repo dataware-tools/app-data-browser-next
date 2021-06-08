@@ -14,6 +14,7 @@ import { FormControl, InputLabel } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { Spacer } from "@dataware-tools/app-common";
 import { useAuth0 } from "@auth0/auth0-react";
+import downloadCSV from "react-csv-downloader/dist/cjs/lib/csv";
 
 type ConfigNameType = "export_metadata";
 
@@ -118,7 +119,7 @@ const ContainerWithRequests = ({
 
   const listRecords = useListRecords(getAccessToken, {
     databaseId,
-    perPage: 999999999,
+    perPage: 999999999, // FIXME
   });
   const listRecordsRes = listRecords[0];
 
@@ -151,7 +152,24 @@ const ContainerWithRequests = ({
   };
 
   const exportAsCSV = () => {
-    window.alert("Export as CSV");
+    if (listRecordsRes) {
+      // TODO: Support mapping column names to display-names
+      downloadCSV({
+        datas: listRecordsRes.data,
+      }).then((csv) => {
+        const fileName = "metadata-" + databaseId + ".csv";
+        const data = new Blob([String(csv)], {
+          type: "text/csv",
+        });
+        const jsonURL = window.URL.createObjectURL(data);
+        const link = document.createElement("a");
+        document.body.appendChild(link);
+        link.href = jsonURL;
+        link.setAttribute("download", fileName);
+        link.click();
+        document.body.removeChild(link);
+      });
+    }
   };
 
   const exportMetadata = async (exportType: string) => {
