@@ -14,16 +14,18 @@ import { FormControl, InputLabel } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { Spacer } from "@dataware-tools/app-common";
 import { useAuth0 } from "@auth0/auth0-react";
+
+// See: https://github.com/dolezel/react-csv-downloader#get-csv-contents
 import downloadCSV from "react-csv-downloader/dist/cjs/lib/csv";
 
 type ConfigNameType = "export_metadata";
 
-type ContainerProps = ContainerWithRequestsProps & {
+type ComponentProps = ContainerProps & {
   isLoading: boolean;
   exportMetadata: (exportType: string) => void;
 };
 
-type ContainerWithRequestsProps = {
+type ContainerProps = {
   open: boolean;
   onClose: () => void;
   databaseId: string;
@@ -39,13 +41,13 @@ const useStyles = makeStyles({
   },
 });
 
-const Container = ({
+const Component = ({
   open,
   onClose,
   databaseId,
   isLoading,
   exportMetadata,
-}: ContainerProps): JSX.Element => {
+}: ComponentProps): JSX.Element => {
   const [exportType, setExportType] = useState<string>("JSON");
 
   const styles = useStyles();
@@ -71,7 +73,7 @@ const Container = ({
         <DialogCloseButton onClick={onClose} />
         <DialogTitle>
           <TextCenteringSpan>
-            {"Export metadata in " + databaseId}
+            {`Export metadata in ${databaseId}`}
           </TextCenteringSpan>
         </DialogTitle>
         <DialogBody>
@@ -82,9 +84,7 @@ const Container = ({
                 labelId="export-type-label"
                 value={exportType}
                 onChange={(event) => {
-                  setExportType(() => {
-                    return event.target.value;
-                  });
+                  setExportType(event.target.value);
                 }}
               >
                 <MenuItem value="JSON">JSON</MenuItem>
@@ -96,11 +96,7 @@ const Container = ({
         <Spacer direction="vertical" size="2vh" />
         <DialogToolBar
           right={
-            <LoadingButton
-              disabled={false}
-              pending={isLoading}
-              onClick={onExport}
-            >
+            <LoadingButton pending={isLoading} onClick={onExport}>
               Export
             </LoadingButton>
           }
@@ -110,11 +106,10 @@ const Container = ({
   );
 };
 
-const ContainerWithRequests = ({
+const Container = ({
   databaseId,
-  ...props
-}: ContainerWithRequestsProps): JSX.Element => {
-  const [isLoading, setIsLoading] = useState(false);
+  ...delegated
+}: ContainerProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
 
   const listRecords = useListRecords(getAccessToken, {
@@ -122,22 +117,11 @@ const ContainerWithRequests = ({
     perPage: 999999999, // FIXME
   });
   const listRecordsRes = listRecords[0];
-
-  useEffect(() => {
-    if (listRecordsRes) {
-      setIsLoading(() => {
-        return false;
-      });
-    } else {
-      setIsLoading(() => {
-        return true;
-      });
-    }
-  }, [listRecordsRes]);
+  const isLoading = !listRecordsRes;
 
   const exportAsJSON = () => {
     if (listRecordsRes) {
-      const fileName = "metadata-" + databaseId + ".json";
+      const fileName = `metadata-${databaseId}.json`;
       const data = new Blob([JSON.stringify(listRecordsRes.data)], {
         type: "text/json",
       });
@@ -156,7 +140,7 @@ const ContainerWithRequests = ({
       const flatData = listRecordsRes.data.map((item) => {
         const metadata = {};
         for (const [key, value] of Object.entries(item)) {
-          metadata[key] = '"' + JSON.stringify(value) + '"';
+          metadata[key] = `"${JSON.stringify(value)}"`;
         }
         return metadata;
       });
@@ -165,7 +149,7 @@ const ContainerWithRequests = ({
       downloadCSV({
         datas: flatData,
       }).then((csv) => {
-        const fileName = "metadata-" + databaseId + ".csv";
+        const fileName = `metadata-${databaseId}.csv`;
         const data = new Blob([String(csv)], {
           type: "text/csv",
         });
@@ -198,14 +182,14 @@ const ContainerWithRequests = ({
   };
 
   return (
-    <Container
+    <Component
       isLoading={isLoading}
       exportMetadata={exportMetadata}
       databaseId={databaseId}
-      {...props}
+      {...delegated}
     />
   );
 };
 
-export { ContainerWithRequests as ExportMetadataModal };
+export { Container as ExportMetadataModal };
 export type { ContainerProps as ExportMetadataModalProps, ConfigNameType };
