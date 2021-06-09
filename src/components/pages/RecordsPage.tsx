@@ -67,6 +67,17 @@ const Page = (): JSX.Element => {
     string | null
   >(null);
 
+  const [getConfigRes, getConfigError] = (useGetConfig(getAccessToken, {
+    databaseId,
+  }) as unknown) as [
+    data: DatabaseConfigType | undefined,
+    error: any,
+    cacheKey: string
+  ];
+
+  const searchColumn = getConfigRes?.data_browser_config
+    ?.record_search_config || ["record_id"];
+
   const [
     listRecordsRes,
     listRecordsError,
@@ -76,15 +87,8 @@ const Page = (): JSX.Element => {
     perPage,
     page,
     search: searchText,
+    searchKey: searchColumn,
   });
-
-  const [getConfigRes, getConfigError] = (useGetConfig(getAccessToken, {
-    databaseId,
-  }) as unknown) as [
-    data: DatabaseConfigType | undefined,
-    error: any,
-    cacheKey: string
-  ];
 
   const displayColumns = getConfigRes?.data_browser_config?.record_display_config?.map(
     (value) => ({
@@ -113,6 +117,10 @@ const Page = (): JSX.Element => {
     {
       label: "Change display fields for record",
       value: "record_display_config",
+    },
+    {
+      label: "Change search fields for record",
+      value: "record_search_config",
     },
   ];
   const onSelectDatabaseConfig: DatabaseConfigButtonProps["onMenuSelect"] = (
