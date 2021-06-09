@@ -6,7 +6,7 @@ import {
 
 export default {
   component: FilePreviewModalComponent,
-  title: "FilePreviewModal",
+  title: "FilePreview/ModalComponent",
 };
 
 const Template: Story<FilePreviewModalComponentProps> = (args) => (
@@ -23,4 +23,6 @@ Default.args = {
   file: {
     path: "file.txt",
   },
+  fullWidth: true,
+  maxWidth: "lg",
 };

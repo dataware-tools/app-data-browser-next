@@ -3,62 +3,42 @@ import {
   fileProvider,
   API_ROUTE,
 } from "@dataware-tools/app-common";
-import Dialog from "@material-ui/core/Dialog";
+import Dialog, { DialogProps } from "@material-ui/core/Dialog";
 import React, { useState, useEffect } from "react";
 import { DialogBody } from "components/atoms/DialogBody";
 import { DialogContainer } from "components/atoms/DialogContainer";
-import { makeStyles } from "@material-ui/core/styles";
 import { useAuth0 } from "@auth0/auth0-react";
 import { FileType } from "./FileListItem";
+import { PreviewContainer } from "../molecules/preview";
 
-type ComponentProps = {
-  open: boolean;
-  onClose: () => void;
+type ComponentProps = DialogProps & {
   downloadURL: string | undefined | null;
   file: FileType;
+  height?: string;
 };
 
-type ContainerProps = {
-  open: boolean;
-  onClose: () => void;
+type ContainerProps = DialogProps & {
   file: FileType;
+  height?: string;
 };
-
-const useStyles = makeStyles({
-  body: {
-    alignItems: "center",
-    display: "flex",
-    flexShrink: 0,
-    justifyContent: "center",
-    width: "100%",
-  },
-});
 
 const Component = ({
-  open,
-  onClose,
   downloadURL,
   file,
+  height,
+  ...dialogProps
 }: ComponentProps): JSX.Element => {
-  const styles = useStyles();
-
-  const getPreviewComponent = (file: FileType) => {
-    return <>{file.path}</>;
-  };
-
   return (
-    <Dialog open={open} maxWidth="xl" onClose={onClose}>
-      <DialogContainer height="auto">
+    <Dialog {...dialogProps}>
+      <DialogContainer height={height}>
         <DialogBody>
-          <div className={styles.body}>
-            {downloadURL === undefined ? (
-              <LoadingIndicator />
-            ) : downloadURL === null ? (
-              <>Failed to get donwload-link</>
-            ) : (
-              <>{getPreviewComponent(file)}</>
-            )}
-          </div>
+          {downloadURL === undefined ? (
+            <LoadingIndicator />
+          ) : downloadURL === null ? (
+            <>Failed to get donwload-link</>
+          ) : (
+            <PreviewContainer file={file} url={downloadURL} />
+          )}
         </DialogBody>
       </DialogContainer>
     </Dialog>
@@ -72,23 +52,25 @@ const Container = ({ file, ...delegated }: ContainerProps): JSX.Element => {
   );
 
   useEffect(() => {
-    getAccessToken().then((accessToken: string) => {
-      fileProvider.OpenAPI.TOKEN = accessToken;
-      fileProvider.OpenAPI.BASE = API_ROUTE.FILE.BASE;
-      fileProvider.DownloadService.createJwtToDownloadFile({
-        requestBody: {
-          path: file.path,
-          content_type: file["content-type"],
-        },
-      })
-        .then((res: fileProvider.DownloadsPostedModel) => {
-          setDownloadURL(API_ROUTE.FILE.BASE + "/download/" + res.token);
+    if (file.path) {
+      getAccessToken().then((accessToken: string) => {
+        fileProvider.OpenAPI.TOKEN = accessToken;
+        fileProvider.OpenAPI.BASE = API_ROUTE.FILE.BASE;
+        fileProvider.DownloadService.createJwtToDownloadFile({
+          requestBody: {
+            path: file.path,
+            content_type: file["content-type"],
+          },
         })
-        .catch(() => {
-          setDownloadURL(null);
-        });
-    });
-  }, []);
+          .then((res: fileProvider.DownloadsPostedModel) => {
+            setDownloadURL(API_ROUTE.FILE.BASE + "/download/" + res.token);
+          })
+          .catch(() => {
+            setDownloadURL(null);
+          });
+      });
+    }
+  }, [file, getAccessToken]);
 
   return <Component downloadURL={downloadURL} file={file} {...delegated} />;
 };
