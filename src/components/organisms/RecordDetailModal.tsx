@@ -108,7 +108,20 @@ const Container = ({
   const onDeleteFile = async (file: metaStore.FileModel) => {
     if (!window.confirm("Are you sure you want to delete file?")) return;
 
-    const [deleteFileRes] = await fetchMetaStore(
+    const [, deleteFileEntityError] = await fetchFileProvider(
+      getAccessToken,
+      fileProvider.DeleteService.deleteFile,
+      {
+        path: file.path,
+      }
+    );
+
+    if (deleteFileEntityError) {
+      window.alert(`Error occur! : ${JSON.stringify(deleteFileEntityError)}`);
+      return;
+    }
+
+    const [deleteFileMetaRes, deleteFileMetaError] = await fetchMetaStore(
       getAccessToken,
       metaStore.FileService.deleteFile,
       {
@@ -117,9 +130,14 @@ const Container = ({
       }
     );
 
-    if (deleteFileRes && listFilesRes) {
+    if (deleteFileMetaError) {
+      window.alert(`Error occur! : ${JSON.stringify(deleteFileMetaError)}`);
+      return;
+    }
+
+    if (deleteFileMetaRes && listFilesRes) {
       const newFiles = listFilesRes.data.filter((oldFile) => {
-        return oldFile.uuid !== deleteFileRes.uuid;
+        return oldFile.uuid !== deleteFileMetaRes.uuid;
       });
       const newListFilesRes = { ...listFilesRes };
       newListFilesRes.data = newFiles;
