@@ -122,6 +122,10 @@ const Page = (): JSX.Element => {
       label: "Change search fields for record",
       value: "record_search_config",
     },
+    {
+      label: "Export metadata",
+      value: "export_metadata",
+    },
   ];
   const onSelectDatabaseConfig: DatabaseConfigButtonProps["onMenuSelect"] = (
     targetValue
