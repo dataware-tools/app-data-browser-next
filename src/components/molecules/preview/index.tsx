@@ -2,8 +2,13 @@ import { ContainerWithSpecType, PreviewContainerProps } from "./types";
 
 import DefaultPreview from "./Default";
 import TextPreview from "./Text";
+import VideoPreview from "./Video";
 
-const candidates: ContainerWithSpecType = [TextPreview, DefaultPreview];
+const candidates: ContainerWithSpecType = [
+  TextPreview,
+  VideoPreview,
+  DefaultPreview,
+];
 
 const PreviewContainer = ({
   file,
