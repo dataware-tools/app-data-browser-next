@@ -47,12 +47,18 @@ const FilePreviewer = ({ file, url }: FilePreviewerProps): JSX.Element => {
   for (const candidate of candidates) {
     const extensionSupported = file.path
       ? isExtensionsSupported(candidate, file)
-      : true;
+      : false;
     const contentTypeSupported = file["content-type"]
       ? isContentTypeSupported(candidate, file)
-      : true;
+      : false;
 
     if (extensionSupported && contentTypeSupported) {
+      return candidate.render({ url: url });
+    }
+    if (extensionSupported) {
+      return candidate.render({ url: url });
+    }
+    if (contentTypeSupported) {
       return candidate.render({ url: url });
     }
   }
