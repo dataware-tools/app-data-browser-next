@@ -11,7 +11,7 @@ const candidates: ContainerWithSpecType[] = [
   defaultPreviewerWithSpec,
 ];
 
-type PreviewerProps = {
+type FilePreviewerProps = {
   file: FileType;
   url: string;
 };
@@ -43,7 +43,7 @@ const isContentTypeSupported = (
     });
 };
 
-const Previewer = ({ file, url }: PreviewerProps): JSX.Element => {
+const FilePreviewer = ({ file, url }: FilePreviewerProps): JSX.Element => {
   for (const candidate of candidates) {
     const extensionSupported = file.path
       ? isExtensionsSupported(candidate, file)
@@ -60,5 +60,5 @@ const Previewer = ({ file, url }: PreviewerProps): JSX.Element => {
   return defaultPreviewerWithSpec.render({ url: url });
 };
 
-export { Previewer };
-export type { PreviewerProps };
+export { FilePreviewer };
+export type { FilePreviewerProps };
