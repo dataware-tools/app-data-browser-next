@@ -1,4 +1,4 @@
-import { SpecType } from "components/molecules/Preview/types";
+import { SpecType } from "./types";
 import ReactPlayer from "react-player";
 
 const spec: SpecType = {

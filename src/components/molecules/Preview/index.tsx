@@ -1,7 +1,4 @@
-import {
-  ContainerWithSpecType,
-  PreviewContainerProps,
-} from "components/molecules/Preview/types";
+import { ContainerWithSpecType, PreviewContainerProps } from "./types";
 
 import { defaultPreviewWithSpec } from "./Default";
 import { textPreviewWithSpec } from "./Text";

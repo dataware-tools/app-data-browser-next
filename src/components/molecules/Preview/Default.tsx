@@ -1,4 +1,4 @@
-import { SpecType } from "components/molecules/Preview/types";
+import { SpecType } from "./types";
 
 const spec: SpecType = {
   extensions: [".*"],
