@@ -21,10 +21,10 @@ const Container = ({ file, render }: ContainerProps): JSX.Element => {
     { requestBody: { path: file.path, content_type: file["content-type"] } },
     Boolean(file.path)
   );
+
   const downloadURL = createJwtRes
     ? `${API_ROUTE.FILE.BASE}/download/${createJwtRes.token}`
     : undefined;
-
   const isFetchFailed = Boolean(createJwtError);
 
   return isFetchFailed ? (
