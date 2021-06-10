@@ -1,4 +1,4 @@
-import { SpecType } from "./types";
+import { SpecType, ContainerProps } from "./types";
 import { useEffect, useState } from "react";
 import { TextField } from "@material-ui/core";
 
@@ -7,11 +7,11 @@ const spec: SpecType = {
   contentTypes: ["text/.*"],
 };
 
-const Container = (url: string): JSX.Element => {
+const Container = (props: ContainerProps): JSX.Element => {
   const [content, setContent] = useState<string | undefined>(undefined);
 
   useEffect(() => {
-    fetch(url)
+    fetch(props.url)
       .then((resp) => {
         return resp.text();
       })
@@ -38,7 +38,7 @@ const containerWithSpec = {
 };
 
 export {
-  spec as textPreviewSpec,
-  Container as TextPreview,
-  containerWithSpec as textPreviewWithSpec,
+  spec as textPreviewerSpec,
+  Container as TextPreviewer,
+  containerWithSpec as textPreviewerWithSpec,
 };

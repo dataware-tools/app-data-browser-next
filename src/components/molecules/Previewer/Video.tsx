@@ -1,4 +1,4 @@
-import { SpecType } from "./types";
+import { SpecType, ContainerProps } from "./types";
 import ReactPlayer from "react-player";
 
 const spec: SpecType = {
@@ -6,8 +6,8 @@ const spec: SpecType = {
   contentTypes: ["video/.*"],
 };
 
-const Container = (url: string): JSX.Element => {
-  return <ReactPlayer url={url} controls width="100%" height="100%" />;
+const Container = (props: ContainerProps): JSX.Element => {
+  return <ReactPlayer url={props.url} controls width="100%" height="100%" />;
 };
 
 const containerWithSpec = {
@@ -16,7 +16,7 @@ const containerWithSpec = {
 };
 
 export {
-  spec as videoPreviewSpec,
-  Container as VideoPreview,
-  containerWithSpec as videoPreviewWithSpec,
+  spec as videoPreviewerSpec,
+  Container as VideoPreviewer,
+  containerWithSpec as videoPreviewerWithSpec,
 };

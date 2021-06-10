@@ -1,12 +1,12 @@
-import { SpecType } from "./types";
+import { SpecType, ContainerProps } from "./types";
 
 const spec: SpecType = {
   extensions: [".*"],
   contentTypes: [".*"],
 };
 
-const Container = (url: string): JSX.Element => {
-  return <div>Default Preview: {url}</div>;
+const Container = (props: ContainerProps): JSX.Element => {
+  return <div>Default Preview: {props.url}</div>;
 };
 
 const containerWithSpec = {
@@ -15,7 +15,7 @@ const containerWithSpec = {
 };
 
 export {
-  spec as defaultPreviewSpec,
-  Container as DefaultPreview,
-  containerWithSpec as defaultPreviewWithSpec,
+  spec as defaultPreviewerSpec,
+  Container as DefaultPreviewer,
+  containerWithSpec as defaultPreviewerWithSpec,
 };

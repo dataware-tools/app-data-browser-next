@@ -3,9 +3,13 @@ type SpecType = {
   contentTypes: string[];
 };
 
+type ContainerProps = {
+  url: string;
+};
+
 type ContainerWithSpecType = {
   spec: SpecType;
-  render: (url: string) => JSX.Element;
+  render: (props: ContainerProps) => JSX.Element;
 }[];
 
-export type { SpecType, ContainerWithSpecType };
+export type { SpecType, ContainerProps, ContainerWithSpecType };

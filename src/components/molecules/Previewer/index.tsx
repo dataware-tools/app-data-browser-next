@@ -1,14 +1,14 @@
 import { FileType } from "components/organisms/FileListItem";
 
 import { ContainerWithSpecType } from "./types";
-import { defaultPreviewWithSpec } from "./Default";
-import { textPreviewWithSpec } from "./Text";
-import { videoPreviewWithSpec } from "./Video";
+import { defaultPreviewerWithSpec } from "./Default";
+import { textPreviewerWithSpec } from "./Text";
+import { videoPreviewerWithSpec } from "./Video";
 
 const candidates: ContainerWithSpecType = [
-  textPreviewWithSpec,
-  videoPreviewWithSpec,
-  defaultPreviewWithSpec,
+  textPreviewerWithSpec,
+  videoPreviewerWithSpec,
+  defaultPreviewerWithSpec,
 ];
 
 type PreviewerProps = {
@@ -40,11 +40,11 @@ const Previewer = ({ file, url }: PreviewerProps): JSX.Element => {
     }
 
     if (isExtensionSupported && isContentTypeSupported) {
-      return candidate.render(url);
+      return candidate.render({ url: url });
     }
   }
 
-  return defaultPreviewWithSpec.render(url);
+  return defaultPreviewerWithSpec.render({ url: url });
 };
 
 export { Previewer };
