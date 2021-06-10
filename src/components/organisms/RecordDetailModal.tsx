@@ -16,12 +16,12 @@ import { RecordInfo } from "components/organisms/RecordInfo";
 import { mutate } from "swr";
 import { useAuth0 } from "@auth0/auth0-react";
 import {
-  fetchFileProvider,
   fetchMetaStore,
   useGetRecord,
   useListFiles,
   usePrevious,
-} from "utils/index";
+  uploadFileToFileProvider,
+} from "utils";
 import { RecordEditModal } from "components/organisms/RecordEditModal";
 import {
   FileUploadButton,
@@ -34,6 +34,7 @@ import { DialogContainer } from "components/atoms/DialogContainer";
 import { DialogTitle } from "components/atoms/DialogTitle";
 import { DialogBody } from "components/atoms/DialogBody";
 import { DialogToolBar } from "components/atoms/DialogToolBar";
+import { produce } from "immer";
 
 type ContainerProps = {
   open: boolean;
@@ -176,20 +177,14 @@ const Container = ({
     ) {
       return;
     }
+
     setIsAddingFile(true);
 
-    const contents = { description: "this is test file" };
-    const binaryJson = new Blob([JSON.stringify(contents)], {
-      type: "application/json",
-    });
-
     const requestBody = new FormData();
-    requestBody.append("contents", binaryJson);
     requestBody.append("file", files[0]);
 
-    const [createFileRes] = await fetchFileProvider(
+    const [createFileRes, createFileError] = await uploadFileToFileProvider(
       getAccessToken,
-      fileProvider.UploadService.uploadFile,
       {
         databaseId,
         recordId,
@@ -197,13 +192,20 @@ const Container = ({
       }
     );
 
-    if (createFileRes && listFilesRes) {
-      const newFileList = { ...listFilesRes };
-      newFileList.data.push(createFileRes);
-
-      mutate(listFilesCacheKey, newFileList, false);
+    if (createFileError) {
+      window.alert(`Fail to upload: ${JSON.stringify(createFileError)}`);
+      setIsAddingFile(false);
+      return;
     }
-    // TODO: add file uploading process
+
+    if (createFileRes && listFilesRes) {
+      const newListFilesRes = produce(listFilesRes, (draft) => {
+        draft.data.push(createFileRes);
+      });
+
+      mutate(listFilesCacheKey, newListFilesRes, false);
+    }
+
     setIsAddingFile(false);
   };
 

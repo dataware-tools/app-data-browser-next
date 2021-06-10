@@ -40,8 +40,48 @@ const fetchFileProvider = async <T, U>(
   param: T
 ): Promise<[data: Data<U>, error: any]> => {
   fileProvider.OpenAPI.BASE = API_ROUTE.FILE.BASE;
-  metaStore.OpenAPI.TOKEN = token;
+  fileProvider.OpenAPI.TOKEN = token;
   return await fetchAPI(fetcher, param);
+};
+
+// TODO: If openapi-typescript-codegen support multipart/formData schema, deprecate below fetching
+// See: https://github.com/ferdikoomen/openapi-typescript-codegen/issues/257
+const uploadFileToFileProvider = async (
+  token: string | (() => Promise<string>),
+  {
+    databaseId,
+    recordId,
+    requestBody,
+  }: Parameters<typeof fileProvider.UploadService.uploadFile>[number]
+): Promise<
+  [
+    data: Data<
+      AwaitType<ReturnType<typeof fileProvider.UploadService.uploadFile>>
+    >,
+    error: any
+  ]
+> => {
+  const accessToken = typeof token === "string" ? token : await token();
+
+  const [data, error] = await fetch(
+    `${API_ROUTE.FILE.BASE}/upload?database_id=${databaseId}&record_id=${recordId}`,
+    {
+      method: "POST",
+      body: requestBody,
+      headers: { Authorization: `Bearer ${accessToken}` },
+    }
+  )
+    .then(async (res) => {
+      if (!res.ok) {
+        const error = await res.json();
+        return error;
+      }
+      return res.json();
+    })
+    .then((resBody) => [resBody || "__fetchSuccess__", undefined])
+    .catch((error) => [undefined, error]);
+
+  return [data, error];
 };
 
 interface UseAPI<T extends (...args: any) => Promise<any>> {
@@ -174,6 +214,7 @@ export {
   fetchAPI,
   fetchMetaStore,
   fetchFileProvider,
+  uploadFileToFileProvider,
   useGetRecord,
   useListRecords,
   useListFiles,

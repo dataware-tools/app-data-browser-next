@@ -28,3 +28,11 @@ RecordDisplayConfig.args = {
   databaseId: "test1",
   configName: "record_display_config",
 };
+
+export const ExportMetadata = Template.bind({});
+ExportMetadata.args = {
+  open: true,
+  onClose: () => window.alert("close!"),
+  databaseId: "test1",
+  configName: "export_metadata",
+};
