@@ -16,30 +16,43 @@ type PreviewerProps = {
   url: string;
 };
 
+const isExtensionsSupported = (
+  candidate: ContainerWithSpecType,
+  file: FileType
+): boolean => {
+  return candidate.spec.extensions
+    .map((extension: string) => {
+      return file.path.endsWith(extension);
+    })
+    .some((b) => {
+      return b;
+    });
+};
+
+const isContentTypeSupported = (
+  candidate: ContainerWithSpecType,
+  file: FileType
+): boolean => {
+  return candidate.spec.contentTypes
+    .map((contentType: string) => {
+      const regex = new RegExp(contentType);
+      return regex.test(file["content-type"]);
+    })
+    .some((b) => {
+      return b;
+    });
+};
+
 const Previewer = ({ file, url }: PreviewerProps): JSX.Element => {
   for (const candidate of candidates) {
-    let isExtensionSupported = false;
-    let isContentTypeSupported = false;
+    const extensionSupported = file.path
+      ? isExtensionsSupported(candidate, file)
+      : true;
+    const contentTypeSupported = file["content-type"]
+      ? isContentTypeSupported(candidate, file)
+      : true;
 
-    if (file.path) {
-      for (const extension of candidate.spec.extensions) {
-        if (file.path.endsWith(extension)) {
-          isExtensionSupported = true;
-        }
-      }
-    }
-    if (file["content-type"]) {
-      for (const contentType of candidate.spec.contentTypes) {
-        const regex = new RegExp(contentType);
-        if (regex.test(file["content-type"])) {
-          isContentTypeSupported = true;
-        }
-      }
-    } else {
-      isContentTypeSupported = true;
-    }
-
-    if (isExtensionSupported && isContentTypeSupported) {
+    if (extensionSupported && contentTypeSupported) {
       return candidate.render({ url: url });
     }
   }
