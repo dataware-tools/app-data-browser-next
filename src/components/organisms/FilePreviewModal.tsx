@@ -52,6 +52,7 @@ const Container = ({ file, ...delegated }: ContainerProps): JSX.Element => {
   );
 
   if (file.path) {
+    // TODO: Move the following fetcher to app-common
     getAccessToken().then((accessToken: string) => {
       fileProvider.OpenAPI.TOKEN = accessToken;
       fileProvider.OpenAPI.BASE = API_ROUTE.FILE.BASE;
