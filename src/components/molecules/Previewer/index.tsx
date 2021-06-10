@@ -1,5 +1,6 @@
-import { ContainerWithSpecType, PreviewContainerProps } from "./types";
+import { FileType } from "components/organisms/FileListItem";
 
+import { ContainerWithSpecType } from "./types";
 import { defaultPreviewWithSpec } from "./Default";
 import { textPreviewWithSpec } from "./Text";
 import { videoPreviewWithSpec } from "./Video";
@@ -10,10 +11,12 @@ const candidates: ContainerWithSpecType = [
   defaultPreviewWithSpec,
 ];
 
-const PreviewContainer = ({
-  file,
-  url,
-}: PreviewContainerProps): JSX.Element => {
+type PreviewerProps = {
+  file: FileType;
+  url: string;
+};
+
+const Previewer = ({ file, url }: PreviewerProps): JSX.Element => {
   for (const candidate of candidates) {
     let isExtensionSupported = false;
     let isContentTypeSupported = false;
@@ -44,5 +47,5 @@ const PreviewContainer = ({
   return defaultPreviewWithSpec.render(url);
 };
 
-export { PreviewContainer };
-export type { PreviewContainerProps };
+export { Previewer };
+export type { PreviewerProps };

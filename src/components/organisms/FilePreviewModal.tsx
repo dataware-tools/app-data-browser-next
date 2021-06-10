@@ -9,7 +9,7 @@ import { DialogBody } from "components/atoms/DialogBody";
 import { DialogContainer } from "components/atoms/DialogContainer";
 import { useAuth0 } from "@auth0/auth0-react";
 import { FileType } from "components/organisms/FileListItem";
-import { PreviewContainer } from "components/molecules/Preview";
+import { Previewer } from "components/molecules/Previewer";
 
 type ComponentProps = DialogProps & {
   downloadURL: string | undefined | null;
@@ -37,7 +37,7 @@ const Component = ({
           ) : downloadURL === null ? (
             "Failed to get download-link"
           ) : (
-            <PreviewContainer file={file} url={downloadURL} />
+            <Previewer file={file} url={downloadURL} />
           )}
         </DialogBody>
       </DialogContainer>
