@@ -8,8 +8,8 @@ import React, { useState } from "react";
 import { DialogBody } from "components/atoms/DialogBody";
 import { DialogContainer } from "components/atoms/DialogContainer";
 import { useAuth0 } from "@auth0/auth0-react";
-import { FileType } from "./FileListItem";
-import { PreviewContainer } from "../molecules/preview";
+import { FileType } from "components/organisms/FileListItem";
+import { PreviewContainer } from "components/molecules/Preview";
 
 type ComponentProps = DialogProps & {
   downloadURL: string | undefined | null;

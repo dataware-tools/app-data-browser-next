@@ -1,4 +1,4 @@
-import { SpecType } from "./types";
+import { SpecType } from "components/molecules/Preview/types";
 
 const spec: SpecType = {
   extensions: [".*"],
@@ -11,9 +11,11 @@ const Container = (url: string): JSX.Element => {
 
 const containerWithSpec = {
   spec: spec,
-  container: Container,
+  render: Container,
 };
 
-export { spec, Container };
-
-export default containerWithSpec;
+export {
+  spec as defaultPreviewSpec,
+  Container as DefaultPreview,
+  containerWithSpec as defaultPreviewWithSpec,
+};

@@ -1,13 +1,16 @@
-import { ContainerWithSpecType, PreviewContainerProps } from "./types";
+import {
+  ContainerWithSpecType,
+  PreviewContainerProps,
+} from "components/molecules/Preview/types";
 
-import DefaultPreview from "./Default";
-import TextPreview from "./Text";
-import VideoPreview from "./Video";
+import { defaultPreviewWithSpec } from "./Default";
+import { textPreviewWithSpec } from "./Text";
+import { videoPreviewWithSpec } from "./Video";
 
 const candidates: ContainerWithSpecType = [
-  TextPreview,
-  VideoPreview,
-  DefaultPreview,
+  textPreviewWithSpec,
+  videoPreviewWithSpec,
+  defaultPreviewWithSpec,
 ];
 
 const PreviewContainer = ({
@@ -37,11 +40,11 @@ const PreviewContainer = ({
     }
 
     if (isExtensionSupported && isContentTypeSupported) {
-      return candidate.container(url);
+      return candidate.render(url);
     }
   }
 
-  return DefaultPreview.container(url);
+  return defaultPreviewWithSpec.render(url);
 };
 
 export { PreviewContainer };

@@ -1,4 +1,4 @@
-import { FileType } from "../../organisms/FileListItem";
+import { FileType } from "components/organisms/FileListItem";
 
 type SpecType = {
   extensions: string[];
@@ -12,7 +12,7 @@ type PreviewContainerProps = {
 
 type ContainerWithSpecType = {
   spec: SpecType;
-  container: (url: string) => JSX.Element;
+  render: (url: string) => JSX.Element;
 }[];
 
 export type { SpecType, PreviewContainerProps, ContainerWithSpecType };
