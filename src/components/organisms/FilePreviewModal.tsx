@@ -11,45 +11,28 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { FileType } from "components/organisms/FileListItem";
 import { FilePreviewer } from "components/molecules/FilePreviewer";
 
-type ComponentProps = DialogProps & {
-  downloadURL: string | undefined | null;
+type ComponentProps = {
+  downloadURL: string;
+  file: FileType;
+};
+
+type ContainerProps = {
+  file: FileType;
+};
+
+type ContainerWithDialogProps = DialogProps & {
   file: FileType;
   height?: string;
 };
 
-type ContainerProps = DialogProps & {
-  file: FileType;
-  height?: string;
+const Component = ({ downloadURL, file }: ComponentProps): JSX.Element => {
+  return <FilePreviewer file={file} url={downloadURL} />;
 };
 
-const Component = ({
-  downloadURL,
-  file,
-  height,
-  ...dialogProps
-}: ComponentProps): JSX.Element => {
-  return (
-    <Dialog {...dialogProps}>
-      <DialogContainer height={height}>
-        <DialogBody>
-          {downloadURL === undefined ? (
-            <LoadingIndicator />
-          ) : downloadURL === null ? (
-            "Failed to get download-link"
-          ) : (
-            <FilePreviewer file={file} url={downloadURL} />
-          )}
-        </DialogBody>
-      </DialogContainer>
-    </Dialog>
-  );
-};
-
-const Container = ({ file, ...delegated }: ContainerProps): JSX.Element => {
+const Container = ({ file }: ContainerProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
-  const [downloadURL, setDownloadURL] = useState<string | undefined | null>(
-    undefined
-  );
+  const [downloadURL, setDownloadURL] = useState<string | undefined>(undefined);
+  const [isFetchFailed, setIsFetchFailed] = useState<boolean>(false);
 
   if (file.path) {
     // TODO: Move the following fetcher to app-common
@@ -66,19 +49,47 @@ const Container = ({ file, ...delegated }: ContainerProps): JSX.Element => {
           setDownloadURL(API_ROUTE.FILE.BASE + "/download/" + res.token);
         })
         .catch(() => {
-          setDownloadURL(null);
+          setIsFetchFailed(true);
         });
     });
   }
 
-  return <Component downloadURL={downloadURL} file={file} {...delegated} />;
+  return (
+    <>
+      {isFetchFailed ? (
+        <p>Fetch failed</p>
+      ) : downloadURL ? (
+        <Component downloadURL={downloadURL} file={file} />
+      ) : (
+        <LoadingIndicator />
+      )}
+    </>
+  );
+};
+
+const ContainerWithDialog = ({
+  file,
+  height,
+  ...dialogProps
+}: ContainerWithDialogProps): JSX.Element => {
+  return (
+    <Dialog {...dialogProps}>
+      <DialogContainer height={height}>
+        <DialogBody>
+          <Container file={file} />
+        </DialogBody>
+      </DialogContainer>
+    </Dialog>
+  );
 };
 
 export {
-  Container as FilePreviewModal,
+  ContainerWithDialog as FilePreviewModal,
+  Container as FilePreviewModalContainer,
   Component as FilePreviewModalComponent,
 };
 export type {
-  ContainerProps as FilePreviewModalProps,
+  ContainerWithDialogProps as FilePreviewModalProps,
+  ContainerProps as FilePreviewModalContainerProps,
   ComponentProps as FilePreviewModalComponentProps,
 };

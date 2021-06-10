@@ -1,27 +1,36 @@
 import { Story } from "@storybook/react";
-import {
-  FilePreviewModalComponent,
-  FilePreviewModalComponentProps,
-} from "./FilePreviewModal";
+import { FilePreviewModal, FilePreviewModalProps } from "./FilePreviewModal";
 
 export default {
-  component: FilePreviewModalComponent,
-  title: "FilePreview/ModalComponent",
+  component: FilePreviewModal,
+  title: "FilePreview/Modal",
 };
 
-const Template: Story<FilePreviewModalComponentProps> = (args) => (
-  <FilePreviewModalComponent {...args} />
+const Template: Story<FilePreviewModalProps> = (args) => (
+  <FilePreviewModal {...args} />
 );
 
-export const Default = Template.bind({});
-Default.args = {
+export const NoSuchFile = Template.bind({});
+NoSuchFile.args = {
   open: true,
   onClose: () => {
     window.alert("Close");
   },
-  downloadURL: undefined,
   file: {
-    path: "file.txt",
+    path: "/path/to/file",
+  },
+  fullWidth: true,
+  maxWidth: "lg",
+};
+
+export const Text = Template.bind({});
+Text.args = {
+  open: true,
+  onClose: () => {
+    window.alert("Close");
+  },
+  file: {
+    path: "/opt/app/README.md",
   },
   fullWidth: true,
   maxWidth: "lg",
