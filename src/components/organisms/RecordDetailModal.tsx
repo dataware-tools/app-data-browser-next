@@ -20,7 +20,8 @@ import {
   useGetRecord,
   useListFiles,
   usePrevious,
-} from "utils/index";
+  uploadFileToFileProvider,
+} from "utils";
 import { RecordEditModal } from "components/organisms/RecordEditModal";
 import {
   FileUploadButton,
@@ -33,6 +34,7 @@ import { DialogContainer } from "components/atoms/DialogContainer";
 import { DialogTitle } from "components/atoms/DialogTitle";
 import { DialogBody } from "components/atoms/DialogBody";
 import { DialogToolBar } from "components/atoms/DialogToolBar";
+import { produce } from "immer";
 
 type ContainerProps = {
   open: boolean;
@@ -157,40 +159,35 @@ const Container = ({
     ) {
       return;
     }
+
     setIsAddingFile(true);
 
-    const contents = {
-      database_id: databaseId,
-      record_id: recordId,
-      description: "this is test file",
-    };
-    const binaryMetadata = new Blob([JSON.stringify(contents)], {
-      type: "application/json",
-    });
-
     const requestBody = new FormData();
-    requestBody.append("contents", binaryMetadata);
     requestBody.append("file", files[0]);
 
-    // TODO: If openapi-typescript-codegen support multipart/formData schema, deprecate this func
-    // See: https://github.com/ferdikoomen/openapi-typescript-codegen/issues/257
-    const accessToken = await getAccessToken();
-    const createFileRes = await fetch(
-      `${API_ROUTE.FILE.BASE}/upload?database_id=${databaseId}&record_id=${recordId}`,
+    const [createFileRes, createFileError] = await uploadFileToFileProvider(
+      getAccessToken,
       {
-        method: "POST",
-        body: requestBody,
-        headers: { Authorization: `Bearer ${accessToken}` },
+        databaseId,
+        recordId,
+        requestBody,
       }
     );
 
-    if (createFileRes.status === 201 && listFilesRes) {
-      const newFileList = { ...listFilesRes };
-      newFileList.data.push(createFileRes.json());
-
-      mutate(listFilesCacheKey, newFileList, false);
+    if (createFileError) {
+      window.alert(`Fail to upload: ${JSON.stringify(createFileError)}`);
+      setIsAddingFile(false);
+      return;
     }
-    // TODO: add file uploading process
+
+    if (createFileRes && listFilesRes) {
+      const newListFilesRes = produce(listFilesRes, (draft) => {
+        draft.data.push(createFileRes);
+      });
+
+      mutate(listFilesCacheKey, newListFilesRes, false);
+    }
+
     setIsAddingFile(false);
   };
 
