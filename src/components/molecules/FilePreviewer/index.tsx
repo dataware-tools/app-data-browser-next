@@ -2,7 +2,14 @@ import { DefaultPreviewer } from "./DefaultPreviewer";
 import { TextPreviewer } from "./TextPreviewer";
 import { VideoPreviewer } from "./VideoPreviewer";
 import { metaStore } from "@dataware-tools/app-common";
-import { FilePreviewerContentWithSpec } from "./types";
+
+type FilePreviewerContentWithSpec = {
+  spec: {
+    extensions: string[];
+    contentTypes: string[];
+  };
+  render: (url: string) => JSX.Element;
+};
 
 const filePreviewerCandidates: Record<string, FilePreviewerContentWithSpec> = {
   default: {
