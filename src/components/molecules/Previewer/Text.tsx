@@ -1,4 +1,4 @@
-import { SpecType, ContainerProps } from "./types";
+import { SpecType, ContainerProps, ContainerWithSpecType } from "./types";
 import { useEffect, useState } from "react";
 import { TextField } from "@material-ui/core";
 
@@ -32,7 +32,7 @@ const Container = (props: ContainerProps): JSX.Element => {
   );
 };
 
-const containerWithSpec = {
+const containerWithSpec: ContainerWithSpecType = {
   spec: spec,
   render: Container,
 };

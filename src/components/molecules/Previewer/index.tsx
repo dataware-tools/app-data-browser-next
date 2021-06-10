@@ -5,7 +5,7 @@ import { defaultPreviewerWithSpec } from "./Default";
 import { textPreviewerWithSpec } from "./Text";
 import { videoPreviewerWithSpec } from "./Video";
 
-const candidates: ContainerWithSpecType = [
+const candidates: ContainerWithSpecType[] = [
   textPreviewerWithSpec,
   videoPreviewerWithSpec,
   defaultPreviewerWithSpec,

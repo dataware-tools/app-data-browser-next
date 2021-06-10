@@ -1,4 +1,4 @@
-import { SpecType, ContainerProps } from "./types";
+import { SpecType, ContainerProps, ContainerWithSpecType } from "./types";
 import ReactPlayer from "react-player";
 
 const spec: SpecType = {
@@ -10,7 +10,7 @@ const Container = (props: ContainerProps): JSX.Element => {
   return <ReactPlayer url={props.url} controls width="100%" height="100%" />;
 };
 
-const containerWithSpec = {
+const containerWithSpec: ContainerWithSpecType = {
   spec: spec,
   render: Container,
 };

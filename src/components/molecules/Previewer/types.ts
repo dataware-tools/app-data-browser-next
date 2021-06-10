@@ -10,6 +10,6 @@ type ContainerProps = {
 type ContainerWithSpecType = {
   spec: SpecType;
   render: (props: ContainerProps) => JSX.Element;
-}[];
+};
 
 export type { SpecType, ContainerProps, ContainerWithSpecType };
