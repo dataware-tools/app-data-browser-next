@@ -6,7 +6,7 @@ const spec: SpecType = {
 };
 
 const Container = (url: string): JSX.Element => {
-  return <>Default Preview: {url}</>;
+  return <div>Default Preview: {url}</div>;
 };
 
 const containerWithSpec = {
