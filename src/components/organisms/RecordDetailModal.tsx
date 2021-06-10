@@ -34,7 +34,7 @@ import { DialogContainer } from "components/atoms/DialogContainer";
 import { DialogTitle } from "components/atoms/DialogTitle";
 import { DialogBody } from "components/atoms/DialogBody";
 import { DialogToolBar } from "components/atoms/DialogToolBar";
-import { FilePreviewModal } from "./FilePreviewModal";
+import { FilePreviewModal } from "components/organisms/FilePreviewModal";
 
 type ContainerProps = {
   open: boolean;

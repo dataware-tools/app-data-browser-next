@@ -4,7 +4,7 @@ import {
   API_ROUTE,
 } from "@dataware-tools/app-common";
 import Dialog, { DialogProps } from "@material-ui/core/Dialog";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { DialogBody } from "components/atoms/DialogBody";
 import { DialogContainer } from "components/atoms/DialogContainer";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -35,7 +35,7 @@ const Component = ({
           {downloadURL === undefined ? (
             <LoadingIndicator />
           ) : downloadURL === null ? (
-            <>Failed to get donwload-link</>
+            "Failed to get download-link"
           ) : (
             <PreviewContainer file={file} url={downloadURL} />
           )}
@@ -51,26 +51,24 @@ const Container = ({ file, ...delegated }: ContainerProps): JSX.Element => {
     undefined
   );
 
-  useEffect(() => {
-    if (file.path) {
-      getAccessToken().then((accessToken: string) => {
-        fileProvider.OpenAPI.TOKEN = accessToken;
-        fileProvider.OpenAPI.BASE = API_ROUTE.FILE.BASE;
-        fileProvider.DownloadService.createJwtToDownloadFile({
-          requestBody: {
-            path: file.path,
-            content_type: file["content-type"],
-          },
+  if (file.path) {
+    getAccessToken().then((accessToken: string) => {
+      fileProvider.OpenAPI.TOKEN = accessToken;
+      fileProvider.OpenAPI.BASE = API_ROUTE.FILE.BASE;
+      fileProvider.DownloadService.createJwtToDownloadFile({
+        requestBody: {
+          path: file.path,
+          content_type: file["content-type"],
+        },
+      })
+        .then((res: fileProvider.DownloadsPostedModel) => {
+          setDownloadURL(API_ROUTE.FILE.BASE + "/download/" + res.token);
         })
-          .then((res: fileProvider.DownloadsPostedModel) => {
-            setDownloadURL(API_ROUTE.FILE.BASE + "/download/" + res.token);
-          })
-          .catch(() => {
-            setDownloadURL(null);
-          });
-      });
-    }
-  }, [file, getAccessToken]);
+        .catch(() => {
+          setDownloadURL(null);
+        });
+    });
+  }
 
   return <Component downloadURL={downloadURL} file={file} {...delegated} />;
 };
