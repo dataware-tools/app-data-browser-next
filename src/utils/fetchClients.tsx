@@ -6,7 +6,7 @@ import {
 } from "@dataware-tools/app-common";
 import useSWR from "swr";
 import { AwaitType } from "./utilTypes";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 type Data<T> = T extends void | undefined | null
   ? "__fetchSuccess__" | undefined
@@ -195,19 +195,21 @@ const useCreateJwtToDownloadFile: UseAPIWithoutCache<
     error: undefined,
   });
 
-  if (shouldFetch) {
-    fileProvider.OpenAPI.TOKEN = token;
-    fileProvider.OpenAPI.BASE = API_ROUTE.FILE.BASE;
-    fileProvider.DownloadService.createJwtToDownloadFile({
-      requestBody,
-    })
-      .then((fetchRes) => {
-        setRes({ data: fetchRes, error: undefined });
+  useEffect(() => {
+    if (shouldFetch) {
+      fileProvider.OpenAPI.TOKEN = token;
+      fileProvider.OpenAPI.BASE = API_ROUTE.FILE.BASE;
+      fileProvider.DownloadService.createJwtToDownloadFile({
+        requestBody,
       })
-      .catch((error) => {
-        setRes({ data: undefined, error: error });
-      });
-  }
+        .then((fetchRes) => {
+          setRes({ data: fetchRes, error: undefined });
+        })
+        .catch((error) => {
+          setRes({ data: undefined, error: error });
+        });
+    }
+  }, [token, shouldFetch]);
 
   return [res.data, res.error];
 };

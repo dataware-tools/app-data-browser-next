@@ -1,17 +1,19 @@
 import { FilePreviewerContent } from "./types";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TextField } from "@material-ui/core";
 
 const Container: FilePreviewerContent = ({ url }) => {
   const [content, setContent] = useState<string | undefined>(undefined);
 
-  fetch(url)
-    .then((resp) => {
-      return resp.text();
-    })
-    .then((text) => {
-      setContent(text);
-    });
+  useEffect(() => {
+    fetch(url)
+      .then((resp) => {
+        return resp.text();
+      })
+      .then((text) => {
+        setContent(text);
+      });
+  }, [url]);
 
   return (
     <TextField

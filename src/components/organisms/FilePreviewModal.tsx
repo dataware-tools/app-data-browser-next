@@ -22,7 +22,6 @@ const Component = ({
           <FileDownloadURLInjector
             file={file}
             render={(file, url) => {
-              console.log("render func is executed");
               return <FilePreviewer file={file} url={url} />;
             }}
           />

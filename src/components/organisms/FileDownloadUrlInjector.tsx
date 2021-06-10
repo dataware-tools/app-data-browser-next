@@ -5,13 +5,12 @@ import {
 } from "@dataware-tools/app-common";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useCreateJwtToDownloadFile } from "utils";
-import { ReactNode } from "react";
 
 type FileType = metaStore.FileModel;
 
 type ContainerProps = {
   file: FileType;
-  render: (file: FileType, downloadURL: string) => ReactNode;
+  render: (file: FileType, downloadURL: string) => JSX.Element;
 };
 
 const Container = ({ file, render }: ContainerProps): JSX.Element => {
@@ -28,16 +27,12 @@ const Container = ({ file, render }: ContainerProps): JSX.Element => {
 
   const isFetchFailed = Boolean(createJwtError);
 
-  return (
-    <>
-      {isFetchFailed ? (
-        <p>Fetch failed</p>
-      ) : downloadURL ? (
-        render(file, downloadURL)
-      ) : (
-        <LoadingIndicator />
-      )}
-    </>
+  return isFetchFailed ? (
+    <p>Fetch failed</p>
+  ) : downloadURL ? (
+    render(file, downloadURL)
+  ) : (
+    <LoadingIndicator />
   );
 };
 
