@@ -1,21 +1,18 @@
 import { Story } from "@storybook/react";
-import {
-  FilePreviewModalComponent,
-  FilePreviewModalComponentProps,
-} from "./FilePreviewModal";
+import { FilePreviewer, FilePreviewerProps } from "./";
 
 export default {
-  component: FilePreviewModalComponent,
-  title: "FilePreview/ModalComponent",
+  component: FilePreviewer,
+  title: "FilePreview",
 };
 
-const Template: Story<FilePreviewModalComponentProps> = (args) => (
-  <FilePreviewModalComponent {...args} />
+const Template: Story<FilePreviewerProps> = (args) => (
+  <FilePreviewer {...args} />
 );
 
 export const Default = Template.bind({});
 Default.args = {
-  downloadURL: "",
+  url: "",
   file: {
     path: "",
   },
@@ -23,7 +20,7 @@ Default.args = {
 
 export const Text = Template.bind({});
 Text.args = {
-  downloadURL:
+  url:
     "https://raw.githubusercontent.com/dataware-tools/pydtk/master/README.md",
   file: {
     path: "file.txt",
@@ -32,7 +29,7 @@ Text.args = {
 
 export const Video = Template.bind({});
 Video.args = {
-  downloadURL:
+  url:
     "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/360/Big_Buck_Bunny_360_10s_1MB.mp4",
   file: {
     path:

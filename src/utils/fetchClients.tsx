@@ -6,6 +6,7 @@ import {
 } from "@dataware-tools/app-common";
 import useSWR from "swr";
 import { AwaitType } from "./utilTypes";
+import { useState } from "react";
 
 type Data<T> = T extends void | undefined | null
   ? "__fetchSuccess__" | undefined
@@ -50,6 +51,13 @@ interface UseAPI<T extends (...args: any) => Promise<any>> {
     param: Partial<Parameters<T>[number]>,
     shouldFetch?: boolean
   ): [data: AwaitType<ReturnType<T>> | undefined, error: any, cacheKey: string];
+}
+
+interface UseAPIWithoutCache<T extends (...args: any) => Promise<any>> {
+  (...args: Parameters<UseAPI<T>>): [
+    ReturnType<UseAPI<T>>[0],
+    ReturnType<UseAPI<T>>[1]
+  ];
 }
 
 const useListDatabases: UseAPI<
@@ -168,6 +176,42 @@ const useListFiles: UseAPI<typeof metaStore.FileService.listFiles> = (
   return [data, error, cacheKey];
 };
 
+const useCreateJwtToDownloadFile: UseAPIWithoutCache<
+  typeof fileProvider.DownloadService.createJwtToDownloadFile
+> = (token, { requestBody }, shouldFetch = true) => {
+  type StateType = {
+    data:
+      | AwaitType<
+          ReturnType<
+            typeof fileProvider.DownloadService.createJwtToDownloadFile
+          >
+        >
+      | undefined;
+    error: any;
+  };
+
+  const [res, setRes] = useState<StateType>({
+    data: undefined,
+    error: undefined,
+  });
+
+  if (shouldFetch) {
+    fileProvider.OpenAPI.TOKEN = token;
+    fileProvider.OpenAPI.BASE = API_ROUTE.FILE.BASE;
+    fileProvider.DownloadService.createJwtToDownloadFile({
+      requestBody,
+    })
+      .then((fetchRes) => {
+        setRes({ data: fetchRes, error: undefined });
+      })
+      .catch((error) => {
+        setRes({ data: undefined, error: error });
+      });
+  }
+
+  return [res.data, res.error];
+};
+
 export {
   useListDatabases,
   useGetConfig,
@@ -177,4 +221,5 @@ export {
   useGetRecord,
   useListRecords,
   useListFiles,
+  useCreateJwtToDownloadFile,
 };

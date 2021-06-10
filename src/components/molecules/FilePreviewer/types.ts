@@ -1,15 +1,13 @@
-type SpecType = {
-  extensions: string[];
-  contentTypes: string[];
+interface FilePreviewerContent {
+  (props: { url: string }): JSX.Element;
+}
+
+type FilePreviewerContentWithSpec = {
+  spec: {
+    extensions: string[];
+    contentTypes: string[];
+  };
+  render: (url: string) => JSX.Element;
 };
 
-type ContainerProps = {
-  url: string;
-};
-
-type ContainerWithSpecType = {
-  spec: SpecType;
-  render: (props: ContainerProps) => JSX.Element;
-};
-
-export type { SpecType, ContainerProps, ContainerWithSpecType };
+export type { FilePreviewerContent, FilePreviewerContentWithSpec };
