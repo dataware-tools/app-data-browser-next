@@ -35,7 +35,7 @@ const Component = ({
   onDelete,
   onDownload,
 }: Props): JSX.Element | null => {
-  if (file.path == null) return null;
+  if (file.path == null || file.path === "" || file.path === "/") return null;
 
   return (
     <ListItem
