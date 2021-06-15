@@ -1,9 +1,11 @@
 import Dialog from "@material-ui/core/Dialog";
 import Button from "@material-ui/core/Button";
-import { DialogContainer } from "components/atoms/DialogContainer";
-import { DialogCloseButton } from "components/atoms/DialogCloseButton";
-import { DialogBody } from "components/atoms/DialogBody";
-import { DialogToolBar } from "components/atoms/DialogToolBar";
+import {
+  DialogToolBar,
+  DialogBody,
+  DialogCloseButton,
+  DialogContainer,
+} from "@dataware-tools/app-common";
 import Autocomplete, {
   createFilterOptions,
 } from "@material-ui/core/Autocomplete";

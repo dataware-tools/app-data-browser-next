@@ -1,6 +1,13 @@
-import { ErrorMessage, LoadingIndicator } from "@dataware-tools/app-common";
+import {
+  ErrorMessage,
+  LoadingIndicator,
+  DialogTitle,
+  DialogToolBar,
+  DialogBody,
+  DialogContainer,
+  DialogCloseButton,
+} from "@dataware-tools/app-common";
 import Dialog from "@material-ui/core/Dialog";
-import { DialogCloseButton } from "components/atoms/DialogCloseButton";
 import { useState, useEffect } from "react";
 import LoadingButton from "@material-ui/lab/LoadingButton";
 import { usePrevious } from "utils/index";
@@ -8,10 +15,6 @@ import {
   MetadataInputFieldList,
   MetadataInputFieldListProps,
 } from "components/organisms/MetadataInputFieldList";
-import { DialogContainer } from "components/atoms/DialogContainer";
-import { DialogBody } from "components/atoms/DialogBody";
-import { DialogToolBar } from "components/atoms/DialogToolBar";
-import { DialogTitle } from "components/atoms/DialogTitle";
 
 type ContainerProps = {
   open: boolean;

@@ -4,7 +4,7 @@ import {
   DatabaseConfigMenu,
   DatabaseConfigMenuProps,
 } from "components/molecules/DatabaseConfigMenu";
-import { SquareIconButton } from "components/atoms/SquareIconButton";
+import { SquareIconButton } from "@dataware-tools/app-common";
 import { DatabaseConfigNameType } from "components/organisms/DatabaseConfigModal";
 
 type Props = {

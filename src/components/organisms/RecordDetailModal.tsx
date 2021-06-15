@@ -6,12 +6,18 @@ import {
   LoadingIndicator,
   fileProvider,
   API_ROUTE,
+  DialogTitle,
+  DialogCloseButton,
+  DialogContainer,
+  DialogBody,
+  DialogToolBar,
+  FileUploadButton,
+  FileUploadButtonProps,
 } from "@dataware-tools/app-common";
 import { makeStyles } from "@material-ui/core/styles";
 import Dialog from "@material-ui/core/Dialog";
 import { useState, useEffect } from "react";
 import { FileList } from "./FileList";
-import { DialogCloseButton } from "components/atoms/DialogCloseButton";
 import { RecordInfo } from "components/organisms/RecordInfo";
 import { mutate } from "swr";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -24,17 +30,9 @@ import {
   fetchFileProvider,
 } from "utils";
 import { RecordEditModal } from "components/organisms/RecordEditModal";
-import {
-  FileUploadButton,
-  FileUploadButtonProps,
-} from "components/atoms/FileUploadButton";
 import UploadIcon from "@material-ui/icons/Upload";
 import EditIcon from "@material-ui/icons/Edit";
 import Button from "@material-ui/core/Button";
-import { DialogContainer } from "components/atoms/DialogContainer";
-import { DialogTitle } from "components/atoms/DialogTitle";
-import { DialogBody } from "components/atoms/DialogBody";
-import { DialogToolBar } from "components/atoms/DialogToolBar";
 import { produce } from "immer";
 
 type ContainerProps = {

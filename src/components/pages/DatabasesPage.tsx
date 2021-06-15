@@ -7,15 +7,15 @@ import {
   SearchForm,
   Spacer,
   PerPageSelect,
+  PageContainer,
+  PageToolBar,
+  PageBody,
 } from "@dataware-tools/app-common";
 import { useAuth0 } from "@auth0/auth0-react";
 import { DatabaseList } from "components/organisms/DatabaseList";
 import { useEffect, useState } from "react";
 import Pagination from "@material-ui/core/Pagination";
 import { useHistory } from "react-router";
-import { PageContainer } from "components/atoms/PageContainer";
-import { PageToolBar } from "components/atoms/PageToolBar";
-import { PageBody } from "components/atoms/PageBody";
 import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
 import { useListDatabases } from "utils";
 

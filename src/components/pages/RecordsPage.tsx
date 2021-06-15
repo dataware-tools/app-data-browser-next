@@ -6,6 +6,10 @@ import {
   SearchForm,
   Spacer,
   PerPageSelect,
+  PageContainer,
+  PageToolBar,
+  PageBody,
+  TextCenteringSpan,
 } from "@dataware-tools/app-common";
 import { makeStyles } from "@material-ui/core/styles";
 
@@ -27,10 +31,7 @@ import {
   DatabaseConfigModal,
   DatabaseConfigNameType,
 } from "components/organisms/DatabaseConfigModal";
-import { TextCenteringSpan } from "components/atoms/TextCenteringSpan";
-import { PageContainer } from "components/atoms/PageContainer";
-import { PageToolBar } from "components/atoms/PageToolBar";
-import { PageBody } from "components/atoms/PageBody";
+
 import { Link } from "react-router-dom";
 import HomeIcon from "@material-ui/icons/Home";
 import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";

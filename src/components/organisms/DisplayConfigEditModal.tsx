@@ -1,5 +1,4 @@
 import Dialog from "@material-ui/core/Dialog";
-import { DialogCloseButton } from "components/atoms/DialogCloseButton";
 import { useState, useEffect } from "react";
 import LoadingButton from "@material-ui/lab/LoadingButton";
 import {
@@ -14,14 +13,18 @@ import {
   DisplayConfigListProps,
 } from "components/organisms/DisplayConfigList";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
-import { SquareIconButton } from "components/atoms/SquareIconButton";
-import { DialogTitle } from "components/atoms/DialogTitle";
-import { TextCenteringSpan } from "components/atoms/TextCenteringSpan";
-import { DialogBody } from "components/atoms/DialogBody";
-import { DialogContainer } from "components/atoms/DialogContainer";
-import { DialogToolBar } from "components/atoms/DialogToolBar";
 import { useAuth0 } from "@auth0/auth0-react";
-import { ErrorMessage, metaStore } from "@dataware-tools/app-common";
+import {
+  ErrorMessage,
+  metaStore,
+  DialogBody,
+  DialogTitle,
+  DialogContainer,
+  DialogToolBar,
+  DialogCloseButton,
+  SquareIconButton,
+  TextCenteringSpan,
+} from "@dataware-tools/app-common";
 import { produce } from "immer";
 import { mutate } from "swr";
 
