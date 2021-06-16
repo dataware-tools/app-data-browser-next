@@ -1,5 +1,5 @@
 import Dialog from "@material-ui/core/Dialog";
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import LoadingButton from "@material-ui/lab/LoadingButton";
 import { useListRecords, usePrevious } from "utils/index";
 import Select from "@material-ui/core/Select";

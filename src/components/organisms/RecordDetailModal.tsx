@@ -34,6 +34,7 @@ import UploadIcon from "@material-ui/icons/Upload";
 import EditIcon from "@material-ui/icons/Edit";
 import Button from "@material-ui/core/Button";
 import { produce } from "immer";
+import { FilePreviewModal } from "./FilePreviewModal";
 
 type ContainerProps = {
   open: boolean;
@@ -65,11 +66,15 @@ const Container = ({
   const [tab, setTab] = useState(0);
   const [isRecordEditModalOpen, setIsRecordEditModalOpen] = useState(false);
   const [isAddingFile, setIsAddingFile] = useState(false);
+  const [previewingFile, setPreviewingFile] = useState<
+    metaStore.FileModel | undefined
+  >(undefined);
 
   const initializeState = () => {
     setTab(0);
     setIsRecordEditModalOpen(false);
     setIsAddingFile(false);
+    setPreviewingFile(undefined);
   };
   // See: https://stackoverflow.com/questions/58209791/set-initial-state-for-material-ui-dialog
   const prevOpen = usePrevious(open);
@@ -98,10 +103,12 @@ const Container = ({
   const onChangeTab = (tabNum: number) => setTab(tabNum);
   const tabNames = ["Info", "Files"];
 
+  const onPreviewFile = (file: metaStore.FileModel) => {
+    setPreviewingFile(file);
+  };
+
   // ! this is dummy func
   // TODO: implement method
-  const onPreviewFile = (file: metaStore.FileModel) =>
-    window.alert(`preview: ${JSON.stringify(file)}`);
   const onEditFile = (file: metaStore.FileModel) =>
     window.alert(`edit: ${JSON.stringify(file)}`);
 
@@ -286,6 +293,16 @@ const Container = ({
               onSubmitSucceeded={(newRecord) =>
                 mutate(getRecordCacheKey, newRecord)
               }
+            />
+            <FilePreviewModal
+              open={previewingFile !== undefined}
+              onClose={() => {
+                setPreviewingFile(undefined);
+              }}
+              file={previewingFile || {}}
+              fullWidth
+              maxWidth="md"
+              height="auto"
             />
           </>
         )}

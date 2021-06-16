@@ -29,7 +29,7 @@ module.exports = {
     // See: https://nextjs.org/docs/api-reference/next.config.js/custom-webpack-config
     const nextConfig = require("../next.config.js");
 
-    if (nextConfig.webpack) return { ...config, ...nextConfig.webpack() };
+    if (nextConfig.webpack) return { ...config, ...nextConfig.webpack(config) };
     else return config;
   },
 };
