@@ -101,7 +101,7 @@ const Container = ({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth>
-      <DialogContainer height="100%">
+      <DialogContainer>
         <DialogCloseButton onClick={onClose} />
         <DialogBody flexDirection="column">
           <div>Name</div>

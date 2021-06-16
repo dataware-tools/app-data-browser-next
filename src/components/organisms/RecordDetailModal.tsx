@@ -220,7 +220,7 @@ const Container = ({
   const title = getRecordRes?.["record name"] || getRecordRes?.record_id;
   return (
     <Dialog open={open} fullWidth maxWidth="xl" onClose={onClose}>
-      <DialogContainer>
+      <DialogContainer height="85vh">
         <DialogCloseButton onClick={onClose} />
         {getRecordError || listFilesError ? (
           <ErrorMessage
