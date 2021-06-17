@@ -24,6 +24,8 @@ import {
   DialogToolBar,
   SquareIconButton,
   TextCenteringSpan,
+  DialogWrapper,
+  DialogMain,
 } from "@dataware-tools/app-common";
 import { produce } from "immer";
 import { mutate } from "swr";
@@ -167,9 +169,9 @@ const Container = ({
 
       setAlreadySelectedOptions((prev) => {
         if (prev) {
-          if (prev.includes(newValue)) {
+          if (prev.includes(oldValue)) {
             const next = produce(prev, (draft) => {
-              draft.splice(draft.indexOf(newValue));
+              draft.splice(draft.indexOf(oldValue), 1);
             });
             return next;
           } else {
@@ -199,7 +201,7 @@ const Container = ({
 
   return (
     <Dialog open={open} maxWidth="xl" onClose={onClose}>
-      <DialogContainer>
+      <DialogWrapper>
         <DialogCloseButton onClick={onClose} />
         <DialogTitle>
           <TextCenteringSpan>{title[configName] + " "}</TextCenteringSpan>
@@ -207,42 +209,44 @@ const Container = ({
             <SquareIconButton onClick={onAdd} icon={<AddCircleIcon />} />
           ) : null}
         </DialogTitle>
-        {getConfigError ? (
-          <ErrorMessage
-            reason={JSON.stringify(getConfigError)}
-            instruction="please reload this page"
-          />
-        ) : getConfigRes ? (
-          options == null ? (
+        <DialogContainer padding="0 0 20px">
+          {getConfigError ? (
             <ErrorMessage
-              reason="no available column"
-              instruction="please add data or input field"
+              reason={JSON.stringify(getConfigError)}
+              instruction="please reload this page"
             />
-          ) : (
-            <>
+          ) : getConfigRes ? (
+            options == null ? (
+              <ErrorMessage
+                reason="no available column"
+                instruction="please add data or input field"
+              />
+            ) : (
               <DialogBody>
-                <SearchConfigList
-                  value={config}
-                  onChange={onChange}
-                  options={options}
-                  alreadySelectedOptions={alreadySelectedOptions}
+                <DialogMain>
+                  <SearchConfigList
+                    value={config}
+                    onChange={onChange}
+                    options={options}
+                    alreadySelectedOptions={alreadySelectedOptions}
+                  />
+                </DialogMain>
+                <DialogToolBar
+                  right={
+                    <LoadingButton
+                      disabled={config.length <= 0 || config.includes("")}
+                      pending={isSaving}
+                      onClick={onSave}
+                    >
+                      Save
+                    </LoadingButton>
+                  }
                 />
               </DialogBody>
-              <DialogToolBar
-                right={
-                  <LoadingButton
-                    disabled={config.length <= 0 || config.includes("")}
-                    pending={isSaving}
-                    onClick={onSave}
-                  >
-                    Save
-                  </LoadingButton>
-                }
-              />
-            </>
-          )
-        ) : null}
-      </DialogContainer>
+            )
+          ) : null}
+        </DialogContainer>
+      </DialogWrapper>
     </Dialog>
   );
 };

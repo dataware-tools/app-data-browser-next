@@ -5,12 +5,14 @@ type Props = ContainerProps;
 type ContainerProps = {
   records: metaStore.RecordModel[];
   onSelectRecord: TableProps["onClickRow"];
+  onDeleteRecord: TableProps["onDeleteRow"];
   columns: TableProps["columns"];
 };
 
 const Component = ({
   records,
   onSelectRecord,
+  onDeleteRecord,
   columns,
 }: Props): JSX.Element => {
   return (
@@ -18,6 +20,7 @@ const Component = ({
       rows={records}
       columns={columns}
       onClickRow={onSelectRecord}
+      onDeleteRow={onDeleteRecord}
       stickyHeader
       disableHoverCell
     />
