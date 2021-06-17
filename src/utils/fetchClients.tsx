@@ -249,7 +249,7 @@ const useCreateJwtToDownloadFile: UseAPIWithoutCache<
           setRes({ data: undefined, error: error });
         });
     }
-  }, [token, shouldFetch, requestBody]);
+  }, [token, shouldFetch]);
 
   return [res.data, res.error];
 };
