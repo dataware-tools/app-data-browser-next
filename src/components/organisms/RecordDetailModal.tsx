@@ -29,6 +29,8 @@ import {
   usePrevious,
   uploadFileToFileProvider,
   fetchFileProvider,
+  DatabaseConfigType,
+  useGetConfig,
 } from "utils";
 import { RecordEditModal } from "components/organisms/RecordEditModal";
 import UploadIcon from "@material-ui/icons/Upload";
@@ -71,6 +73,14 @@ const Container = ({
       initializeState();
     }
   }, [open, prevOpen]);
+
+  const [getConfigRes, getConfigError] = (useGetConfig(getAccessToken, {
+    databaseId,
+  }) as unknown) as [
+    data: DatabaseConfigType | undefined,
+    error: any,
+    cacheKey: string
+  ];
 
   const [getRecordRes, getRecordError, getRecordCacheKey] = useGetRecord(
     getAccessToken,
@@ -205,7 +215,17 @@ const Container = ({
 
   const onEditRecord = () => setIsRecordEditModalOpen(true);
 
-  const title = getRecordRes?.["record name"] || getRecordRes?.record_id;
+  const requiredInputFields = getConfigRes?.data_browser_config?.record_input_config?.filter(
+    (config) => config.necessity === "required"
+  );
+  const columnName =
+    requiredInputFields && requiredInputFields[0]
+      ? requiredInputFields[0].name
+      : undefined;
+  const title = columnName
+    ? getRecordRes?.[columnName]
+    : getRecordRes?.record_id;
+
   return (
     <Dialog open={open} fullWidth maxWidth="xl" onClose={onClose}>
       <DialogWrapper>
@@ -222,9 +242,11 @@ const Container = ({
             tabNames={tabNames}
             value={tab}
           />
-          {getRecordError || listFilesError ? (
+          {getRecordError || listFilesError || getConfigError ? (
             <ErrorMessage
-              reason={JSON.stringify(getRecordError || listFilesError)}
+              reason={JSON.stringify(
+                getRecordError || listFilesError || getConfigError
+              )}
               instruction="please reload this page"
             />
           ) : (
