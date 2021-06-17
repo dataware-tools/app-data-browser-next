@@ -194,8 +194,6 @@ const Container = ({
     }
   }, [getConfigRes]);
 
-  console.log(options);
-  console.log(alreadySelectedOptions);
   return (
     <Dialog open={open} maxWidth="xl" onClose={onClose}>
       <DialogContainer>
