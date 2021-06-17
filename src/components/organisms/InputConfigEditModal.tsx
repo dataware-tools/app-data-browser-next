@@ -184,7 +184,10 @@ const Container = ({
     setOptions((prev) => {
       if (prev) {
         const newOption = produce(prev, (prev) => {
-          prev.splice(prev.findIndex((elem) => elem.name === newConfig.name));
+          prev.splice(
+            prev.findIndex((elem) => elem.name === newConfig.name),
+            1
+          );
         });
         return newOption;
       } else {
