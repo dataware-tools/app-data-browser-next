@@ -19,7 +19,6 @@ const Component = ({
   height,
   ...dialogProps
 }: ContainerWithDialogProps): JSX.Element => {
-  console.log("render!!!");
   return (
     <Dialog {...dialogProps}>
       <DialogWrapper>
