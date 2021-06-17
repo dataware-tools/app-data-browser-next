@@ -1,5 +1,4 @@
 import Dialog from "@material-ui/core/Dialog";
-import { DialogCloseButton } from "components/atoms/DialogCloseButton";
 import { useState, useEffect } from "react";
 import LoadingButton from "@material-ui/lab/LoadingButton";
 import {
@@ -14,14 +13,20 @@ import {
   DisplayConfigListProps,
 } from "components/organisms/DisplayConfigList";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
-import { SquareIconButton } from "components/atoms/SquareIconButton";
-import { DialogTitle } from "components/atoms/DialogTitle";
-import { TextCenteringSpan } from "components/atoms/TextCenteringSpan";
-import { DialogBody } from "components/atoms/DialogBody";
-import { DialogContainer } from "components/atoms/DialogContainer";
-import { DialogToolBar } from "components/atoms/DialogToolBar";
 import { useAuth0 } from "@auth0/auth0-react";
-import { ErrorMessage, metaStore } from "@dataware-tools/app-common";
+import {
+  ErrorMessage,
+  metaStore,
+  DialogWrapper,
+  DialogContainer,
+  DialogBody,
+  DialogMain,
+  DialogTitle,
+  DialogToolBar,
+  DialogCloseButton,
+  SquareIconButton,
+  TextCenteringSpan,
+} from "@dataware-tools/app-common";
 import { produce } from "immer";
 import { mutate } from "swr";
 
@@ -196,7 +201,7 @@ const Container = ({
 
   return (
     <Dialog open={open} maxWidth="xl" onClose={onClose}>
-      <DialogContainer>
+      <DialogWrapper>
         <DialogCloseButton onClick={onClose} />
         <DialogTitle>
           <TextCenteringSpan>{title[configName] + " "}</TextCenteringSpan>
@@ -204,42 +209,46 @@ const Container = ({
             <SquareIconButton onClick={onAdd} icon={<AddCircleIcon />} />
           ) : null}
         </DialogTitle>
-        {getConfigError ? (
-          <ErrorMessage
-            reason={JSON.stringify(getConfigError)}
-            instruction="please reload this page"
-          />
-        ) : getConfigRes ? (
-          options == null ? (
-            <ErrorMessage
-              reason="no available column"
-              instruction="please add data or input field"
-            />
-          ) : (
-            <>
-              <DialogBody>
-                <DisplayConfigList
-                  value={config}
-                  onChange={onChange}
-                  options={options}
-                  alreadySelectedOptions={alreadySelectedOptions}
-                />
-              </DialogBody>
-              <DialogToolBar
-                right={
-                  <LoadingButton
-                    disabled={config.length <= 0 || config.includes("")}
-                    pending={isSaving}
-                    onClick={onSave}
-                  >
-                    Save
-                  </LoadingButton>
-                }
+        <DialogContainer padding="0 0 20px">
+          <DialogBody>
+            {getConfigError ? (
+              <ErrorMessage
+                reason={JSON.stringify(getConfigError)}
+                instruction="please reload this page"
               />
-            </>
-          )
-        ) : null}
-      </DialogContainer>
+            ) : getConfigRes ? (
+              options == null ? (
+                <ErrorMessage
+                  reason="no available column"
+                  instruction="please add data or input field"
+                />
+              ) : (
+                <>
+                  <DialogMain>
+                    <DisplayConfigList
+                      value={config}
+                      onChange={onChange}
+                      options={options}
+                      alreadySelectedOptions={alreadySelectedOptions}
+                    />
+                  </DialogMain>
+                  <DialogToolBar
+                    right={
+                      <LoadingButton
+                        disabled={config.length <= 0 || config.includes("")}
+                        pending={isSaving}
+                        onClick={onSave}
+                      >
+                        Save
+                      </LoadingButton>
+                    }
+                  />
+                </>
+              )
+            ) : null}
+          </DialogBody>
+        </DialogContainer>
+      </DialogWrapper>
     </Dialog>
   );
 };

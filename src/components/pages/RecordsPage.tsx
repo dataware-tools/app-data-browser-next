@@ -6,6 +6,11 @@ import {
   SearchForm,
   Spacer,
   PerPageSelect,
+  PageContainer,
+  PageToolBar,
+  PageBody,
+  TextCenteringSpan,
+  PageMain,
   fetchMetaStore,
   metaStore,
   confirm,
@@ -30,10 +35,7 @@ import {
   DatabaseConfigModal,
   DatabaseConfigNameType,
 } from "components/organisms/DatabaseConfigModal";
-import { TextCenteringSpan } from "components/atoms/TextCenteringSpan";
-import { PageContainer } from "components/atoms/PageContainer";
-import { PageToolBar } from "components/atoms/PageToolBar";
-import { PageBody } from "components/atoms/PageBody";
+
 import { Link } from "react-router-dom";
 import HomeIcon from "@material-ui/icons/Home";
 import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
@@ -177,88 +179,92 @@ const Page = (): JSX.Element => {
   return (
     <>
       <PageContainer>
-        <PageToolBar
-          left={
-            <Link to="/">
-              <ElemCenteringFlexDiv>
-                <HomeIcon />
-                Home
-              </ElemCenteringFlexDiv>
-            </Link>
-          }
-          right={
-            <>
-              {!listRecordsError ? (
-                <>
-                  <div className={classes.fixedFlexShrink}>
-                    <SearchForm
-                      onSearch={(newSearchText) => setSearchText(newSearchText)}
-                      defaultValue={searchText}
-                    />
-                  </div>
-                  <Spacer direction="horizontal" size="15px" />
-                  <PerPageSelect
-                    perPage={perPage}
-                    setPerPage={setPerPage}
-                    values={[10, 20, 50, 100]}
-                  />
-                  <Spacer direction="horizontal" size="15px" />
-                  <Button
-                    onClick={() => setIsRecordEditModalOpen(true)}
-                    startIcon={<AddCircle />}
-                    className={classes.fixedFlexShrink}
-                  >
-                    <TextCenteringSpan>Record</TextCenteringSpan>
-                  </Button>
-                  <Spacer direction="horizontal" size="15px" />
-                </>
-              ) : null}
-              {!getConfigError ? (
-                <DatabaseConfigButton
-                  onMenuSelect={onSelectDatabaseConfig}
-                  menu={databaseConfigMenu}
-                />
-              ) : null}
-            </>
-          }
-        />
         <PageBody>
-          {fetchError || error ? (
-            <ErrorMessage
-              reason={JSON.stringify(fetchError || error)}
-              instruction="please reload this page"
-            />
-          ) : listRecordsRes && getConfigRes ? (
-            !displayColumns ? (
-              <ErrorMessage
-                reason="Display columns is not configured"
-                instruction="please report administrator this error"
-              />
-            ) : (
+          <PageToolBar
+            left={
+              <Link to="/">
+                <ElemCenteringFlexDiv>
+                  <HomeIcon />
+                  Home
+                </ElemCenteringFlexDiv>
+              </Link>
+            }
+            right={
               <>
+                {!listRecordsError ? (
+                  <>
+                    <div className={classes.fixedFlexShrink}>
+                      <SearchForm
+                        onSearch={(newSearchText) =>
+                          setSearchText(newSearchText)
+                        }
+                        defaultValue={searchText}
+                      />
+                    </div>
+                    <Spacer direction="horizontal" size="15px" />
+                    <PerPageSelect
+                      perPage={perPage}
+                      setPerPage={setPerPage}
+                      values={[10, 20, 50, 100]}
+                    />
+                    <Spacer direction="horizontal" size="15px" />
+                    <Button
+                      onClick={() => setIsRecordEditModalOpen(true)}
+                      startIcon={<AddCircle />}
+                      className={classes.fixedFlexShrink}
+                    >
+                      <TextCenteringSpan>Record</TextCenteringSpan>
+                    </Button>
+                    <Spacer direction="horizontal" size="15px" />
+                  </>
+                ) : null}
+                {!getConfigError ? (
+                  <DatabaseConfigButton
+                    onMenuSelect={onSelectDatabaseConfig}
+                    menu={databaseConfigMenu}
+                  />
+                ) : null}
+              </>
+            }
+          />
+          <PageMain>
+            {fetchError || error ? (
+              <ErrorMessage
+                reason={JSON.stringify(fetchError || error)}
+                instruction="please reload this page"
+              />
+            ) : listRecordsRes && getConfigRes ? (
+              !displayColumns ? (
+                <ErrorMessage
+                  reason="Display columns is not configured"
+                  instruction="please report administrator this error"
+                />
+              ) : (
                 <RecordList
                   columns={displayColumns}
                   records={listRecordsRes.data}
                   onSelectRecord={onSelectRecord}
                   onDeleteRecord={onDeleteRecord}
                 />
-              </>
-            )
-          ) : (
-            <LoadingIndicator />
-          )}
+              )
+            ) : (
+              <LoadingIndicator />
+            )}
+          </PageMain>
+          <Spacer direction="vertical" size="3vh" />
+          {listRecordsRes ? (
+            <ElemCenteringFlexDiv>
+              <Pagination
+                count={Math.ceil(
+                  listRecordsRes.total / listRecordsRes.per_page
+                )}
+                page={page}
+                onChange={(_, newPage) => setPage(newPage)}
+              />
+            </ElemCenteringFlexDiv>
+          ) : null}
         </PageBody>
-        <Spacer direction="vertical" size="3vh" />
       </PageContainer>
-      {listRecordsRes ? (
-        <ElemCenteringFlexDiv>
-          <Pagination
-            count={Math.ceil(listRecordsRes.total / listRecordsRes.per_page)}
-            page={page}
-            onChange={(_, newPage) => setPage(newPage)}
-          />
-        </ElemCenteringFlexDiv>
-      ) : null}
       {listRecordsRes ? (
         <RecordEditModal
           open={isRecordEditModalOpen}

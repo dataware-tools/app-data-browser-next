@@ -1,6 +1,15 @@
-import { ErrorMessage, LoadingIndicator } from "@dataware-tools/app-common";
+import {
+  ErrorMessage,
+  LoadingIndicator,
+  DialogTitle,
+  DialogToolBar,
+  DialogBody,
+  DialogContainer,
+  DialogCloseButton,
+  DialogWrapper,
+  DialogMain,
+} from "@dataware-tools/app-common";
 import Dialog from "@material-ui/core/Dialog";
-import { DialogCloseButton } from "components/atoms/DialogCloseButton";
 import { useState, useEffect } from "react";
 import LoadingButton from "@material-ui/lab/LoadingButton";
 import { usePrevious } from "utils/index";
@@ -8,10 +17,6 @@ import {
   MetadataInputFieldList,
   MetadataInputFieldListProps,
 } from "components/organisms/MetadataInputFieldList";
-import { DialogContainer } from "components/atoms/DialogContainer";
-import { DialogBody } from "components/atoms/DialogBody";
-import { DialogToolBar } from "components/atoms/DialogToolBar";
-import { DialogTitle } from "components/atoms/DialogTitle";
 
 type ContainerProps = {
   open: boolean;
@@ -115,40 +120,44 @@ const Container = ({
 
   return (
     <Dialog open={open} maxWidth="xl" onClose={onClose}>
-      <DialogContainer>
+      <DialogWrapper>
         <DialogCloseButton onClick={onClose} />
         <DialogTitle>{create ? "Add" : "Edit"} Record</DialogTitle>
-        {error ? (
-          <ErrorMessage
-            reason={JSON.stringify(error)}
-            instruction="please reload this page"
-          />
-        ) : !inputConfig || inputConfig.length <= 0 ? (
-          <ErrorMessage
-            reason="Input fields is not configured"
-            instruction="please report administrator this error"
-          />
-        ) : currentMetadata || create ? (
-          <>
-            <DialogBody>
-              <MetadataInputFieldList
-                currentMetadata={currentMetadata}
-                inputConfig={inputConfig}
-                nonFilledRequiredFieldNames={nonFilledRequiredFieldNames}
-              />
-            </DialogBody>
-            <DialogToolBar
-              right={
-                <LoadingButton pending={isSaving} onClick={onSave}>
-                  Save
-                </LoadingButton>
-              }
+        <DialogContainer padding="0 0 20px">
+          {error ? (
+            <ErrorMessage
+              reason={JSON.stringify(error)}
+              instruction="please reload this page"
             />
-          </>
-        ) : (
-          <LoadingIndicator />
-        )}
-      </DialogContainer>
+          ) : !inputConfig || inputConfig.length <= 0 ? (
+            <ErrorMessage
+              reason="Input fields is not configured"
+              instruction="please report administrator this error"
+            />
+          ) : currentMetadata || create ? (
+            <>
+              <DialogBody>
+                <DialogMain>
+                  <MetadataInputFieldList
+                    currentMetadata={currentMetadata}
+                    inputConfig={inputConfig}
+                    nonFilledRequiredFieldNames={nonFilledRequiredFieldNames}
+                  />
+                </DialogMain>
+                <DialogToolBar
+                  right={
+                    <LoadingButton pending={isSaving} onClick={onSave}>
+                      Save
+                    </LoadingButton>
+                  }
+                />
+              </DialogBody>
+            </>
+          ) : (
+            <LoadingIndicator />
+          )}
+        </DialogContainer>
+      </DialogWrapper>
     </Dialog>
   );
 };

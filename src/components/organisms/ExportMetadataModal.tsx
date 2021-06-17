@@ -1,18 +1,21 @@
 import Dialog from "@material-ui/core/Dialog";
-import { DialogCloseButton } from "components/atoms/DialogCloseButton";
 import { useState, useEffect } from "react";
 import LoadingButton from "@material-ui/lab/LoadingButton";
 import { useListRecords, usePrevious } from "utils/index";
-import { DialogTitle } from "components/atoms/DialogTitle";
-import { TextCenteringSpan } from "components/atoms/TextCenteringSpan";
-import { DialogBody } from "components/atoms/DialogBody";
-import { DialogContainer } from "components/atoms/DialogContainer";
-import { DialogToolBar } from "components/atoms/DialogToolBar";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import { FormControl, InputLabel } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import { Spacer } from "@dataware-tools/app-common";
+import {
+  Spacer,
+  DialogBody,
+  DialogContainer,
+  DialogToolBar,
+  DialogTitle,
+  DialogCloseButton,
+  DialogWrapper,
+  DialogMain,
+} from "@dataware-tools/app-common";
 import { useAuth0 } from "@auth0/auth0-react";
 
 // See: https://github.com/dolezel/react-csv-downloader#get-csv-contents
@@ -69,31 +72,31 @@ const Component = ({
 
   return (
     <Dialog open={open} maxWidth="xl" onClose={onClose}>
-      <DialogContainer height="auto">
+      <DialogWrapper>
         <DialogCloseButton onClick={onClose} />
-        <DialogTitle>
-          <TextCenteringSpan>
-            {`Export metadata in ${databaseId}`}
-          </TextCenteringSpan>
-        </DialogTitle>
-        <DialogBody>
-          <div className={styles.body}>
-            <FormControl>
-              <InputLabel id="export-type-label">Format: </InputLabel>
-              <Select
-                labelId="export-type-label"
-                value={exportType}
-                onChange={(event) => {
-                  setExportType(event.target.value);
-                }}
-              >
-                <MenuItem value="JSON">JSON</MenuItem>
-                <MenuItem value="CSV">CSV</MenuItem>
-              </Select>
-            </FormControl>
-          </div>
-        </DialogBody>
-        <Spacer direction="vertical" size="2vh" />
+        <DialogTitle>{`Export metadata in ${databaseId}`}</DialogTitle>
+        <DialogContainer height="auto">
+          <DialogBody>
+            <DialogMain>
+              <div className={styles.body}>
+                <FormControl>
+                  <InputLabel id="export-type-label">Format: </InputLabel>
+                  <Select
+                    labelId="export-type-label"
+                    value={exportType}
+                    onChange={(event) => {
+                      setExportType(event.target.value);
+                    }}
+                  >
+                    <MenuItem value="JSON">JSON</MenuItem>
+                    <MenuItem value="CSV">CSV</MenuItem>
+                  </Select>
+                </FormControl>
+              </div>
+            </DialogMain>
+            <Spacer direction="vertical" size="2vh" />
+          </DialogBody>
+        </DialogContainer>
         <DialogToolBar
           right={
             <LoadingButton pending={isLoading} onClick={onExport}>
@@ -101,7 +104,7 @@ const Component = ({
             </LoadingButton>
           }
         />
-      </DialogContainer>
+      </DialogWrapper>
     </Dialog>
   );
 };
