@@ -167,9 +167,9 @@ const Container = ({
 
       setAlreadySelectedOptions((prev) => {
         if (prev) {
-          if (prev.includes(newValue)) {
+          if (prev.includes(oldValue)) {
             const next = produce(prev, (draft) => {
-              draft.splice(draft.indexOf(newValue));
+              draft.splice(draft.indexOf(oldValue), 1);
             });
             return next;
           } else {

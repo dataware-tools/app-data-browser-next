@@ -11,6 +11,9 @@ import {
   PageBody,
   TextCenteringSpan,
   PageMain,
+  fetchMetaStore,
+  metaStore,
+  confirm,
 } from "@dataware-tools/app-common";
 import { makeStyles } from "@material-ui/core/styles";
 
@@ -37,6 +40,7 @@ import { Link } from "react-router-dom";
 import HomeIcon from "@material-ui/icons/Home";
 import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
 import { useListRecords, useGetConfig, DatabaseConfigType } from "utils";
+import { produce } from "immer";
 
 const useStyles = makeStyles(() => ({
   fixedFlexShrink: {
@@ -68,6 +72,9 @@ const Page = (): JSX.Element => {
   const [currentSelectedRecordId, setCurrentSelectedRecordId] = useState<
     string | null
   >(null);
+  const [error, setError] = useState<
+    { reason: string; instruction: string } | undefined
+  >(undefined);
 
   const [getConfigRes, getConfigError] = (useGetConfig(getAccessToken, {
     databaseId,
@@ -108,6 +115,39 @@ const Page = (): JSX.Element => {
     if (listRecordsRes) {
       setIsRecordDetailModalOpen(true);
       setCurrentSelectedRecordId(listRecordsRes.data[record.index].record_id);
+    }
+  };
+
+  const onDeleteRecord: RecordListProps["onDeleteRecord"] = async (target) => {
+    if (listRecordsRes) {
+      if (
+        !(await confirm({ title: "Are you sure you want to delete record?" }))
+      ) {
+        return;
+      }
+
+      const newRecordList = produce(listRecordsRes, (draft) => {
+        draft.data.splice(target.index, 1);
+      });
+      mutate(listRecordsCacheKey, newRecordList, false);
+
+      const [deleteRecordRes, deleteRecordError] = await fetchMetaStore(
+        getAccessToken,
+        metaStore.RecordService.deleteRecord,
+        {
+          databaseId,
+          recordId: listRecordsRes.data[target.index].record_id,
+        }
+      );
+
+      if (deleteRecordError) {
+        setError({
+          reason: JSON.stringify(deleteRecordError),
+          instruction: "Please reload this page",
+        });
+      } else if (deleteRecordRes) {
+        mutate(listRecordsCacheKey);
+      }
     }
   };
 
@@ -188,9 +228,9 @@ const Page = (): JSX.Element => {
             }
           />
           <PageMain>
-            {fetchError ? (
+            {fetchError || error ? (
               <ErrorMessage
-                reason={JSON.stringify(fetchError)}
+                reason={JSON.stringify(fetchError || error)}
                 instruction="please reload this page"
               />
             ) : listRecordsRes && getConfigRes ? (
@@ -200,13 +240,12 @@ const Page = (): JSX.Element => {
                   instruction="please report administrator this error"
                 />
               ) : (
-                <>
-                  <RecordList
-                    columns={displayColumns}
-                    records={listRecordsRes.data}
-                    onSelectRecord={onSelectRecord}
-                  />
-                </>
+                <RecordList
+                  columns={displayColumns}
+                  records={listRecordsRes.data}
+                  onSelectRecord={onSelectRecord}
+                  onDeleteRecord={onDeleteRecord}
+                />
               )
             ) : (
               <LoadingIndicator />

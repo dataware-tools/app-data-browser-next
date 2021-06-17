@@ -34,7 +34,6 @@ const Component = ({
   options,
   alreadySelectedOptions,
 }: Props): JSX.Element => {
-  console.log(value);
   return (
     <div className={classes.root}>
       <Select
