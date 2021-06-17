@@ -1,5 +1,10 @@
 import Dialog, { DialogProps } from "@material-ui/core/Dialog";
-import { DialogBody, DialogContainer } from "@dataware-tools/app-common";
+import {
+  DialogBody,
+  DialogContainer,
+  DialogMain,
+  DialogWrapper,
+} from "@dataware-tools/app-common";
 import { FileType } from "components/organisms/FileListItem";
 import { FileDownloadURLInjector } from "./FileDownloadUrlInjector";
 import { FilePreviewer } from "components/molecules/FilePreviewer";
@@ -14,18 +19,23 @@ const Component = ({
   height,
   ...dialogProps
 }: ContainerWithDialogProps): JSX.Element => {
+  console.log("render!!!");
   return (
     <Dialog {...dialogProps}>
-      <DialogContainer height={height}>
-        <DialogBody>
-          <FileDownloadURLInjector
-            file={file}
-            render={(file, url) => {
-              return <FilePreviewer file={file} url={url} />;
-            }}
-          />
-        </DialogBody>
-      </DialogContainer>
+      <DialogWrapper>
+        <DialogContainer height={height}>
+          <DialogBody>
+            <DialogMain>
+              <FileDownloadURLInjector
+                file={file}
+                render={(file, url) => {
+                  return <FilePreviewer file={file} url={url} />;
+                }}
+              />
+            </DialogMain>
+          </DialogBody>
+        </DialogContainer>
+      </DialogWrapper>
     </Dialog>
   );
 };

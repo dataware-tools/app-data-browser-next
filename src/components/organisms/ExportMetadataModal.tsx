@@ -13,7 +13,8 @@ import {
   DialogToolBar,
   DialogTitle,
   DialogCloseButton,
-  TextCenteringSpan,
+  DialogWrapper,
+  DialogMain,
 } from "@dataware-tools/app-common";
 import { useAuth0 } from "@auth0/auth0-react";
 
@@ -71,31 +72,31 @@ const Component = ({
 
   return (
     <Dialog open={open} maxWidth="xl" onClose={onClose}>
-      <DialogContainer height="auto">
+      <DialogWrapper>
         <DialogCloseButton onClick={onClose} />
-        <DialogTitle>
-          <TextCenteringSpan>
-            {`Export metadata in ${databaseId}`}
-          </TextCenteringSpan>
-        </DialogTitle>
-        <DialogBody>
-          <div className={styles.body}>
-            <FormControl>
-              <InputLabel id="export-type-label">Format: </InputLabel>
-              <Select
-                labelId="export-type-label"
-                value={exportType}
-                onChange={(event) => {
-                  setExportType(event.target.value);
-                }}
-              >
-                <MenuItem value="JSON">JSON</MenuItem>
-                <MenuItem value="CSV">CSV</MenuItem>
-              </Select>
-            </FormControl>
-          </div>
-        </DialogBody>
-        <Spacer direction="vertical" size="2vh" />
+        <DialogTitle>{`Export metadata in ${databaseId}`}</DialogTitle>
+        <DialogContainer height="auto">
+          <DialogBody>
+            <DialogMain>
+              <div className={styles.body}>
+                <FormControl>
+                  <InputLabel id="export-type-label">Format: </InputLabel>
+                  <Select
+                    labelId="export-type-label"
+                    value={exportType}
+                    onChange={(event) => {
+                      setExportType(event.target.value);
+                    }}
+                  >
+                    <MenuItem value="JSON">JSON</MenuItem>
+                    <MenuItem value="CSV">CSV</MenuItem>
+                  </Select>
+                </FormControl>
+              </div>
+            </DialogMain>
+            <Spacer direction="vertical" size="2vh" />
+          </DialogBody>
+        </DialogContainer>
         <DialogToolBar
           right={
             <LoadingButton pending={isLoading} onClick={onExport}>
@@ -103,7 +104,7 @@ const Component = ({
             </LoadingButton>
           }
         />
-      </DialogContainer>
+      </DialogWrapper>
     </Dialog>
   );
 };

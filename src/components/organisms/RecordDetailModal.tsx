@@ -1,5 +1,4 @@
 import {
-  TabBar,
   Spacer,
   metaStore,
   ErrorMessage,
@@ -13,8 +12,10 @@ import {
   DialogToolBar,
   FileUploadButton,
   FileUploadButtonProps,
+  DialogWrapper,
+  DialogTabBar,
+  DialogMain,
 } from "@dataware-tools/app-common";
-import { makeStyles } from "@material-ui/core/styles";
 import Dialog from "@material-ui/core/Dialog";
 import { useState, useEffect } from "react";
 import { FileList } from "./FileList";
@@ -43,18 +44,6 @@ type ContainerProps = {
   databaseId: string;
 };
 
-const useStyles = makeStyles({
-  tabBarContainer: {
-    flex: 0,
-  },
-  mainContainer: {
-    display: "flex",
-    flex: 1,
-    flexDirection: "column",
-    overflow: "auto",
-  },
-});
-
 const Container = ({
   open,
   onClose,
@@ -62,7 +51,6 @@ const Container = ({
   recordId,
 }: ContainerProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
-  const classes = useStyles();
   const [tab, setTab] = useState(0);
   const [isRecordEditModalOpen, setIsRecordEditModalOpen] = useState(false);
   const [isAddingFile, setIsAddingFile] = useState(false);
@@ -220,93 +208,90 @@ const Container = ({
   const title = getRecordRes?.["record name"] || getRecordRes?.record_id;
   return (
     <Dialog open={open} fullWidth maxWidth="xl" onClose={onClose}>
-      <DialogContainer height="85vh">
+      <DialogWrapper>
         <DialogCloseButton onClick={onClose} />
-        {getRecordError || listFilesError ? (
-          <ErrorMessage
-            reason={JSON.stringify(getRecordError || listFilesError)}
-            instruction="please reload this page"
-          />
-        ) : (
-          <>
-            {title && (
-              <>
-                <DialogTitle>
-                  <Spacer direction="horizontal" size="3vw" />
-                  {title}
-                </DialogTitle>
-              </>
-            )}
-            <Spacer direction="vertical" size="2vh" />
-            <DialogBody>
-              <div className={classes.tabBarContainer}>
-                <TabBar
-                  onChange={onChangeTab}
-                  tabNames={tabNames}
-                  value={tab}
-                />
-              </div>
-              <div className={classes.mainContainer}>
-                {tabNames[tab] === "Info" ? (
-                  getRecordRes ? (
-                    <RecordInfo record={getRecordRes} />
-                  ) : (
-                    <LoadingIndicator />
-                  )
-                ) : tabNames[tab] === "Files" ? (
-                  listFilesRes ? (
-                    <FileList
-                      files={listFilesRes.data}
-                      onPreview={onPreviewFile}
-                      onDownload={onDownloadFile}
-                      onEdit={onEditFile}
-                      onDelete={onDeleteFile}
-                    />
-                  ) : (
-                    <LoadingIndicator />
-                  )
-                ) : null}
-              </div>
-            </DialogBody>
-            <DialogToolBar
-              right={
-                <>
-                  <FileUploadButton
-                    onFileChange={onAddFile}
-                    startIcon={<UploadIcon />}
-                    pending={isAddingFile}
-                  >
-                    Add File
-                  </FileUploadButton>
-                  <Spacer direction="horizontal" size="10px" />
-                  <Button onClick={onEditRecord} startIcon={<EditIcon />}>
-                    Edit Record
-                  </Button>
-                </>
-              }
-            />
-            <RecordEditModal
-              databaseId={databaseId}
-              recordId={recordId}
-              open={isRecordEditModalOpen}
-              onClose={() => setIsRecordEditModalOpen(false)}
-              onSubmitSucceeded={(newRecord) =>
-                mutate(getRecordCacheKey, newRecord)
-              }
-            />
-            <FilePreviewModal
-              open={previewingFile !== undefined}
-              onClose={() => {
-                setPreviewingFile(undefined);
-              }}
-              file={previewingFile || {}}
-              fullWidth
-              maxWidth="md"
-              height="auto"
-            />
-          </>
+        {title && (
+          <DialogTitle>
+            <Spacer direction="horizontal" size="3vw" />
+            {title}
+          </DialogTitle>
         )}
-      </DialogContainer>
+        <DialogContainer height="60vh">
+          <DialogTabBar
+            onChange={onChangeTab}
+            tabNames={tabNames}
+            value={tab}
+          />
+          {getRecordError || listFilesError ? (
+            <ErrorMessage
+              reason={JSON.stringify(getRecordError || listFilesError)}
+              instruction="please reload this page"
+            />
+          ) : (
+            <>
+              <DialogBody>
+                <DialogMain>
+                  {tabNames[tab] === "Info" ? (
+                    getRecordRes ? (
+                      <RecordInfo record={getRecordRes} />
+                    ) : (
+                      <LoadingIndicator />
+                    )
+                  ) : tabNames[tab] === "Files" ? (
+                    listFilesRes ? (
+                      <FileList
+                        files={listFilesRes.data}
+                        onPreview={onPreviewFile}
+                        onDownload={onDownloadFile}
+                        onEdit={onEditFile}
+                        onDelete={onDeleteFile}
+                      />
+                    ) : (
+                      <LoadingIndicator />
+                    )
+                  ) : null}
+                </DialogMain>
+              </DialogBody>
+              <RecordEditModal
+                databaseId={databaseId}
+                recordId={recordId}
+                open={isRecordEditModalOpen}
+                onClose={() => setIsRecordEditModalOpen(false)}
+                onSubmitSucceeded={(newRecord) =>
+                  mutate(getRecordCacheKey, newRecord)
+                }
+              />
+              <FilePreviewModal
+                open={previewingFile !== undefined}
+                onClose={() => {
+                  setPreviewingFile(undefined);
+                }}
+                file={previewingFile || {}}
+                fullWidth
+                maxWidth="md"
+                height="auto"
+              />
+            </>
+          )}
+        </DialogContainer>
+        <DialogToolBar
+          right={
+            <>
+              <FileUploadButton
+                onFileChange={onAddFile}
+                startIcon={<UploadIcon />}
+                pending={isAddingFile}
+              >
+                Add File
+              </FileUploadButton>
+              <Spacer direction="horizontal" size="10px" />
+              <Button onClick={onEditRecord} startIcon={<EditIcon />}>
+                Edit Record
+              </Button>
+            </>
+          }
+        />
+      </DialogWrapper>
     </Dialog>
   );
 };

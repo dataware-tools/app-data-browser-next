@@ -10,6 +10,7 @@ import {
   PageContainer,
   PageToolBar,
   PageBody,
+  PageMain,
 } from "@dataware-tools/app-common";
 import { useAuth0 } from "@auth0/auth0-react";
 import { DatabaseList } from "components/organisms/DatabaseList";
@@ -44,47 +45,49 @@ const Page = (): JSX.Element => {
 
   return (
     <PageContainer>
-      <PageToolBar
-        right={
-          <>
-            <SearchForm
-              onSearch={(newSearchText) => setSearchText(newSearchText)}
-              defaultValue={searchText}
-            />
-            <Spacer direction="horizontal" size="15px" />
-            <PerPageSelect
-              perPage={perPage}
-              setPerPage={setPerPage}
-              values={[10, 20, 50, 100]}
-            />
-          </>
-        }
-      />
       <PageBody>
-        {listDatabasesError ? (
-          <ErrorMessage
-            reason={JSON.stringify(listDatabasesError)}
-            instruction="please reload this page"
-          />
-        ) : listDatabasesRes ? (
-          <DatabaseList
-            databases={listDatabasesRes.data}
-            onSelectDatabase={onSelectDatabases}
-          />
-        ) : (
-          <LoadingIndicator />
-        )}
+        <PageToolBar
+          right={
+            <>
+              <SearchForm
+                onSearch={(newSearchText) => setSearchText(newSearchText)}
+                defaultValue={searchText}
+              />
+              <Spacer direction="horizontal" size="15px" />
+              <PerPageSelect
+                perPage={perPage}
+                setPerPage={setPerPage}
+                values={[10, 20, 50, 100]}
+              />
+            </>
+          }
+        />
+        <PageMain>
+          {listDatabasesError ? (
+            <ErrorMessage
+              reason={JSON.stringify(listDatabasesError)}
+              instruction="please reload this page"
+            />
+          ) : listDatabasesRes ? (
+            <DatabaseList
+              databases={listDatabasesRes.data}
+              onSelectDatabase={onSelectDatabases}
+            />
+          ) : (
+            <LoadingIndicator />
+          )}
+        </PageMain>
+        <Spacer direction="vertical" size="3vh" />
+        {listDatabasesRes ? (
+          <ElemCenteringFlexDiv>
+            <Pagination
+              count={Math.ceil(listDatabasesRes.number_of_pages)}
+              page={page}
+              onChange={(_, newPage) => setPage(newPage)}
+            />
+          </ElemCenteringFlexDiv>
+        ) : null}
       </PageBody>
-      <Spacer direction="vertical" size="3vh" />
-      {listDatabasesRes ? (
-        <ElemCenteringFlexDiv>
-          <Pagination
-            count={Math.ceil(listDatabasesRes.number_of_pages)}
-            page={page}
-            onChange={(_, newPage) => setPage(newPage)}
-          />
-        </ElemCenteringFlexDiv>
-      ) : null}
     </PageContainer>
   );
 };

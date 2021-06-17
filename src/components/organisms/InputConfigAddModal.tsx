@@ -5,6 +5,8 @@ import {
   DialogBody,
   DialogCloseButton,
   DialogContainer,
+  DialogWrapper,
+  DialogMain,
 } from "@dataware-tools/app-common";
 import Autocomplete, {
   createFilterOptions,
@@ -101,118 +103,123 @@ const Container = ({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth>
-      <DialogContainer>
+      <DialogWrapper>
         <DialogCloseButton onClick={onClose} />
-        <DialogBody flexDirection="column">
-          <div>Name</div>
-          <Autocomplete
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                error={Boolean(nameValidateError)}
-                helperText={nameValidateError}
-              />
-            )}
-            options={options}
-            value={name}
-            onChange={(_, newValue) => {
-              if (typeof newValue === "string") {
-                setName({
-                  name: newValue,
-                  display_name: newValue,
-                });
-              } else if (newValue && newValue.inputValue) {
-                setName({
-                  name: newValue.inputValue,
-                  display_name: newValue.inputValue,
-                });
-              } else {
-                setName(newValue);
-              }
-            }}
-            filterOptions={(options, params) => {
-              const filtered = filter(options, params);
-              const { inputValue } = params;
-
-              const isExisting = options.some(
-                (option) => inputValue === option.name
-              );
-              if (inputValue !== "" && !isExisting) {
-                filtered.push({
-                  inputValue,
-                  name: inputValue,
-                  display_name: inputValue,
-                });
-              }
-
-              return filtered;
-            }}
-            getOptionLabel={(option) => {
-              if (typeof option === "string") {
-                return option;
-              }
-              if (option.inputValue) {
-                return `Add ${option.inputValue}`;
-              }
-              return option.name;
-            }}
-            freeSolo
-            filterSelectedOptions
-            fullWidth
-          />
-
-          {name ? (
-            <>
-              <div>Display name</div>
-              <TextField
-                value={displayName}
-                error={Boolean(displayNameValidateError)}
-                helperText={displayNameValidateError}
-                onChange={(event) => {
-                  const currentValue = event.target.value;
-                  setDisplayName(currentValue);
+        <DialogContainer padding="0 0 20px">
+          <DialogBody>
+            <DialogMain>
+              <div>Name</div>
+              <Autocomplete
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    error={Boolean(nameValidateError)}
+                    helperText={nameValidateError}
+                  />
+                )}
+                options={options}
+                value={name}
+                onChange={(_, newValue) => {
+                  if (typeof newValue === "string") {
+                    setName({
+                      name: newValue,
+                      display_name: newValue,
+                    });
+                  } else if (newValue && newValue.inputValue) {
+                    setName({
+                      name: newValue.inputValue,
+                      display_name: newValue.inputValue,
+                    });
+                  } else {
+                    setName(newValue);
+                  }
                 }}
+                filterOptions={(options, params) => {
+                  const filtered = filter(options, params);
+                  const { inputValue } = params;
+
+                  const isExisting = options.some(
+                    (option) => inputValue === option.name
+                  );
+                  if (inputValue !== "" && !isExisting) {
+                    filtered.push({
+                      inputValue,
+                      name: inputValue,
+                      display_name: inputValue,
+                    });
+                  }
+
+                  return filtered;
+                }}
+                getOptionLabel={(option) => {
+                  if (typeof option === "string") {
+                    return option;
+                  }
+                  if (option.inputValue) {
+                    return `Add ${option.inputValue}`;
+                  }
+                  return option.name;
+                }}
+                freeSolo
+                filterSelectedOptions
+                fullWidth
               />
-              <div>Necessity</div>
-              <Select
-                value={necessity}
-                onChange={(event) => setNecessity(event.target.value)}
-                variant="outlined"
-                error={Boolean(!necessity)}
-              >
-                <MenuItem value="required">Required</MenuItem>
-                <MenuItem value="recommended">Recommended</MenuItem>
-                <MenuItem value="optional">Optional</MenuItem>
-              </Select>
-            </>
-          ) : null}
-        </DialogBody>
-        <DialogToolBar
-          right={
-            <Button
-              onClick={() => {
-                if (name && displayName && necessity) {
-                  onSave({
-                    name: name.name,
-                    display_name: displayName,
-                    necessity,
-                  });
-                }
-                onClose();
-              }}
-              disabled={Boolean(
-                !name?.name ||
-                  !displayName ||
-                  !necessity ||
-                  nameValidateError ||
-                  displayNameValidateError
-              )}
-            >
-              Add
-            </Button>
-          }
-        />
-      </DialogContainer>
+
+              {name ? (
+                <>
+                  <div>Display name</div>
+                  <TextField
+                    value={displayName}
+                    error={Boolean(displayNameValidateError)}
+                    helperText={displayNameValidateError}
+                    onChange={(event) => {
+                      const currentValue = event.target.value;
+                      setDisplayName(currentValue);
+                    }}
+                    fullWidth
+                  />
+                  <div>Necessity</div>
+                  <Select
+                    value={necessity}
+                    onChange={(event) => setNecessity(event.target.value)}
+                    variant="outlined"
+                    error={Boolean(!necessity)}
+                  >
+                    <MenuItem value="required">Required</MenuItem>
+                    <MenuItem value="recommended">Recommended</MenuItem>
+                    <MenuItem value="optional">Optional</MenuItem>
+                  </Select>
+                </>
+              ) : null}
+            </DialogMain>
+            <DialogToolBar
+              right={
+                <Button
+                  onClick={() => {
+                    if (name && displayName && necessity) {
+                      onSave({
+                        name: name.name,
+                        display_name: displayName,
+                        necessity,
+                      });
+                    }
+                    onClose();
+                  }}
+                  disabled={Boolean(
+                    !name?.name ||
+                      !displayName ||
+                      !necessity ||
+                      nameValidateError ||
+                      displayNameValidateError
+                  )}
+                >
+                  Add
+                </Button>
+              }
+            />
+          </DialogBody>
+        </DialogContainer>
+      </DialogWrapper>
     </Dialog>
   );
 };

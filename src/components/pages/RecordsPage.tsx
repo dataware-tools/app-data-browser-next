@@ -10,6 +10,7 @@ import {
   PageToolBar,
   PageBody,
   TextCenteringSpan,
+  PageMain,
 } from "@dataware-tools/app-common";
 import { makeStyles } from "@material-ui/core/styles";
 
@@ -138,87 +139,93 @@ const Page = (): JSX.Element => {
   return (
     <>
       <PageContainer>
-        <PageToolBar
-          left={
-            <Link to="/">
-              <ElemCenteringFlexDiv>
-                <HomeIcon />
-                Home
-              </ElemCenteringFlexDiv>
-            </Link>
-          }
-          right={
-            <>
-              {!listRecordsError ? (
-                <>
-                  <div className={classes.fixedFlexShrink}>
-                    <SearchForm
-                      onSearch={(newSearchText) => setSearchText(newSearchText)}
-                      defaultValue={searchText}
-                    />
-                  </div>
-                  <Spacer direction="horizontal" size="15px" />
-                  <PerPageSelect
-                    perPage={perPage}
-                    setPerPage={setPerPage}
-                    values={[10, 20, 50, 100]}
-                  />
-                  <Spacer direction="horizontal" size="15px" />
-                  <Button
-                    onClick={() => setIsRecordEditModalOpen(true)}
-                    startIcon={<AddCircle />}
-                    className={classes.fixedFlexShrink}
-                  >
-                    <TextCenteringSpan>Record</TextCenteringSpan>
-                  </Button>
-                  <Spacer direction="horizontal" size="15px" />
-                </>
-              ) : null}
-              {!getConfigError ? (
-                <DatabaseConfigButton
-                  onMenuSelect={onSelectDatabaseConfig}
-                  menu={databaseConfigMenu}
-                />
-              ) : null}
-            </>
-          }
-        />
         <PageBody>
-          {fetchError ? (
-            <ErrorMessage
-              reason={JSON.stringify(fetchError)}
-              instruction="please reload this page"
-            />
-          ) : listRecordsRes && getConfigRes ? (
-            !displayColumns ? (
-              <ErrorMessage
-                reason="Display columns is not configured"
-                instruction="please report administrator this error"
-              />
-            ) : (
+          <PageToolBar
+            left={
+              <Link to="/">
+                <ElemCenteringFlexDiv>
+                  <HomeIcon />
+                  Home
+                </ElemCenteringFlexDiv>
+              </Link>
+            }
+            right={
               <>
-                <RecordList
-                  columns={displayColumns}
-                  records={listRecordsRes.data}
-                  onSelectRecord={onSelectRecord}
-                />
+                {!listRecordsError ? (
+                  <>
+                    <div className={classes.fixedFlexShrink}>
+                      <SearchForm
+                        onSearch={(newSearchText) =>
+                          setSearchText(newSearchText)
+                        }
+                        defaultValue={searchText}
+                      />
+                    </div>
+                    <Spacer direction="horizontal" size="15px" />
+                    <PerPageSelect
+                      perPage={perPage}
+                      setPerPage={setPerPage}
+                      values={[10, 20, 50, 100]}
+                    />
+                    <Spacer direction="horizontal" size="15px" />
+                    <Button
+                      onClick={() => setIsRecordEditModalOpen(true)}
+                      startIcon={<AddCircle />}
+                      className={classes.fixedFlexShrink}
+                    >
+                      <TextCenteringSpan>Record</TextCenteringSpan>
+                    </Button>
+                    <Spacer direction="horizontal" size="15px" />
+                  </>
+                ) : null}
+                {!getConfigError ? (
+                  <DatabaseConfigButton
+                    onMenuSelect={onSelectDatabaseConfig}
+                    menu={databaseConfigMenu}
+                  />
+                ) : null}
               </>
-            )
-          ) : (
-            <LoadingIndicator />
-          )}
-        </PageBody>
-        <Spacer direction="vertical" size="3vh" />
-      </PageContainer>
-      {listRecordsRes ? (
-        <ElemCenteringFlexDiv>
-          <Pagination
-            count={Math.ceil(listRecordsRes.total / listRecordsRes.per_page)}
-            page={page}
-            onChange={(_, newPage) => setPage(newPage)}
+            }
           />
-        </ElemCenteringFlexDiv>
-      ) : null}
+          <PageMain>
+            {fetchError ? (
+              <ErrorMessage
+                reason={JSON.stringify(fetchError)}
+                instruction="please reload this page"
+              />
+            ) : listRecordsRes && getConfigRes ? (
+              !displayColumns ? (
+                <ErrorMessage
+                  reason="Display columns is not configured"
+                  instruction="please report administrator this error"
+                />
+              ) : (
+                <>
+                  <RecordList
+                    columns={displayColumns}
+                    records={listRecordsRes.data}
+                    onSelectRecord={onSelectRecord}
+                  />
+                </>
+              )
+            ) : (
+              <LoadingIndicator />
+            )}
+          </PageMain>
+          <Spacer direction="vertical" size="3vh" />
+          {listRecordsRes ? (
+            <ElemCenteringFlexDiv>
+              <Pagination
+                count={Math.ceil(
+                  listRecordsRes.total / listRecordsRes.per_page
+                )}
+                page={page}
+                onChange={(_, newPage) => setPage(newPage)}
+              />
+            </ElemCenteringFlexDiv>
+          ) : null}
+        </PageBody>
+      </PageContainer>
       {listRecordsRes ? (
         <RecordEditModal
           open={isRecordEditModalOpen}
