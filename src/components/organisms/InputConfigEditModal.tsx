@@ -274,6 +274,7 @@ const Container = ({
               open={openAddModal}
               onClose={() => setOpenAddModal(false)}
               onSave={(newConfig) => onAdd(newConfig)}
+              alreadyUsedNames={config?.map((config) => config.name) || []}
               alreadyUsedDisplayNames={alreadyUsedDisplayNames}
             />
           ) : null}

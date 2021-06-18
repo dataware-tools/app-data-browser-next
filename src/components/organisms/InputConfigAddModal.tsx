@@ -34,6 +34,7 @@ type ContainerProps = {
   open: boolean;
   onClose: () => void;
   onSave: (newConfig: NewConfigType) => void;
+  alreadyUsedNames: string[];
   alreadyUsedDisplayNames: string[];
 };
 const Container = ({
@@ -41,6 +42,7 @@ const Container = ({
   open,
   onClose,
   onSave,
+  alreadyUsedNames,
   alreadyUsedDisplayNames,
 }: ContainerProps): JSX.Element => {
   const [name, setName] = useState<OptionType | null>(null);
@@ -76,6 +78,8 @@ const Container = ({
       const reg = /^[a-zA-Z0-9]{1}[a-zA-Z0-9_\-()]*$/;
       if (!reg.test(name.name) || name.name === "") {
         setNameValidateError("invalid field name");
+      } else if (alreadyUsedNames.includes(name.name)) {
+        setNameValidateError("duplicated name");
       } else {
         setNameValidateError(null);
         if (!displayName) {
@@ -84,7 +88,7 @@ const Container = ({
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [name]);
+  }, [name, alreadyUsedDisplayNames]);
 
   useEffect(() => {
     if (displayName != null) {
