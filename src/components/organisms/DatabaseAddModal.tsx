@@ -13,21 +13,25 @@ import {
 } from "@dataware-tools/app-common";
 import { useAuth0 } from "@auth0/auth0-react";
 import Dialog, { DialogProps } from "@material-ui/core/Dialog";
-import TextField, { TextFieldProps } from "@material-ui/core/TextField";
+import TextField from "@material-ui/core/TextField";
 import { useEffect, useState } from "react";
+import {
+  useForm,
+  Controller,
+  SubmitHandler,
+  Control,
+  DeepMap,
+  FieldError,
+} from "react-hook-form";
 import LoadingButton from "@material-ui/lab/LoadingButton";
 import { usePrevious } from "utils";
 
 type Props = {
-  databaseId: string;
-  name: string;
-  description: string;
-  onChangeDatabaseId: TextFieldProps["onChange"];
-  onChangeName: TextFieldProps["onChange"];
-  onChangeDescriptions: TextFieldProps["onChange"];
   onSubmit: () => Promise<void>;
   isSubmitting: boolean;
   error?: ErrorMessageProps;
+  formErrors: DeepMap<FormInput, FieldError>;
+  control: Control<FormInput>;
 } & Omit<ContainerProps, "onSubmitSucceeded">;
 
 type ContainerProps = {
@@ -35,17 +39,19 @@ type ContainerProps = {
   onSubmitSucceeded: (newDatabase: metaStore.DatabaseModel) => void;
 } & Omit<DialogProps, "onClose" | "onSubmit">;
 
+type FormInput = {
+  database_id: string;
+  name?: string;
+  description?: string;
+};
+
 const Component = ({
-  databaseId,
-  name,
-  description,
-  onChangeDatabaseId,
-  onChangeName,
-  onChangeDescriptions,
   onClose,
   error,
   onSubmit,
   isSubmitting,
+  formErrors,
+  control,
   ...delegated
 }: Props) => {
   return (
@@ -53,50 +59,80 @@ const Component = ({
       <DialogWrapper>
         <DialogCloseButton onClick={onClose} />
         <DialogTitle>Add Record</DialogTitle>
-        {error ? (
-          <ErrorMessage {...error} />
-        ) : (
-          <DialogContainer>
-            <DialogBody>
-              <DialogMain>
-                <label htmlFor="DatabaseAddModal_databaseId">
-                  Database ID
-                  <TextField
-                    fullWidth
-                    id="DatabaseAddModal_databaseId"
-                    value={databaseId}
-                    onChange={onChangeDatabaseId}
+        <DialogContainer padding="0 0 20px">
+          <DialogBody>
+            <DialogMain>
+              {error ? (
+                <ErrorMessage {...error} />
+              ) : (
+                <>
+                  <label htmlFor="DatabaseAddModal_database_id">
+                    Database ID
+                  </label>
+                  <Controller
+                    name="database_id"
+                    control={control}
+                    defaultValue=""
+                    rules={{ required: true }}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        error={formErrors.database_id?.type === "required"}
+                        helperText={
+                          formErrors.database_id?.type === "required" &&
+                          "Database ID is required"
+                        }
+                        fullWidth
+                        id="DatabaseAddModal_database_id"
+                      />
+                    )}
                   />
-                </label>
-                <label htmlFor="DatabaseAddModal_name">
-                  Name
-                  <TextField
-                    fullWidth
-                    id="DatabaseAddModal_name"
-                    value={name}
-                    onChange={onChangeName}
+                  <label htmlFor="DatabaseAddModal_name">Name</label>
+                  <Controller
+                    name="name"
+                    control={control}
+                    defaultValue=""
+                    rules={{ required: true }}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        fullWidth
+                        id="DatabaseAddModal_name"
+                        error={formErrors.name?.type === "required"}
+                        helperText={
+                          formErrors.name?.type === "required" &&
+                          "Name is required"
+                        }
+                      />
+                    )}
                   />
-                </label>
-                <label htmlFor="DatabaseAddModal_description">
-                  Description
-                  <TextField
-                    fullWidth
-                    id="DatabaseAddModal_description"
-                    value={description}
-                    onChange={onChangeDescriptions}
+                  <label htmlFor="DatabaseAddModal_description">
+                    Description
+                  </label>
+                  <Controller
+                    name="description"
+                    control={control}
+                    defaultValue=""
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        fullWidth
+                        id="DatabaseAddModal_description"
+                      />
+                    )}
                   />
-                </label>
-              </DialogMain>
-              <DialogToolBar
-                right={
-                  <LoadingButton pending={isSubmitting} onClick={onSubmit}>
-                    Save
-                  </LoadingButton>
-                }
-              />
-            </DialogBody>
-          </DialogContainer>
-        )}
+                </>
+              )}
+            </DialogMain>
+          </DialogBody>
+        </DialogContainer>
+        <DialogToolBar
+          right={
+            <LoadingButton pending={isSubmitting} onClick={onSubmit}>
+              Save
+            </LoadingButton>
+          }
+        />
       </DialogWrapper>
     </Dialog>
   );
@@ -109,19 +145,18 @@ const Container = ({
   ...delegated
 }: ContainerProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
+  const {
+    control,
+    formState: { errors: formErrors },
+    handleSubmit,
+  } = useForm<FormInput>();
 
   const [error, setError] = useState<ErrorMessageProps | undefined>(undefined);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [databaseId, setDatabaseId] = useState("");
-  const [name, setName] = useState("");
-  const [description, setDescription] = useState("");
 
   const initializeState = () => {
     setError(undefined);
     setIsSubmitting(false);
-    setDatabaseId("");
-    setName("");
-    setDescription("");
   };
 
   // See: https://stackoverflow.com/questions/58209791/set-initial-state-for-material-ui-dialog
@@ -133,24 +168,14 @@ const Container = ({
     }
   }, [open, prevOpen]);
 
-  const onChangeDatabaseId: Props["onChangeDatabaseId"] = (event) => {
-    setDatabaseId(event.target.value);
-  };
-  const onChangeName: Props["onChangeName"] = (event) => {
-    setName(event.target.value);
-  };
-  const onChangeDescription: Props["onChangeDescriptions"] = (event) => {
-    setDescription(event.target.value);
-  };
-
-  const onSubmit: Props["onSubmit"] = async () => {
+  const onSubmit: SubmitHandler<FormInput> = async (requestBody) => {
     setIsSubmitting(true);
 
     const [createDatabaseRes, createDatabaseError] = await fetchMetaStore(
       getAccessToken,
       metaStore.DatabaseService.createDatabase,
       {
-        requestBody: { database_id: databaseId, name, description },
+        requestBody,
       }
     );
     if (createDatabaseError) {
@@ -171,15 +196,11 @@ const Container = ({
     <Component
       open={open}
       onClose={onClose}
-      databaseId={databaseId}
-      name={name}
-      description={description}
-      onChangeDatabaseId={onChangeDatabaseId}
-      onChangeName={onChangeName}
-      onChangeDescriptions={onChangeDescription}
-      onSubmit={onSubmit}
+      onSubmit={handleSubmit(onSubmit)}
       isSubmitting={isSubmitting}
       error={error}
+      formErrors={formErrors}
+      control={control}
       {...delegated}
     />
   );
