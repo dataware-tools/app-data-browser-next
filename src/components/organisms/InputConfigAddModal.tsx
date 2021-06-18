@@ -77,7 +77,7 @@ const Container = ({
     if (name) {
       const reg = /^[a-zA-Z0-9]{1}[a-zA-Z0-9_\-()]*$/;
       if (!reg.test(name.name) || name.name === "") {
-        setNameValidateError("invalid field name");
+        setNameValidateError("invalid name");
       } else if (alreadyUsedNames.includes(name.name)) {
         setNameValidateError("duplicated name");
       } else {
@@ -86,6 +86,8 @@ const Container = ({
           setDisplayName(name.display_name);
         }
       }
+    } else {
+      setNameValidateError(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [name, alreadyUsedDisplayNames]);
