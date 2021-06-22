@@ -13,7 +13,7 @@ import Autocomplete, {
 } from "@material-ui/core/Autocomplete";
 import TextField from "@material-ui/core/TextField";
 import { useState, useEffect } from "react";
-import { DataBrowserInputConfigType, usePrevious } from "utils";
+import { RecordAddInputableColumnsConfig, usePrevious } from "utils";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 
@@ -26,7 +26,7 @@ type OptionType = {
 type NewConfigType = {
   name: string;
   display_name: string;
-  necessity: DataBrowserInputConfigType[number]["necessity"];
+  necessity: RecordAddInputableColumnsConfig[number]["necessity"];
 };
 
 type ContainerProps = {
@@ -54,7 +54,7 @@ const Container = ({
     string | null
   >(null);
   const [necessity, setNecessity] = useState<
-    DataBrowserInputConfigType[number]["necessity"] | null
+    RecordAddInputableColumnsConfig[number]["necessity"] | null
   >(null);
 
   const initializeState = () => {

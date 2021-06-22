@@ -30,31 +30,32 @@ type DatabaseColumnsConfigType = {
     | "stdDevSamp"
     | "sum";
 }[];
-type DatabaseIndexColumnsConfigType = string[];
-
-type DataBrowserInputConfigType = {
+type RecordAddInputableColumnsConfig = {
   name: string;
   necessity: "required" | "recommended" | "optional";
 }[];
-type DataBrowserDisplayConfigType = string[];
-type DataBrowserSearchConfigType = string[];
+type RecordDetailTitleColumnConfig = string;
+type RecordListDisplayColumns = string[];
+type RecordSearchTargetColumns = string[];
 
+type DataBrowserConfigType = {
+  record_add_inputable_columns?: RecordAddInputableColumnsConfig;
+  record_detail_title_column?: RecordDetailTitleColumnConfig;
+  record_list_display_columns?: RecordListDisplayColumns;
+  record_search_target_columns?: RecordSearchTargetColumns;
+};
 type DatabaseConfigType = {
   columns: DatabaseColumnsConfigType;
-  index_columns: DatabaseIndexColumnsConfigType;
-  data_browser_config?: {
-    record_input_config?: DataBrowserInputConfigType;
-    record_display_config?: DataBrowserDisplayConfigType;
-    record_search_config?: DataBrowserSearchConfigType;
-  };
+  index_columns: string[];
+  data_browser_config?: DataBrowserConfigType;
 };
 
 export type {
   AwaitType,
   DatabaseConfigType,
-  DatabaseColumnsConfigType,
-  DatabaseIndexColumnsConfigType,
-  DataBrowserInputConfigType,
-  DataBrowserDisplayConfigType,
-  DataBrowserSearchConfigType,
+  DataBrowserConfigType,
+  RecordAddInputableColumnsConfig,
+  RecordDetailTitleColumnConfig,
+  RecordListDisplayColumns,
+  RecordSearchTargetColumns,
 };

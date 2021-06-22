@@ -5,7 +5,7 @@ import {
   useGetConfig,
   usePrevious,
   DatabaseConfigType,
-  DataBrowserSearchConfigType,
+  RecordSearchTargetColumns,
   fetchMetaStore,
 } from "utils/index";
 import {
@@ -30,7 +30,7 @@ import {
 import { produce } from "immer";
 import { mutate } from "swr";
 
-type ConfigNameType = "record_search_config";
+type ConfigNameType = "record_search_target_columns";
 
 type ContainerProps = {
   open: boolean;
@@ -39,7 +39,7 @@ type ContainerProps = {
   configName: ConfigNameType;
 };
 
-const title = { record_search_config: "Record Search Fields" };
+const title = { record_search_target_columns: "Record Search Fields" };
 
 type OptionType = { label: string; value: string };
 const compareOption = (a: OptionType, b: OptionType) => {
@@ -60,7 +60,7 @@ const Container = ({
 }: ContainerProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const [isSaving, setIsSaving] = useState(false);
-  const [config, setConfig] = useState<DataBrowserSearchConfigType>([]);
+  const [config, setConfig] = useState<RecordSearchTargetColumns>([]);
   const [options, setOptions] = useState<OptionType[] | null>(null);
   const [alreadySelectedOptions, setAlreadySelectedOptions] = useState<
     string[]

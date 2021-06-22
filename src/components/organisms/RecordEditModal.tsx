@@ -43,7 +43,7 @@ const Container = ({
   ];
 
   const record_input_config =
-    getConfigRes?.data_browser_config?.record_input_config;
+    getConfigRes?.data_browser_config?.record_add_inputable_columns;
   const columns = getConfigRes?.columns;
   const inputConfig =
     record_input_config && columns

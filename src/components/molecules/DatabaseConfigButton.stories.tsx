@@ -16,8 +16,14 @@ const Template: Story<DatabaseConfigButtonProps> = (args) => (
 export const Default = Template.bind({});
 Default.args = {
   menu: [
-    { label: "Record Input Config", value: "record_input_config" as const },
-    { label: "Record Display Config", value: "record_display_config" as const },
+    {
+      label: "Record Input Config",
+      value: "record_add_inputable_columns" as const,
+    },
+    {
+      label: "Record Display Config",
+      value: "record_list_display_columns" as const,
+    },
   ],
   onMenuSelect: (target) => window.alert(`click ${target}!`),
 };

@@ -33,11 +33,11 @@ const Container = ({
   ...delegated
 }: ContainerProps): JSX.Element => {
   switch (configName) {
-    case "record_input_config":
+    case "record_add_inputable_columns":
       return <InputConfigEditModal {...delegated} configName={configName} />;
-    case "record_display_config":
+    case "record_list_display_columns":
       return <DisplayConfigEditModal {...delegated} configName={configName} />;
-    case "record_search_config":
+    case "record_search_target_columns":
       return <SearchConfigEditModal {...delegated} configName={configName} />;
     case "export_metadata":
       return <ExportMetadataModal {...delegated} />;

@@ -18,7 +18,7 @@ RecordInputConfig.args = {
   open: true,
   onClose: () => window.alert("close!"),
   databaseId: "test1",
-  configName: "record_input_config",
+  configName: "record_add_inputable_columns",
 };
 
 export const RecordDisplayConfig = Template.bind({});
@@ -26,7 +26,7 @@ RecordDisplayConfig.args = {
   open: true,
   onClose: () => window.alert("close!"),
   databaseId: "test1",
-  configName: "record_display_config",
+  configName: "record_list_display_columns",
 };
 
 export const ExportMetadata = Template.bind({});

@@ -33,7 +33,7 @@ import {
 import { produce } from "immer";
 import { mutate } from "swr";
 
-type ConfigNameType = "record_input_config";
+type ConfigNameType = "record_add_inputable_columns";
 
 type ContainerProps = {
   open: boolean;
@@ -42,7 +42,7 @@ type ContainerProps = {
   configName: ConfigNameType;
 };
 
-const title = { record_input_config: "Record Input Fields" };
+const title = { record_add_inputable_columns: "Record Input Fields" };
 
 const Container = ({
   open,
@@ -93,7 +93,7 @@ const Container = ({
           if (column.name.startsWith("_")) {
             return undefined;
           } else if (
-            getConfigRes.data_browser_config?.record_input_config
+            getConfigRes.data_browser_config?.record_add_inputable_columns
               ?.map((el) => el.name)
               .includes(column.name)
           ) {
@@ -156,10 +156,10 @@ const Container = ({
       const newConfig = produce(getConfigRes, (draft) => {
         draft.columns = newColumns;
         if (draft.data_browser_config) {
-          draft.data_browser_config.record_input_config = newInputConfig;
+          draft.data_browser_config.record_add_inputable_columns = newInputConfig;
         } else {
           draft.data_browser_config = {
-            record_input_config: newInputConfig,
+            record_add_inputable_columns: newInputConfig,
           };
         }
       });

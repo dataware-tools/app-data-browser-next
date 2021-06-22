@@ -5,7 +5,7 @@ import {
   useGetConfig,
   usePrevious,
   DatabaseConfigType,
-  DataBrowserDisplayConfigType,
+  RecordListDisplayColumns,
   fetchMetaStore,
 } from "utils/index";
 import {
@@ -30,7 +30,7 @@ import {
 import { produce } from "immer";
 import { mutate } from "swr";
 
-type ConfigNameType = "record_display_config";
+type ConfigNameType = "record_list_display_columns";
 
 type ContainerProps = {
   open: boolean;
@@ -39,7 +39,7 @@ type ContainerProps = {
   configName: ConfigNameType;
 };
 
-const title = { record_display_config: "Record Display Fields" };
+const title = { record_list_display_columns: "Record Display Fields" };
 
 type OptionType = { label: string; value: string };
 const compareOption = (a: OptionType, b: OptionType) => {
@@ -60,7 +60,7 @@ const Container = ({
 }: ContainerProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const [isSaving, setIsSaving] = useState(false);
-  const [config, setConfig] = useState<DataBrowserDisplayConfigType>([]);
+  const [config, setConfig] = useState<RecordListDisplayColumns>([]);
   const [options, setOptions] = useState<OptionType[] | null>(null);
   const [alreadySelectedOptions, setAlreadySelectedOptions] = useState<
     string[]
@@ -97,9 +97,9 @@ const Container = ({
       setIsSaving(true);
       const newConfig = produce(getConfigRes, (draft) => {
         if (draft.data_browser_config) {
-          draft.data_browser_config.record_display_config = config;
+          draft.data_browser_config.record_list_display_columns = config;
         } else {
-          draft.data_browser_config = { record_display_config: config };
+          draft.data_browser_config = { record_list_display_columns: config };
         }
       });
 
@@ -194,7 +194,7 @@ const Container = ({
       setOptions(options.length > 0 ? options : null);
 
       setAlreadySelectedOptions(
-        getConfigRes.data_browser_config?.record_display_config || []
+        getConfigRes.data_browser_config?.record_list_display_columns || []
       );
     }
   }, [getConfigRes]);
