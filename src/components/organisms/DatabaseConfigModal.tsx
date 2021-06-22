@@ -33,7 +33,7 @@ const Container = ({
   ...delegated
 }: ContainerProps): JSX.Element => {
   switch (configName) {
-    case "record_add_inputable_columns":
+    case "record_add_editable_columns":
       return <InputConfigEditModal {...delegated} configName={configName} />;
     case "record_list_display_columns":
       return <DisplayConfigEditModal {...delegated} configName={configName} />;

@@ -18,7 +18,7 @@ Default.args = {
   menu: [
     {
       label: "Record Input Config",
-      value: "record_add_inputable_columns" as const,
+      value: "record_add_editable_columns" as const,
     },
     {
       label: "Record Display Config",

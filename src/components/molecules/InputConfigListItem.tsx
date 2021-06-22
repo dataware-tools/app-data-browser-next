@@ -6,11 +6,11 @@ import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from "@material-ui/icons/Delete";
 import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
 import React from "react";
-import { RecordAddInputableColumnsConfig } from "utils";
+import { RecordAddEditableColumnsConfig } from "utils";
 
 type ValueType = {
   display_name: string;
-} & RecordAddInputableColumnsConfig[number];
+} & RecordAddEditableColumnsConfig[number];
 type ActionType = "change" | "delete";
 
 type Props = { classes: ReturnType<typeof useStyles> } & ContainerProps;

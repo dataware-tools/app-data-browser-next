@@ -30,7 +30,7 @@ type DatabaseColumnsConfigType = {
     | "stdDevSamp"
     | "sum";
 }[];
-type RecordAddInputableColumnsConfig = {
+type RecordAddEditableColumnsConfig = {
   name: string;
   necessity: "required" | "recommended" | "optional";
 }[];
@@ -39,7 +39,7 @@ type RecordListDisplayColumns = string[];
 type RecordSearchTargetColumns = string[];
 
 type DataBrowserConfigType = {
-  record_add_inputable_columns?: RecordAddInputableColumnsConfig;
+  record_add_editable_columns?: RecordAddEditableColumnsConfig;
   record_detail_title_column?: RecordDetailTitleColumnConfig;
   record_list_display_columns?: RecordListDisplayColumns;
   record_search_target_columns?: RecordSearchTargetColumns;
@@ -54,7 +54,7 @@ export type {
   AwaitType,
   DatabaseConfigType,
   DataBrowserConfigType,
-  RecordAddInputableColumnsConfig,
+  RecordAddEditableColumnsConfig,
   RecordDetailTitleColumnConfig,
   RecordListDisplayColumns,
   RecordSearchTargetColumns,

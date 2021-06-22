@@ -154,7 +154,7 @@ const Page = (): JSX.Element => {
   const databaseConfigMenu: DatabaseConfigButtonProps["menu"] = [
     {
       label: "Change input fields for record",
-      value: "record_add_inputable_columns",
+      value: "record_add_editable_columns",
     },
     {
       label: "Change display fields for record",

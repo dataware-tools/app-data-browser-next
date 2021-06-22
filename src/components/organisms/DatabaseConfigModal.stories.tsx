@@ -18,7 +18,7 @@ RecordInputConfig.args = {
   open: true,
   onClose: () => window.alert("close!"),
   databaseId: "test1",
-  configName: "record_add_inputable_columns",
+  configName: "record_add_editable_columns",
 };
 
 export const RecordDisplayConfig = Template.bind({});
