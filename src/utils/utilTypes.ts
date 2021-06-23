@@ -50,6 +50,21 @@ type DatabaseConfigType = {
   };
 };
 
+type UserActionType =
+  | "databases"
+  | "databases:read"
+  | "databases:write"
+  | "databases:write:add"
+  | "databases:write:update"
+  | "databases:write:delete"
+  | "metadata"
+  | "metadata:read"
+  | "metadata:read:public"
+  | "metadata:write"
+  | "metadata:write:add"
+  | "metadata:write:update"
+  | "metadata:write:delete";
+
 export type {
   AwaitType,
   DatabaseConfigType,
@@ -58,4 +73,5 @@ export type {
   DataBrowserInputConfigType,
   DataBrowserDisplayConfigType,
   DataBrowserSearchConfigType,
+  UserActionType,
 };
