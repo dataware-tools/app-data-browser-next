@@ -39,13 +39,13 @@ const Container = ({
 }: ContainerProps): JSX.Element => {
   switch (configName) {
     case "record_add_editable_columns":
-      return <InputConfigEditModal {...delegated} configName={configName} />;
+      return <InputConfigEditModal {...delegated} />;
     case "record_list_display_columns":
-      return <DisplayConfigEditModal {...delegated} configName={configName} />;
+      return <DisplayConfigEditModal {...delegated} />;
     case "record_search_target_columns":
-      return <SearchConfigEditModal {...delegated} configName={configName} />;
+      return <SearchConfigEditModal {...delegated} />;
     case "secret_columns":
-      return <SecretConfigEditModal {...delegated} configName={configName} />;
+      return <SecretConfigEditModal {...delegated} />;
     case "export_metadata":
       return <ExportMetadataModal {...delegated} />;
   }

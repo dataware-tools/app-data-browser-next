@@ -37,10 +37,7 @@ type ContainerProps = {
   open: boolean;
   databaseId: string;
   onClose: () => void;
-  configName: ConfigNameType;
 };
-
-const title = { record_list_display_columns: "Record Display Fields" };
 
 type OptionType = { label: string; value: string };
 const compareOption = (a: OptionType, b: OptionType) => {
@@ -57,7 +54,6 @@ const Container = ({
   open,
   onClose,
   databaseId,
-  configName,
 }: ContainerProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const [isSaving, setIsSaving] = useState(false);
@@ -230,7 +226,7 @@ const Container = ({
         <DialogTitle>
           {/* //TODO:Fix typeError */}
           {/* <NoticeableLetters> */}
-          <TextCenteringSpan>{title[configName] + " "}</TextCenteringSpan>
+          <TextCenteringSpan>Display columns</TextCenteringSpan>
           {/* </NoticeableLetters> */}
           {getConfigRes ? (
             <SquareIconButton onClick={onAdd} icon={<AddCircleIcon />} />

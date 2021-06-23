@@ -42,15 +42,11 @@ type ContainerProps = {
   open: boolean;
   onClose: () => void;
   databaseId: string;
-  configName: ConfigNameType;
 };
-
-const title = { record_add_editable_columns: "Record Input Fields" };
 
 const Container = ({
   open,
   onClose,
-  configName,
   databaseId,
 }: ContainerProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
@@ -99,7 +95,7 @@ const Container = ({
         display_name: string;
       }[]
     );
-  }, [getConfigRes, configName]);
+  }, [getConfigRes]);
 
   const initializeState = () => {
     setIsSaving(false);
@@ -246,7 +242,7 @@ const Container = ({
         <DialogTitle>
           {/* // TODO:Fix typeError */}
           {/* <NoticeableLetters> */}
-          <TextCenteringSpan>{title[configName] + " "}</TextCenteringSpan>
+          <TextCenteringSpan>Input columns</TextCenteringSpan>
           {/* </NoticeableLetters> */}
           {getConfigRes ? (
             <SquareIconButton

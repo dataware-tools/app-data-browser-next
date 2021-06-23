@@ -36,10 +36,7 @@ type ContainerProps = {
   open: boolean;
   databaseId: string;
   onClose: () => void;
-  configName: ConfigNameType;
 };
-
-const title = { record_search_target_columns: "Record Search Fields" };
 
 type OptionType = { label: string; value: string };
 const compareOption = (a: OptionType, b: OptionType) => {
@@ -56,7 +53,6 @@ const Container = ({
   open,
   onClose,
   databaseId,
-  configName,
 }: ContainerProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const [isSaving, setIsSaving] = useState(false);
@@ -83,7 +79,7 @@ const Container = ({
         .filter((column) => column.is_search_target)
         .map((column) => column.name) || []
     );
-  }, [getConfigRes, configName]);
+  }, [getConfigRes]);
 
   const initializeState = () => {
     setIsSaving(false);
@@ -211,7 +207,7 @@ const Container = ({
         <DialogTitle>
           {/* //TODO: Fix typeError */}
           {/* <NoticeableLetters> */}
-          <TextCenteringSpan>{title[configName] + " "}</TextCenteringSpan>
+          <TextCenteringSpan>Search target columns</TextCenteringSpan>
           {/* </NoticeableLetters> */}
           {getConfigRes ? (
             <SquareIconButton onClick={onAdd} icon={<AddCircleIcon />} />
