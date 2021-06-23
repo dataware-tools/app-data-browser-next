@@ -7,6 +7,7 @@ type AwaitType<T> = T extends Promise<infer U>
 type DatabaseColumnsConfigType = {
   name: string;
   display_name: string;
+  is_secret?: boolean;
   dtype:
     | "string[]"
     | "string"
