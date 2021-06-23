@@ -27,6 +27,7 @@ import {
   TextCenteringSpan,
   DialogWrapper,
   DialogMain,
+  // NoticeableLetters,
 } from "@dataware-tools/app-common";
 import {
   InputConfigAddModal,
@@ -243,7 +244,10 @@ const Container = ({
       <DialogWrapper>
         <DialogCloseButton onClick={onClose} />
         <DialogTitle>
+          {/* // TODO:Fix typeError */}
+          {/* <NoticeableLetters> */}
           <TextCenteringSpan>{title[configName] + " "}</TextCenteringSpan>
+          {/* </NoticeableLetters> */}
           {getConfigRes ? (
             <SquareIconButton
               onClick={() => setOpenAddModal(true)}

@@ -166,6 +166,10 @@ const Page = (): JSX.Element => {
       value: "record_search_target_columns",
     },
     {
+      label: "Change Secret column",
+      value: "secret_columns",
+    },
+    {
       label: "Export metadata",
       value: "export_metadata",
     },

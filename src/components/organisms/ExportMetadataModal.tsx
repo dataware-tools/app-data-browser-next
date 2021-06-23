@@ -15,6 +15,7 @@ import {
   DialogCloseButton,
   DialogWrapper,
   DialogMain,
+  NoticeableLetters,
 } from "@dataware-tools/app-common";
 import { useAuth0 } from "@auth0/auth0-react";
 
@@ -74,7 +75,9 @@ const Component = ({
     <Dialog open={open} maxWidth="xl" onClose={onClose}>
       <DialogWrapper>
         <DialogCloseButton onClick={onClose} />
-        <DialogTitle>{`Export metadata in ${databaseId}`}</DialogTitle>
+        <DialogTitle>
+          <NoticeableLetters>{`Export metadata in ${databaseId}`}</NoticeableLetters>
+        </DialogTitle>
         <DialogContainer height="auto">
           <DialogBody>
             <DialogMain>

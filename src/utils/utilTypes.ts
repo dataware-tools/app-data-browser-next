@@ -37,6 +37,7 @@ type DatabaseColumnsConfigType = {
   dtype: DatabaseColumnsConfigDtypeType;
   aggregation: DatabaseColumnsConfigAggregationType;
   necessity?: DatabaseColumnsConfigNecessityType;
+  is_secret?: boolean;
   is_display_field?: boolean;
   is_search_target?: boolean;
   is_record_title?: boolean;
