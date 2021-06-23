@@ -3,6 +3,7 @@ import {
   fileProvider,
   metaStore,
   objToQueryString,
+  permissionManager,
 } from "@dataware-tools/app-common";
 import useSWR from "swr";
 import { AwaitType } from "./utilTypes";
@@ -99,6 +100,29 @@ interface UseAPIWithoutCache<T extends (...args: any) => Promise<any>> {
     ReturnType<UseAPI<T>>[1]
   ];
 }
+
+const useListPermittedActions: UseAPI<
+  typeof permissionManager.PermittedActionService.listPermittedActions
+> = (token, { databaseId, ...query }, shouldFetch = true) => {
+  const cacheQuery = objToQueryString({ databaseId, ...query });
+  const cacheKey = `${API_ROUTE.PERMISSION.BASE}/actions${cacheQuery}`;
+  const fetcher = databaseId
+    ? async () => {
+        permissionManager.OpenAPI.TOKEN = token;
+        permissionManager.OpenAPI.BASE = API_ROUTE.PERMISSION.BASE;
+        const res = await permissionManager.PermittedActionService.listPermittedActions(
+          { databaseId, ...query }
+        );
+        return res;
+      }
+    : null;
+  // See: https://swr.vercel.app/docs/conditional-fetching
+  const { data, error } = useSWR(
+    shouldFetch && databaseId ? cacheKey : null,
+    fetcher
+  );
+  return [data, error, cacheKey];
+};
 
 const useListDatabases: UseAPI<
   typeof metaStore.DatabaseService.listDatabases
@@ -255,6 +279,7 @@ const useCreateJwtToDownloadFile: UseAPIWithoutCache<
 };
 
 export {
+  useListPermittedActions,
   useListDatabases,
   useGetConfig,
   fetchAPI,
