@@ -13,7 +13,12 @@ type ComponentProps = {
 
 type ContainerProps = {
   value: InputConfigListItemProps["value"][];
-  onChange: (index: number, action: ActionType, newValue: ValueType) => void;
+  onChange: (
+    index: number,
+    action: ActionType,
+    newValue: ValueType | undefined,
+    oldValue: ValueType
+  ) => void;
 };
 
 const Component = ({
@@ -29,8 +34,8 @@ const Component = ({
             <div key={index}>
               <InputConfigListItem
                 value={config}
-                onChange={(action, newConfig) => {
-                  onChange(index, action, newConfig);
+                onChange={(action, newConfig, oldConfig) => {
+                  onChange(index, action, newConfig, oldConfig);
                 }}
               />
               <Spacer direction="vertical" size="3vh" />

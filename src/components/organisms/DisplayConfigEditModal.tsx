@@ -5,8 +5,8 @@ import {
   useGetConfig,
   usePrevious,
   DatabaseConfigType,
-  RecordListDisplayColumns,
   fetchMetaStore,
+  compStr,
 } from "utils/index";
 import {
   DisplayConfigList,
@@ -60,9 +60,11 @@ const Container = ({
 }: ContainerProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const [isSaving, setIsSaving] = useState(false);
-  const [config, setConfig] = useState<RecordListDisplayColumns>([]);
-  const [options, setOptions] = useState<OptionType[] | null>(null);
-  const [alreadySelectedOptions, setAlreadySelectedOptions] = useState<
+  const [displayColumns, setDisplayColumns] = useState<string[]>([]);
+  const [displayColumnOptions, setDisplayColumnOptions] = useState<
+    OptionType[]
+  >([]);
+  const [usedDisplayColumnOptions, setUsedDisplayColumnOptions] = useState<
     string[]
   >([]);
 
@@ -76,10 +78,6 @@ const Container = ({
     error: any,
     cacheKey: string
   ];
-
-  useEffect(() => {
-    setConfig(getConfigRes?.data_browser_config?.[configName] || []);
-  }, [getConfigRes, configName]);
 
   const initializeState = () => {
     setIsSaving(false);
@@ -95,12 +93,28 @@ const Container = ({
   const onSave = async () => {
     if (getConfigRes) {
       setIsSaving(true);
-      const newConfig = produce(getConfigRes, (draft) => {
-        if (draft.data_browser_config) {
-          draft.data_browser_config.record_list_display_columns = config;
-        } else {
-          draft.data_browser_config = { record_list_display_columns: config };
-        }
+      const newDatabaseConfig = produce(getConfigRes, (draft) => {
+        draft.columns = draft.columns.map((column) => ({
+          ...column,
+          is_display_field: displayColumns.includes(column.name),
+        }));
+
+        draft.columns.sort((a, b) => {
+          if (
+            displayColumns.includes(a.name) &&
+            displayColumns.includes(b.name)
+          ) {
+            return (
+              displayColumns.indexOf(a.name) - displayColumns.indexOf(b.name)
+            );
+          } else if (displayColumns.includes(a.name)) {
+            return -1;
+          } else if (displayColumns.includes(b.name)) {
+            return 1;
+          } else {
+            return compStr(a.name, b.name);
+          }
+        });
       });
 
       const [data, error] = await fetchMetaStore(
@@ -108,7 +122,7 @@ const Container = ({
         metaStore.ConfigService.updateConfig,
         {
           databaseId,
-          requestBody: newConfig,
+          requestBody: newDatabaseConfig,
         }
       );
 
@@ -124,7 +138,7 @@ const Container = ({
   };
 
   const onAdd = () =>
-    setConfig((prev) => {
+    setDisplayColumns((prev) => {
       return prev ? [...prev, ""] : [""];
     });
 
@@ -135,14 +149,14 @@ const Container = ({
     oldValue
   ) => {
     if (action === "change") {
-      setConfig((prev) => {
+      setDisplayColumns((prev) => {
         const newConfig = produce(prev, (draft) => {
           draft[index] = newValue;
         });
         return newConfig;
       });
 
-      setAlreadySelectedOptions((prev) => {
+      setUsedDisplayColumnOptions((prev) => {
         if (prev) {
           const next = produce(prev, (draft) => {
             if (draft.includes(oldValue)) {
@@ -160,14 +174,14 @@ const Container = ({
     }
 
     if (action === "delete") {
-      setConfig((prev) => {
+      setDisplayColumns((prev) => {
         const newConfig = produce(prev, (draft) => {
           draft.splice(index, 1);
         });
         return newConfig;
       });
 
-      setAlreadySelectedOptions((prev) => {
+      setUsedDisplayColumnOptions((prev) => {
         if (prev) {
           if (prev.includes(oldValue)) {
             const next = produce(prev, (draft) => {
@@ -185,16 +199,25 @@ const Container = ({
 
   useEffect(() => {
     if (getConfigRes) {
-      const options = getConfigRes.columns
-        .map((column) => ({
-          label: `${column.name} (display name: ${column.display_name})`,
-          value: column.name,
-        }))
-        .sort(compareOption);
-      setOptions(options.length > 0 ? options : null);
+      setDisplayColumns(
+        getConfigRes.columns
+          .filter((column) => column.is_display_field)
+          .map((column) => column.name) || []
+      );
 
-      setAlreadySelectedOptions(
-        getConfigRes.data_browser_config?.record_list_display_columns || []
+      setDisplayColumnOptions(
+        getConfigRes.columns
+          .map((column) => ({
+            label: `${column.name} (display name: ${column.display_name})`,
+            value: column.name,
+          }))
+          .sort(compareOption)
+      );
+
+      setUsedDisplayColumnOptions(
+        getConfigRes.columns
+          .filter((column) => column.is_display_field)
+          .map((column) => column.name) || []
       );
     }
   }, [getConfigRes]);
@@ -217,7 +240,7 @@ const Container = ({
                 instruction="please reload this page"
               />
             ) : getConfigRes ? (
-              options == null ? (
+              displayColumnOptions.length <= 0 ? (
                 <ErrorMessage
                   reason="no available column"
                   instruction="please add data or input field"
@@ -226,16 +249,19 @@ const Container = ({
                 <>
                   <DialogMain>
                     <DisplayConfigList
-                      value={config}
+                      value={displayColumns}
                       onChange={onChange}
-                      options={options}
-                      alreadySelectedOptions={alreadySelectedOptions}
+                      options={displayColumnOptions}
+                      alreadySelectedOptions={usedDisplayColumnOptions}
                     />
                   </DialogMain>
                   <DialogToolBar
                     right={
                       <LoadingButton
-                        disabled={config.length <= 0 || config.includes("")}
+                        disabled={
+                          displayColumns.length <= 0 ||
+                          displayColumns.includes("")
+                        }
                         pending={isSaving}
                         onClick={onSave}
                       >

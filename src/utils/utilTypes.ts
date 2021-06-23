@@ -4,58 +4,53 @@ type AwaitType<T> = T extends Promise<infer U>
   ? V
   : T;
 
+type DatabaseColumnsConfigDtypeType =
+  | "string[]"
+  | "string"
+  | "int"
+  | "float"
+  | "double"
+  | "boolean"
+  | "bool"
+  | "object";
+type DatabaseColumnsConfigAggregationType =
+  | "accumulator"
+  | "addToSet"
+  | "avg"
+  | "first"
+  | "last"
+  | "max"
+  | "mergeObjects"
+  | "min"
+  | "push"
+  | "stdDevPop"
+  | "stdDevSamp"
+  | "sum";
+type DatabaseColumnsConfigNecessityType =
+  | "required"
+  | "recommended"
+  | "optional"
+  | "unnecessary";
 type DatabaseColumnsConfigType = {
   name: string;
   display_name: string;
-  dtype:
-    | "string[]"
-    | "string"
-    | "int"
-    | "float"
-    | "double"
-    | "boolean"
-    | "bool"
-    | "object";
-  aggregation:
-    | "accumulator"
-    | "addToSet"
-    | "avg"
-    | "first"
-    | "last"
-    | "max"
-    | "mergeObjects"
-    | "min"
-    | "push"
-    | "stdDevPop"
-    | "stdDevSamp"
-    | "sum";
+  dtype: DatabaseColumnsConfigDtypeType;
+  aggregation: DatabaseColumnsConfigAggregationType;
+  necessity?: DatabaseColumnsConfigNecessityType;
+  is_display_field?: boolean;
+  is_search_target?: boolean;
+  is_record_title?: boolean;
 }[];
-type RecordAddEditableColumnsConfig = {
-  name: string;
-  necessity: "required" | "recommended" | "optional";
-}[];
-type RecordDetailTitleColumnConfig = string;
-type RecordListDisplayColumns = string[];
-type RecordSearchTargetColumns = string[];
-
-type DataBrowserConfigType = {
-  record_add_editable_columns?: RecordAddEditableColumnsConfig;
-  record_detail_title_column?: RecordDetailTitleColumnConfig;
-  record_list_display_columns?: RecordListDisplayColumns;
-  record_search_target_columns?: RecordSearchTargetColumns;
-};
 type DatabaseConfigType = {
   columns: DatabaseColumnsConfigType;
   index_columns: string[];
-  data_browser_config?: DataBrowserConfigType;
 };
 
 export type {
   AwaitType,
   DatabaseConfigType,
-  DataBrowserConfigType,
-  RecordAddEditableColumnsConfig,
-  RecordDetailTitleColumnConfig,
-  RecordListDisplayColumns,
-  RecordSearchTargetColumns,
+  DatabaseColumnsConfigType,
+  DatabaseColumnsConfigDtypeType,
+  DatabaseColumnsConfigAggregationType,
+  DatabaseColumnsConfigNecessityType,
 };

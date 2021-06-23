@@ -84,8 +84,9 @@ const Page = (): JSX.Element => {
     cacheKey: string
   ];
 
-  const searchColumn = getConfigRes?.data_browser_config
-    ?.record_search_target_columns || ["record_id"];
+  const searchColumn = getConfigRes?.columns
+    .filter((column) => column.is_search_target)
+    .map((column) => column.name) || ["record_id"];
 
   const [
     listRecordsRes,
@@ -99,13 +100,13 @@ const Page = (): JSX.Element => {
     searchKey: searchColumn,
   });
 
-  const displayColumns = getConfigRes?.data_browser_config?.record_list_display_columns?.map(
-    (value) => ({
-      field: value,
-      label: getConfigRes.columns.find((column) => column.name === value)
-        ?.display_name,
-    })
-  );
+  const displayColumns =
+    getConfigRes?.columns
+      .filter((column) => column.is_display_field)
+      .map((column) => ({
+        field: column.name,
+        label: column.display_name,
+      })) || [];
 
   useEffect(() => {
     addQueryString({ page, perPage, searchText }, "replace");
@@ -234,7 +235,7 @@ const Page = (): JSX.Element => {
                 instruction="please reload this page"
               />
             ) : listRecordsRes && getConfigRes ? (
-              !displayColumns ? (
+              displayColumns.length <= 0 ? (
                 <ErrorMessage
                   reason="Display columns is not configured"
                   instruction="please report administrator this error"

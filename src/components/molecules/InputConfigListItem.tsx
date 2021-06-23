@@ -6,17 +6,22 @@ import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from "@material-ui/icons/Delete";
 import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
 import React from "react";
-import { RecordAddEditableColumnsConfig } from "utils";
+import { DatabaseColumnsConfigType } from "utils";
 
-type ValueType = {
-  display_name: string;
-} & RecordAddEditableColumnsConfig[number];
+type ValueType = Required<
+  Pick<DatabaseColumnsConfigType[number], "display_name" | "name" | "necessity">
+>;
+
 type ActionType = "change" | "delete";
 
 type Props = { classes: ReturnType<typeof useStyles> } & ContainerProps;
 type ContainerProps = {
   value: ValueType;
-  onChange: (action: ActionType, newValue: ValueType) => void;
+  onChange: (
+    action: ActionType,
+    newValue: ValueType | undefined,
+    oldValue: ValueType
+  ) => void;
 };
 
 const useStyles = makeStyles({
@@ -49,10 +54,14 @@ const Component = ({ classes, value, onChange }: Props): JSX.Element => {
         <Select
           value={value.necessity}
           onChange={(event) =>
-            onChange("change", {
-              ...value,
-              necessity: event.target.value,
-            })
+            onChange(
+              "change",
+              {
+                ...value,
+                necessity: event.target.value,
+              },
+              { ...value }
+            )
           }
           variant="outlined"
         >
@@ -62,7 +71,9 @@ const Component = ({ classes, value, onChange }: Props): JSX.Element => {
         </Select>
         <Spacer direction="horizontal" size="10px" />
         <ElemCenteringFlexDiv>
-          <IconButton onClick={() => onChange("delete", { ...value })}>
+          <IconButton
+            onClick={() => onChange("delete", undefined, { ...value })}
+          >
             <DeleteIcon />
           </IconButton>
         </ElemCenteringFlexDiv>

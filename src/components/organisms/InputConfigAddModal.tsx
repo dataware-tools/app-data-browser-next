@@ -13,7 +13,11 @@ import Autocomplete, {
 } from "@material-ui/core/Autocomplete";
 import TextField from "@material-ui/core/TextField";
 import { useState, useEffect } from "react";
-import { RecordAddEditableColumnsConfig, usePrevious } from "utils";
+import {
+  usePrevious,
+  DatabaseColumnsConfigType,
+  DatabaseColumnsConfigNecessityType,
+} from "utils";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 
@@ -23,12 +27,9 @@ type OptionType = {
   inputValue?: string;
 };
 
-type NewConfigType = {
-  name: string;
-  display_name: string;
-  necessity: RecordAddEditableColumnsConfig[number]["necessity"];
-};
-
+type NewConfigType = Required<
+  Pick<DatabaseColumnsConfigType[number], "display_name" | "name" | "necessity">
+>;
 type ContainerProps = {
   options: OptionType[];
   open: boolean;
@@ -53,9 +54,10 @@ const Container = ({
   const [displayNameValidateError, setDisplayNameValidateError] = useState<
     string | null
   >(null);
-  const [necessity, setNecessity] = useState<
-    RecordAddEditableColumnsConfig[number]["necessity"] | null
-  >(null);
+  const [
+    necessity,
+    setNecessity,
+  ] = useState<DatabaseColumnsConfigNecessityType | null>(null);
 
   const initializeState = () => {
     setName(null);
@@ -206,7 +208,7 @@ const Container = ({
                       onSave({
                         name: name.name,
                         display_name: displayName,
-                        necessity,
+                        necessity: necessity,
                       });
                     }
                     onClose();

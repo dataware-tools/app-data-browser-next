@@ -5,7 +5,6 @@ import {
   useGetConfig,
   usePrevious,
   DatabaseConfigType,
-  RecordSearchTargetColumns,
   fetchMetaStore,
 } from "utils/index";
 import {
@@ -60,7 +59,7 @@ const Container = ({
 }: ContainerProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const [isSaving, setIsSaving] = useState(false);
-  const [config, setConfig] = useState<RecordSearchTargetColumns>([]);
+  const [config, setConfig] = useState<string[]>([]);
   const [options, setOptions] = useState<OptionType[] | null>(null);
   const [alreadySelectedOptions, setAlreadySelectedOptions] = useState<
     string[]
@@ -78,7 +77,11 @@ const Container = ({
   ];
 
   useEffect(() => {
-    setConfig(getConfigRes?.data_browser_config?.[configName] || []);
+    setConfig(
+      getConfigRes?.columns
+        .filter((column) => column.is_search_target)
+        .map((column) => column.name) || []
+    );
   }, [getConfigRes, configName]);
 
   const initializeState = () => {
@@ -96,11 +99,10 @@ const Container = ({
     if (getConfigRes) {
       setIsSaving(true);
       const newConfig = produce(getConfigRes, (draft) => {
-        if (draft.data_browser_config) {
-          draft.data_browser_config[configName] = config;
-        } else {
-          draft.data_browser_config = { [configName]: config };
-        }
+        draft.columns = draft.columns.map((column) => ({
+          ...column,
+          is_search_target: config.includes(column.name),
+        }));
       });
 
       const [data, error] = await fetchMetaStore(
@@ -194,7 +196,9 @@ const Container = ({
       setOptions(options.length > 0 ? options : null);
 
       setAlreadySelectedOptions(
-        getConfigRes.data_browser_config?.[configName] || []
+        getConfigRes.columns
+          .filter((column) => column.is_search_target)
+          .map((column) => column.name) || []
       );
     }
   }, [getConfigRes]);
