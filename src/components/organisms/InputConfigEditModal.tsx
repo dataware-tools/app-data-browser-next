@@ -83,9 +83,9 @@ const Container = ({
       (getConfigRes?.columns
         .filter(
           (column) =>
-            column.name.startsWith("_") ||
-            pydtkSystemColumns.includes(column.name) ||
-            (column.necessity && column.necessity !== "unnecessary")
+            !column.name.startsWith("_") &&
+            !pydtkSystemColumns.includes(column.name) &&
+            (column.necessity == null || column.necessity === "unnecessary")
         )
         ?.map((column) => ({
           display_name: column.display_name,
