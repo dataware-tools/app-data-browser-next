@@ -122,22 +122,21 @@ const Container = ({
         });
 
         // add new columns
-        draft.columns.concat(
-          databaseColumns
-            .filter((column) => {
-              const existingNames = getConfigRes.columns.map(
-                (column) => column.name
-              );
-              return !existingNames.includes(column.name);
-            })
-            .map((column) => ({
-              name: column.name,
-              display_name: column.display_name,
-              necessity: column.necessity,
-              dtype: "string",
-              aggregation: "first",
-            }))
-        );
+        const addedColumns = databaseColumns
+          .filter((column) => {
+            const existingNames = getConfigRes.columns.map(
+              (column) => column.name
+            );
+            return !existingNames.includes(column.name);
+          })
+          .map((column) => ({
+            name: column.name,
+            display_name: column.display_name,
+            necessity: column.necessity,
+            dtype: "string" as const,
+            aggregation: "first" as const,
+          }));
+        draft.columns = draft.columns.concat(addedColumns);
       });
 
       const [data, error] = await fetchMetaStore(
@@ -232,7 +231,11 @@ const Container = ({
     .sort(compInputFields);
 
   const alreadyUsedDisplayNames = [
-    ...new Set(getConfigRes?.columns.map((column) => column.display_name)),
+    ...new Set(inputConfig.map((column) => column.display_name)),
+  ];
+
+  const alreadyUsedNames = [
+    ...new Set(inputConfig.map((column) => column.name)),
   ];
 
   return (
@@ -277,7 +280,7 @@ const Container = ({
               open={openAddModal}
               onClose={() => setOpenAddModal(false)}
               onSave={(newColumn) => onAdd(newColumn)}
-              alreadyUsedNames={inputConfig?.map((config) => config.name) || []}
+              alreadyUsedNames={alreadyUsedNames}
               alreadyUsedDisplayNames={alreadyUsedDisplayNames}
             />
           ) : null}
