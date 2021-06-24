@@ -28,9 +28,9 @@ import Button from "@material-ui/core/Button";
 import AddCircle from "@material-ui/icons/AddCircle";
 import { RecordEditModal } from "components/organisms/RecordEditModal";
 import {
-  DatabaseConfigButton,
-  DatabaseConfigButtonProps,
-} from "components/molecules/DatabaseConfigButton";
+  DatabaseMenuButton,
+  DatabaseMenuButtonProps,
+} from "components/molecules/DatabaseMenuButton";
 import {
   DatabaseConfigModal,
   DatabaseConfigNameType,
@@ -39,8 +39,16 @@ import {
 import { Link } from "react-router-dom";
 import HomeIcon from "@material-ui/icons/Home";
 import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
-import { useListRecords, useGetConfig, DatabaseConfigType } from "utils";
+import {
+  useListRecords,
+  useGetConfig,
+  DatabaseConfigType,
+  useListPermittedActions,
+  UserActionType,
+} from "utils";
 import { produce } from "immer";
+import { useSetRecoilState } from "recoil";
+import { userActionsState } from "../../globalStates";
 
 const useStyles = makeStyles(() => ({
   fixedFlexShrink: {
@@ -76,6 +84,8 @@ const Page = (): JSX.Element => {
     { reason: string; instruction: string } | undefined
   >(undefined);
 
+  const setUserActions = useSetRecoilState(userActionsState);
+
   const [getConfigRes, getConfigError] = (useGetConfig(getAccessToken, {
     databaseId,
   }) as unknown) as [
@@ -84,9 +94,13 @@ const Page = (): JSX.Element => {
     cacheKey: string
   ];
 
+  const [
+    listPermittedActionRes,
+    listPermittedActionError,
+  ] = useListPermittedActions(getAccessToken, { databaseId });
+
   const searchColumn = getConfigRes?.data_browser_config
     ?.record_search_config || ["record_id"];
-
   const [
     listRecordsRes,
     listRecordsError,
@@ -110,6 +124,11 @@ const Page = (): JSX.Element => {
   useEffect(() => {
     addQueryString({ page, perPage, searchText }, "replace");
   }, [page, perPage, searchText]);
+  useEffect(() => {
+    if (listPermittedActionRes) {
+      setUserActions(listPermittedActionRes as UserActionType[]);
+    }
+  }, [listPermittedActionRes, setUserActions]);
 
   const onSelectRecord: RecordListProps["onSelectRecord"] = (record) => {
     if (listRecordsRes) {
@@ -151,35 +170,31 @@ const Page = (): JSX.Element => {
     }
   };
 
-  const databaseConfigMenu: DatabaseConfigButtonProps["menu"] = [
-    {
-      label: "Change input fields for record",
-      value: "record_input_config",
-    },
-    {
-      label: "Change display fields for record",
-      value: "record_display_config",
-    },
-    {
-      label: "Change search fields for record",
-      value: "record_search_config",
-    },
-    {
-      label: "Change Secret column",
-      value: "secret_columns",
-    },
-    {
-      label: "Export metadata",
-      value: "export_metadata",
-    },
-  ];
-  const onSelectDatabaseConfig: DatabaseConfigButtonProps["onMenuSelect"] = (
-    targetValue
+  const onDatabaseMenuSelect: DatabaseMenuButtonProps["onMenuSelect"] = (
+    targetName
   ) => {
-    setEditingConfigName(targetValue);
+    switch (targetName) {
+      case "Configure display columns":
+        setEditingConfigName("record_display_config");
+        break;
+      case "Configure input columns":
+        setEditingConfigName("record_input_config");
+        break;
+      case "Configure search target columns":
+        setEditingConfigName("record_search_config");
+        break;
+      case "Configure secret columns":
+        setEditingConfigName("secret_columns");
+        break;
+      case "Export metadata":
+        setEditingConfigName("export_metadata");
+        break;
+    }
   };
 
-  const fetchError = listRecordsError || getConfigError;
+  const fetchError =
+    listRecordsError || getConfigError || listPermittedActionError;
+
   return (
     <>
       <PageContainer>
@@ -219,14 +234,13 @@ const Page = (): JSX.Element => {
                     >
                       <TextCenteringSpan>Record</TextCenteringSpan>
                     </Button>
-                    <Spacer direction="horizontal" size="15px" />
                   </>
                 ) : null}
                 {!getConfigError ? (
-                  <DatabaseConfigButton
-                    onMenuSelect={onSelectDatabaseConfig}
-                    menu={databaseConfigMenu}
-                  />
+                  <>
+                    <Spacer direction="horizontal" size="15px" />
+                    <DatabaseMenuButton onMenuSelect={onDatabaseMenuSelect} />
+                  </>
                 ) : null}
               </>
             }

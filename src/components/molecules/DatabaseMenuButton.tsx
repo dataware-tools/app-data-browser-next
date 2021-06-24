@@ -1,22 +1,21 @@
 import { MouseEvent, useState } from "react";
-import SettingsIcon from "@material-ui/icons/Settings";
+import MenuIcon from "@material-ui/icons/Menu";
 import {
-  DatabaseConfigMenu,
-  DatabaseConfigMenuProps,
-} from "components/molecules/DatabaseConfigMenu";
+  DatabaseMenu,
+  DatabaseMenuProps,
+} from "components/molecules/DatabaseMenu";
 import { SquareIconButton } from "@dataware-tools/app-common";
 import { DatabaseConfigNameType } from "components/organisms/DatabaseConfigModal";
 
 type Props = {
   onOpen: (event: MouseEvent<HTMLDivElement>) => void | Promise<void>;
-  onClose: DatabaseConfigMenuProps["onClose"];
-  open: DatabaseConfigMenuProps["open"];
-  anchorEl: DatabaseConfigMenuProps["anchorEl"];
+  onClose: DatabaseMenuProps["onClose"];
+  open: DatabaseMenuProps["open"];
+  anchorEl: DatabaseMenuProps["anchorEl"];
 } & ContainerProps;
 
 type ContainerProps = {
-  onMenuSelect: (targetValue: DatabaseConfigNameType) => void;
-  menu: { label: string; value: DatabaseConfigNameType }[];
+  onMenuSelect: DatabaseMenuProps["onClick"];
 };
 
 const Component = ({
@@ -26,8 +25,8 @@ const Component = ({
 }: Props): JSX.Element | null => {
   return (
     <div>
-      <SquareIconButton icon={<SettingsIcon />} onClick={onOpen} />
-      <DatabaseConfigMenu
+      <SquareIconButton icon={<MenuIcon />} onClick={onOpen} />
+      <DatabaseMenu
         {...delegated}
         onClick={onMenuSelect as (value: string) => void}
       />
@@ -56,8 +55,8 @@ const Container = ({ ...delegated }: ContainerProps): JSX.Element => {
   );
 };
 
-export { Container as DatabaseConfigButton };
+export { Container as DatabaseMenuButton };
 export type {
-  ContainerProps as DatabaseConfigButtonProps,
+  ContainerProps as DatabaseMenuButtonProps,
   DatabaseConfigNameType,
 };
