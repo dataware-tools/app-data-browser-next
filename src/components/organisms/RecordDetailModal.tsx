@@ -29,6 +29,8 @@ import {
   usePrevious,
   uploadFileToFileProvider,
   fetchFileProvider,
+  useGetConfig,
+  DatabaseConfigType,
 } from "utils";
 import { RecordEditModal } from "components/organisms/RecordEditModal";
 import UploadIcon from "@material-ui/icons/Upload";
@@ -64,7 +66,6 @@ const Container = ({
     setIsAddingFile(false);
     setPreviewingFile(undefined);
   };
-  // See: https://stackoverflow.com/questions/58209791/set-initial-state-for-material-ui-dialog
   const prevOpen = usePrevious(open);
   useEffect(() => {
     if (open && !prevOpen) {
@@ -79,7 +80,6 @@ const Container = ({
       recordId,
     }
   );
-
   const [listFilesRes, listFilesError, listFilesCacheKey] = useListFiles(
     getAccessToken,
     {
@@ -87,6 +87,9 @@ const Container = ({
       recordId,
     }
   );
+  const [getConfigRes] = (useGetConfig(getAccessToken, {
+    databaseId,
+  }) as unknown) as [data: DatabaseConfigType | undefined];
 
   const onChangeTab = (tabNum: number) => setTab(tabNum);
   const tabNames = ["Info", "Files"];
@@ -205,17 +208,16 @@ const Container = ({
 
   const onEditRecord = () => setIsRecordEditModalOpen(true);
 
-  const title = getRecordRes?.["record name"] || getRecordRes?.record_id;
+  const titleColumn = getConfigRes?.columns.find(
+    (column) => column.is_record_title
+  )?.name;
+  const title = titleColumn ? getRecordRes?.[titleColumn] : "No title";
+
   return (
     <Dialog open={open} fullWidth maxWidth="xl" onClose={onClose}>
       <DialogWrapper>
         <DialogCloseButton onClick={onClose} />
-        {title && (
-          <DialogTitle>
-            <Spacer direction="horizontal" size="3vw" />
-            {title}
-          </DialogTitle>
-        )}
+        {title && <DialogTitle>{title}</DialogTitle>}
         <DialogContainer height="60vh">
           <DialogTabBar
             onChange={onChangeTab}
