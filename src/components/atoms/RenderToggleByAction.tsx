@@ -20,7 +20,7 @@ const Container = ({
 
   const divided = required.split(actionDivider);
   const permittedActions: UserActionType[] = [];
-  for (let i = 1; i++; i <= divided.length) {
+  for (let i = 1; i <= divided.length; i++) {
     permittedActions.push(
       divided.slice(0, i).join(actionDivider) as UserActionType
     );
