@@ -84,8 +84,9 @@ const Page = (): JSX.Element => {
     cacheKey: string
   ];
 
-  const searchColumn = getConfigRes?.data_browser_config
-    ?.record_search_config || ["record_id"];
+  const searchColumn = getConfigRes?.columns
+    .filter((column) => column.is_search_target)
+    .map((column) => column.name) || ["record_id"];
 
   const [
     listRecordsRes,
@@ -99,13 +100,13 @@ const Page = (): JSX.Element => {
     searchKey: searchColumn,
   });
 
-  const displayColumns = getConfigRes?.data_browser_config?.record_display_config?.map(
-    (value) => ({
-      field: value,
-      label: getConfigRes.columns.find((column) => column.name === value)
-        ?.display_name,
-    })
-  );
+  const displayColumns =
+    getConfigRes?.columns
+      .filter((column) => column.is_display_field)
+      .map((column) => ({
+        field: column.name,
+        label: column.display_name,
+      })) || [];
 
   useEffect(() => {
     addQueryString({ page, perPage, searchText }, "replace");
@@ -153,19 +154,19 @@ const Page = (): JSX.Element => {
 
   const databaseConfigMenu: DatabaseConfigButtonProps["menu"] = [
     {
-      label: "Change input fields for record",
-      value: "record_input_config",
+      label: "Change input columns",
+      value: "record_add_editable_columns",
     },
     {
-      label: "Change display fields for record",
-      value: "record_display_config",
+      label: "Change display columns",
+      value: "record_list_display_columns",
     },
     {
-      label: "Change search fields for record",
-      value: "record_search_config",
+      label: "Change search target columns",
+      value: "record_search_target_columns",
     },
     {
-      label: "Change Secret column",
+      label: "Change Secret columns",
       value: "secret_columns",
     },
     {
@@ -238,7 +239,7 @@ const Page = (): JSX.Element => {
                 instruction="please reload this page"
               />
             ) : listRecordsRes && getConfigRes ? (
-              !displayColumns ? (
+              displayColumns.length <= 0 ? (
                 <ErrorMessage
                   reason="Display columns is not configured"
                   instruction="please report administrator this error"

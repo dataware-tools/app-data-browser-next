@@ -4,58 +4,54 @@ type AwaitType<T> = T extends Promise<infer U>
   ? V
   : T;
 
+type DatabaseColumnsConfigDtypeType =
+  | "string[]"
+  | "string"
+  | "int"
+  | "float"
+  | "double"
+  | "boolean"
+  | "bool"
+  | "object";
+type DatabaseColumnsConfigAggregationType =
+  | "accumulator"
+  | "addToSet"
+  | "avg"
+  | "first"
+  | "last"
+  | "max"
+  | "mergeObjects"
+  | "min"
+  | "push"
+  | "stdDevPop"
+  | "stdDevSamp"
+  | "sum";
+type DatabaseColumnsConfigNecessityType =
+  | "required"
+  | "recommended"
+  | "optional"
+  | "unnecessary";
 type DatabaseColumnsConfigType = {
   name: string;
   display_name: string;
+  dtype: DatabaseColumnsConfigDtypeType;
+  aggregation: DatabaseColumnsConfigAggregationType;
+  necessity?: DatabaseColumnsConfigNecessityType;
   is_secret?: boolean;
-  dtype:
-    | "string[]"
-    | "string"
-    | "int"
-    | "float"
-    | "double"
-    | "boolean"
-    | "bool"
-    | "object";
-  aggregation:
-    | "accumulator"
-    | "addToSet"
-    | "avg"
-    | "first"
-    | "last"
-    | "max"
-    | "mergeObjects"
-    | "min"
-    | "push"
-    | "stdDevPop"
-    | "stdDevSamp"
-    | "sum";
+  is_display_field?: boolean;
+  is_search_target?: boolean;
+  is_record_title?: boolean;
 }[];
-type DatabaseIndexColumnsConfigType = string[];
-
-type DataBrowserInputConfigType = {
-  name: string;
-  necessity: "required" | "recommended" | "optional";
-}[];
-type DataBrowserDisplayConfigType = string[];
-type DataBrowserSearchConfigType = string[];
-
 type DatabaseConfigType = {
   columns: DatabaseColumnsConfigType;
-  index_columns: DatabaseIndexColumnsConfigType;
-  data_browser_config?: {
-    record_input_config?: DataBrowserInputConfigType;
-    record_display_config?: DataBrowserDisplayConfigType;
-    record_search_config?: DataBrowserSearchConfigType;
-  };
+  index_columns: string[];
 };
 
 export type {
   AwaitType,
   DatabaseConfigType,
   DatabaseColumnsConfigType,
-  DatabaseIndexColumnsConfigType,
-  DataBrowserInputConfigType,
-  DataBrowserDisplayConfigType,
-  DataBrowserSearchConfigType,
+  DatabaseColumnsConfigDtypeType,
+  DatabaseColumnsConfigAggregationType,
+  DatabaseColumnsConfigNecessityType,
 };

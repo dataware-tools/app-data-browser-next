@@ -12,7 +12,7 @@ import {
 import Dialog from "@material-ui/core/Dialog";
 import { useState, useEffect } from "react";
 import LoadingButton from "@material-ui/lab/LoadingButton";
-import { usePrevious } from "utils/index";
+import { usePrevious, compInputFields } from "utils/index";
 import {
   MetadataInputFieldList,
   MetadataInputFieldListProps,
@@ -23,7 +23,7 @@ type ContainerProps = {
   onClose: () => void;
   create?: boolean;
   currentMetadata?: MetadataInputFieldListProps["currentMetadata"];
-  inputConfig: MetadataInputFieldListProps["inputConfig"] | null;
+  fields: MetadataInputFieldListProps["fields"];
   error: any;
   onSubmit: (newMetadata: Record<string, unknown>) => Promise<boolean>;
 };
@@ -33,10 +33,18 @@ const Container = ({
   onClose,
   create,
   currentMetadata,
-  inputConfig,
+  fields: propFields,
   error,
   onSubmit,
 }: ContainerProps): JSX.Element => {
+  const fields = create
+    ? propFields
+        .filter(
+          (config) => config.necessity && config.necessity !== "unnecessary"
+        )
+        .sort(compInputFields)
+    : propFields.sort(compInputFields);
+
   const [isSaving, setIsSaving] = useState(false);
   const [
     nonFilledRequiredFieldNames,
@@ -56,14 +64,14 @@ const Container = ({
   }, [open, prevOpen]);
 
   const onSave = async () => {
-    if (inputConfig) {
+    if (fields) {
       setIsSaving(true);
       const newRecordInfo = {};
 
       const nonFilledRequired: string[] = [];
       const nonFilledRecommends: string[] = [];
 
-      inputConfig.forEach((config) => {
+      fields.forEach((config) => {
         const inputEl = document.getElementById(
           `RecordEditModalInputFields_${config.name.replace(/\s+/g, "")}`
         ) as HTMLInputElement;
@@ -97,8 +105,7 @@ const Container = ({
         }
       }
 
-      // ! do not to depend on id!
-      inputConfig.forEach((config) => {
+      fields.forEach((config) => {
         const inputEl = document.getElementById(
           `RecordEditModalInputFields_${config.name.replace(/\s+/g, "")}`
         ) as HTMLInputElement;
@@ -123,13 +130,13 @@ const Container = ({
       <DialogWrapper>
         <DialogCloseButton onClick={onClose} />
         <DialogTitle>{create ? "Add" : "Edit"} Record</DialogTitle>
-        <DialogContainer padding="0 0 20px">
+        <DialogContainer padding="0 0 20px" height="65vh">
           {error ? (
             <ErrorMessage
               reason={JSON.stringify(error)}
               instruction="please reload this page"
             />
-          ) : !inputConfig || inputConfig.length <= 0 ? (
+          ) : !fields || fields.length <= 0 ? (
             <ErrorMessage
               reason="Input fields is not configured"
               instruction="please report administrator this error"
@@ -140,7 +147,7 @@ const Container = ({
                 <DialogMain>
                   <MetadataInputFieldList
                     currentMetadata={currentMetadata}
-                    inputConfig={inputConfig}
+                    fields={fields}
                     nonFilledRequiredFieldNames={nonFilledRequiredFieldNames}
                   />
                 </DialogMain>

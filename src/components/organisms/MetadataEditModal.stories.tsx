@@ -20,8 +20,12 @@ AddMetadata.args = {
     return Math.random() > 0.5;
   },
   open: true,
-  inputConfig: [
-    { name: "test1", display_name: "Test1", necessity: "recommended" },
+  fields: [
+    {
+      name: "test1",
+      display_name: "Test1",
+      necessity: "recommended",
+    },
   ],
   create: true,
 };
@@ -35,9 +39,17 @@ EditMetadata.args = {
     return Math.random() > 0.5;
   },
   open: true,
-  inputConfig: [
-    { name: "test1", display_name: "Test1", necessity: "recommended" },
-    { name: "test2", display_name: "Test2", necessity: "recommended" },
+  fields: [
+    {
+      name: "test1",
+      display_name: "Test1",
+      necessity: "recommended",
+    },
+    {
+      name: "test2",
+      display_name: "Test2",
+      necessity: "recommended",
+    },
   ],
   currentMetadata: {
     test1: "test1",

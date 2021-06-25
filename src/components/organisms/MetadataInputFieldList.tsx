@@ -1,17 +1,18 @@
 import TextField from "@material-ui/core/TextField";
 import { Spacer } from "@dataware-tools/app-common";
 import { makeStyles } from "@material-ui/core/styles";
+import { DatabaseColumnsConfigType } from "utils";
 
 type MetadataType = Record<string, unknown>;
-type InputConfigType = {
-  name: string;
-  necessity: string;
-  display_name: string;
-};
+
+type FieldType = Pick<
+  DatabaseColumnsConfigType[number],
+  "display_name" | "name" | "necessity"
+>;
 
 type ComponentProps = {
   currentMetadata?: MetadataType;
-  inputConfig: InputConfigType[];
+  fields: FieldType[];
   nonFilledRequiredFieldNames: string[];
 };
 
@@ -30,16 +31,16 @@ const useStyles = makeStyles({
 
 const Component = ({
   currentMetadata,
-  inputConfig,
+  fields,
   nonFilledRequiredFieldNames,
 }: ComponentProps): JSX.Element => {
   const classes = useStyles();
   return (
     <div className={classes.root}>
-      {inputConfig.map((inputField) => {
-        const name = inputField.name;
-        const displayName = inputField.display_name;
-        const necessity = inputField.necessity;
+      {fields.map((field) => {
+        const name = field.name;
+        const displayName = field.display_name;
+        const necessity = field.necessity;
         const required = necessity === "required";
         const recommended = necessity === "recommended";
         const id = `RecordEditModalInputFields_${name.replace(/\s+/g, "")}`;
@@ -55,7 +56,7 @@ const Component = ({
             <div className={classes.inputContainer}>
               <TextField
                 fullWidth
-                key={inputField.name}
+                key={field.name}
                 id={id}
                 defaultValue={currentMetadata?.[name]}
                 error={nonFilledRequiredFieldNames.includes(name)}

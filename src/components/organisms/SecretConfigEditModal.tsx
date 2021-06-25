@@ -34,16 +34,12 @@ type ContainerProps = {
   open: boolean;
   databaseId: string;
   onClose: () => void;
-  configName: ConfigNameType;
 };
-
-const title = { secret_columns: "Secret columns" };
 
 const Container = ({
   open,
   onClose,
   databaseId,
-  configName,
 }: ContainerProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const [isSaving, setIsSaving] = useState(false);
@@ -132,7 +128,7 @@ const Container = ({
       <DialogWrapper>
         <DialogCloseButton onClick={onClose} />
         <DialogTitle>
-          <TextCenteringSpan>{title[configName]}</TextCenteringSpan>
+          <TextCenteringSpan>Secret columns</TextCenteringSpan>
         </DialogTitle>
         <DialogContainer padding="0 0 20px">
           {getConfigError ? (
