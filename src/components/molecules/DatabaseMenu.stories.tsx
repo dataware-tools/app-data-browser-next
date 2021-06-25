@@ -1,9 +1,9 @@
-import { DatabaseConfigMenu } from "./DatabaseConfigMenu";
+import { DatabaseMenu } from "./DatabaseMenu";
 import { useState, MouseEventHandler } from "react";
 
 export default {
-  component: DatabaseConfigMenu,
-  title: "DatabaseConfigMenu",
+  component: DatabaseMenu,
+  title: "DatabaseMenu",
 };
 
 export const Default = (): JSX.Element => {
@@ -21,12 +21,11 @@ export const Default = (): JSX.Element => {
   return (
     <div>
       <button onClick={onMenuOpen}>click me!</button>
-      <DatabaseConfigMenu
+      <DatabaseMenu
         open={isMenuOpen}
         onClick={(target) => window.alert(`click ${target}!`)}
         onClose={onMenuClose}
         anchorEl={menuAnchorEl}
-        menu={[{ label: "Test", value: "Test value" }]}
       />
     </div>
   );
