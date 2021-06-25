@@ -1,19 +1,9 @@
-import Dialog from "@material-ui/core/Dialog";
 import { useState, useEffect } from "react";
-import LoadingButton from "@material-ui/lab/LoadingButton";
-import {
-  useGetConfig,
-  usePrevious,
-  DatabaseConfigType,
-  fetchMetaStore,
-  compStr,
-} from "utils/index";
-import {
-  DisplayConfigList,
-  DisplayConfigListProps,
-} from "components/organisms/DisplayConfigList";
-import AddCircleIcon from "@material-ui/icons/AddCircle";
 import { useAuth0 } from "@auth0/auth0-react";
+import AddCircleIcon from "@material-ui/icons/AddCircle";
+import Dialog from "@material-ui/core/Dialog";
+import { produce } from "immer";
+import { mutate } from "swr";
 import {
   ErrorMessage,
   metaStore,
@@ -26,10 +16,23 @@ import {
   DialogCloseButton,
   SquareIconButton,
   TextCenteringSpan,
+  DialogSubTitle,
+  NoticeableLetters,
   // NoticeableLetters,
 } from "@dataware-tools/app-common";
-import { produce } from "immer";
-import { mutate } from "swr";
+import {
+  DisplayConfigList,
+  DisplayConfigListProps,
+} from "components/organisms/DisplayConfigList";
+import LoadingButton from "@material-ui/lab/LoadingButton";
+import { SoloSelect } from "components/molecules/SoloSelect";
+import {
+  useGetConfig,
+  usePrevious,
+  DatabaseConfigType,
+  fetchMetaStore,
+  compStr,
+} from "utils/index";
 
 type ConfigNameType = "record_list_display_columns";
 
@@ -58,9 +61,8 @@ const Container = ({
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const [isSaving, setIsSaving] = useState(false);
   const [displayColumns, setDisplayColumns] = useState<string[]>([]);
-  const [displayColumnOptions, setDisplayColumnOptions] = useState<
-    OptionType[]
-  >([]);
+  const [titleColumnName, setTitleColumnName] = useState("");
+  const [columnOptions, setColumnOptions] = useState<OptionType[]>([]);
   const [usedDisplayColumnOptions, setUsedDisplayColumnOptions] = useState<
     string[]
   >([]);
@@ -112,6 +114,11 @@ const Container = ({
             return compStr(a.name, b.name);
           }
         });
+
+        draft.columns = draft.columns.map((column) => ({
+          ...column,
+          is_record_title: column.name === titleColumnName,
+        }));
       });
 
       const [data, error] = await fetchMetaStore(
@@ -202,7 +209,12 @@ const Container = ({
           .map((column) => column.name) || []
       );
 
-      setDisplayColumnOptions(
+      setTitleColumnName(
+        getConfigRes.columns.find((column) => column.is_record_title)?.name ||
+          ""
+      );
+
+      setColumnOptions(
         getConfigRes.columns
           .map((column) => ({
             label: `${column.name} (display name: ${column.display_name})`,
@@ -224,13 +236,7 @@ const Container = ({
       <DialogWrapper>
         <DialogCloseButton onClick={onClose} />
         <DialogTitle>
-          {/* //TODO:Fix typeError */}
-          {/* <NoticeableLetters> */}
-          <TextCenteringSpan>Display columns</TextCenteringSpan>
-          {/* </NoticeableLetters> */}
-          {getConfigRes ? (
-            <SquareIconButton onClick={onAdd} icon={<AddCircleIcon />} />
-          ) : null}
+          <NoticeableLetters>Display config</NoticeableLetters>
         </DialogTitle>
         <DialogContainer padding="0 0 20px">
           <DialogBody>
@@ -240,7 +246,7 @@ const Container = ({
                 instruction="please reload this page"
               />
             ) : getConfigRes ? (
-              displayColumnOptions.length <= 0 ? (
+              columnOptions.length <= 0 ? (
                 <ErrorMessage
                   reason="no available column"
                   instruction="please add data or input field"
@@ -248,11 +254,26 @@ const Container = ({
               ) : (
                 <>
                   <DialogMain>
+                    <DialogSubTitle>
+                      <TextCenteringSpan>
+                        {"Record table columns "}
+                      </TextCenteringSpan>
+                      <SquareIconButton
+                        onClick={onAdd}
+                        icon={<AddCircleIcon />}
+                      />
+                    </DialogSubTitle>
                     <DisplayConfigList
                       value={displayColumns}
                       onChange={onChange}
-                      options={displayColumnOptions}
+                      options={columnOptions}
                       alreadySelectedOptions={usedDisplayColumnOptions}
+                    />
+                    <DialogSubTitle>Record title</DialogSubTitle>
+                    <SoloSelect
+                      options={columnOptions}
+                      onChange={setTitleColumnName}
+                      value={titleColumnName}
                     />
                   </DialogMain>
                   <DialogToolBar
