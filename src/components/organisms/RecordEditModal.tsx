@@ -42,18 +42,18 @@ const Container = ({
     cacheKey: string
   ];
 
-  const record_input_config =
-    getConfigRes?.data_browser_config?.record_input_config;
-  const columns = getConfigRes?.columns;
-  const inputConfig =
-    record_input_config && columns
-      ? record_input_config.map((config) => ({
-          ...config,
-          display_name:
-            columns.find((column) => column.name === config.name)
-              ?.display_name || "",
-        }))
-      : null;
+  const fields: MetadataEditModalProps["fields"] =
+    getConfigRes?.columns
+      .filter(
+        (column) =>
+          !["record_id", "path", "contents"].includes(column.name) &&
+          !column.name.startsWith("_")
+      )
+      .map((column) => ({
+        name: column.name,
+        display_name: column.display_name,
+        necessity: column.necessity || "unnecessary",
+      })) || [];
 
   const onSubmit: MetadataEditModalProps["onSubmit"] = async (
     newRecordInfo
@@ -92,7 +92,7 @@ const Container = ({
   return (
     <MetadataEditModal
       currentMetadata={getRecordRes}
-      inputConfig={inputConfig}
+      fields={fields}
       error={getRecordError || getConfigError}
       onSubmit={onSubmit}
       create={create}

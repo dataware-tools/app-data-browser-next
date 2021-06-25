@@ -5,7 +5,6 @@ import {
   useGetConfig,
   usePrevious,
   DatabaseConfigType,
-  DataBrowserSearchConfigType,
   fetchMetaStore,
 } from "utils/index";
 import {
@@ -31,16 +30,13 @@ import {
 import { produce } from "immer";
 import { mutate } from "swr";
 
-type ConfigNameType = "record_search_config";
+type ConfigNameType = "record_search_target_columns";
 
 type ContainerProps = {
   open: boolean;
   databaseId: string;
   onClose: () => void;
-  configName: ConfigNameType;
 };
-
-const title = { record_search_config: "Record Search Fields" };
 
 type OptionType = { label: string; value: string };
 const compareOption = (a: OptionType, b: OptionType) => {
@@ -57,11 +53,10 @@ const Container = ({
   open,
   onClose,
   databaseId,
-  configName,
 }: ContainerProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const [isSaving, setIsSaving] = useState(false);
-  const [config, setConfig] = useState<DataBrowserSearchConfigType>([]);
+  const [config, setConfig] = useState<string[]>([]);
   const [options, setOptions] = useState<OptionType[] | null>(null);
   const [alreadySelectedOptions, setAlreadySelectedOptions] = useState<
     string[]
@@ -79,8 +74,12 @@ const Container = ({
   ];
 
   useEffect(() => {
-    setConfig(getConfigRes?.data_browser_config?.[configName] || []);
-  }, [getConfigRes, configName]);
+    setConfig(
+      getConfigRes?.columns
+        .filter((column) => column.is_search_target)
+        .map((column) => column.name) || []
+    );
+  }, [getConfigRes]);
 
   const initializeState = () => {
     setIsSaving(false);
@@ -97,11 +96,10 @@ const Container = ({
     if (getConfigRes) {
       setIsSaving(true);
       const newConfig = produce(getConfigRes, (draft) => {
-        if (draft.data_browser_config) {
-          draft.data_browser_config[configName] = config;
-        } else {
-          draft.data_browser_config = { [configName]: config };
-        }
+        draft.columns = draft.columns.map((column) => ({
+          ...column,
+          is_search_target: config.includes(column.name),
+        }));
       });
 
       const [data, error] = await fetchMetaStore(
@@ -195,7 +193,9 @@ const Container = ({
       setOptions(options.length > 0 ? options : null);
 
       setAlreadySelectedOptions(
-        getConfigRes.data_browser_config?.[configName] || []
+        getConfigRes.columns
+          .filter((column) => column.is_search_target)
+          .map((column) => column.name) || []
       );
     }
   }, [getConfigRes]);
@@ -207,7 +207,7 @@ const Container = ({
         <DialogTitle>
           {/* //TODO: Fix typeError */}
           {/* <NoticeableLetters> */}
-          <TextCenteringSpan>{title[configName] + " "}</TextCenteringSpan>
+          <TextCenteringSpan>Search target columns</TextCenteringSpan>
           {/* </NoticeableLetters> */}
           {getConfigRes ? (
             <SquareIconButton onClick={onAdd} icon={<AddCircleIcon />} />

@@ -99,8 +99,10 @@ const Page = (): JSX.Element => {
     listPermittedActionError,
   ] = useListPermittedActions(getAccessToken, { databaseId });
 
-  const searchColumn = getConfigRes?.data_browser_config
-    ?.record_search_config || ["record_id"];
+  const searchColumn = getConfigRes?.columns
+    .filter((column) => column.is_search_target)
+    .map((column) => column.name) || ["record_id"];
+
   const [
     listRecordsRes,
     listRecordsError,
@@ -113,13 +115,13 @@ const Page = (): JSX.Element => {
     searchKey: searchColumn,
   });
 
-  const displayColumns = getConfigRes?.data_browser_config?.record_display_config?.map(
-    (value) => ({
-      field: value,
-      label: getConfigRes.columns.find((column) => column.name === value)
-        ?.display_name,
-    })
-  );
+  const displayColumns =
+    getConfigRes?.columns
+      .filter((column) => column.is_display_field)
+      .map((column) => ({
+        field: column.name,
+        label: column.display_name,
+      })) || [];
 
   useEffect(() => {
     addQueryString({ page, perPage, searchText }, "replace");
@@ -175,13 +177,13 @@ const Page = (): JSX.Element => {
   ) => {
     switch (targetName) {
       case "Configure display columns":
-        setEditingConfigName("record_display_config");
+        setEditingConfigName("record_list_display_columns");
         break;
       case "Configure input columns":
-        setEditingConfigName("record_input_config");
+        setEditingConfigName("record_add_editable_columns");
         break;
       case "Configure search target columns":
-        setEditingConfigName("record_search_config");
+        setEditingConfigName("record_search_target_columns");
         break;
       case "Configure secret columns":
         setEditingConfigName("secret_columns");
@@ -252,7 +254,7 @@ const Page = (): JSX.Element => {
                 instruction="please reload this page"
               />
             ) : listRecordsRes && getConfigRes ? (
-              !displayColumns ? (
+              displayColumns.length <= 0 ? (
                 <ErrorMessage
                   reason="Display columns is not configured"
                   instruction="please report administrator this error"

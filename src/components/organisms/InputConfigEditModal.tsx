@@ -6,6 +6,8 @@ import {
   useGetConfig,
   usePrevious,
   fetchMetaStore,
+  pydtkSystemColumns,
+  compInputFields,
 } from "utils/index";
 import {
   InputConfigList,
@@ -34,32 +36,28 @@ import {
 import { produce } from "immer";
 import { mutate } from "swr";
 
-type ConfigNameType = "record_input_config";
+type ConfigNameType = "record_add_editable_columns";
 
 type ContainerProps = {
   open: boolean;
   onClose: () => void;
   databaseId: string;
-  configName: ConfigNameType;
 };
-
-const title = { record_input_config: "Record Input Fields" };
 
 const Container = ({
   open,
   onClose,
-  configName,
   databaseId,
 }: ContainerProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const [isSaving, setIsSaving] = useState(false);
   const [openAddModal, setOpenAddModal] = useState(false);
-  const [config, setConfig] = useState<InputConfigListProps["value"] | null>(
-    null
-  );
-  const [options, setOptions] = useState<
-    { name: string; display_name: string }[] | null
-  >(null);
+  const [databaseColumns, setDatabaseColumns] = useState<
+    InputConfigListProps["value"]
+  >([]);
+  const [databaseColumnOptions, setDatabaseColumnOptions] = useState<
+    { name: string; display_name: string }[]
+  >([]);
 
   const [getConfigRes, getConfigError, getConfigCacheKey] = (useGetConfig(
     getAccessToken,
@@ -73,42 +71,31 @@ const Container = ({
   ];
 
   useEffect(() => {
-    setConfig(
-      getConfigRes?.data_browser_config?.[configName]?.map((config) => ({
-        ...config,
-        display_name:
-          getConfigRes.columns.find((column) => column.name === config.name)
-            ?.display_name || "",
-      })) || [
-        {
-          name: "record_name",
-          display_name: "Record name",
-          necessity: "required",
-        },
-      ]
+    setDatabaseColumns(
+      getConfigRes?.columns.map((column) => ({
+        name: column.name,
+        display_name: column.display_name,
+        necessity: column.necessity || "unnecessary",
+      })) || []
     );
 
-    setOptions(
+    setDatabaseColumnOptions(
       (getConfigRes?.columns
-        .map((column) => {
-          if (column.name.startsWith("_")) {
-            return undefined;
-          } else if (
-            getConfigRes.data_browser_config?.record_input_config
-              ?.map((el) => el.name)
-              .includes(column.name)
-          ) {
-            return undefined;
-          } else {
-            return {
-              display_name: column.display_name,
-              name: column.name,
-            };
-          }
-        })
-        .filter((c) => c) || []) as { name: string; display_name: string }[]
+        .filter(
+          (column) =>
+            !column.name.startsWith("_") &&
+            !pydtkSystemColumns.includes(column.name) &&
+            (column.necessity == null || column.necessity === "unnecessary")
+        )
+        ?.map((column) => ({
+          display_name: column.display_name,
+          name: column.name,
+        })) || []) as {
+        name: string;
+        display_name: string;
+      }[]
     );
-  }, [getConfigRes, configName]);
+  }, [getConfigRes]);
 
   const initializeState = () => {
     setIsSaving(false);
@@ -122,47 +109,34 @@ const Container = ({
   }, [open, prevOpen]);
 
   const onSave = async () => {
-    if (getConfigRes && config) {
+    if (getConfigRes && databaseColumns) {
       setIsSaving(true);
-      const newInputConfig = config.map((value) => ({
-        name: value.name,
-        necessity: value.necessity,
-      }));
 
-      const existingNames = getConfigRes.columns.map((column) => column.name);
-      const newColumns = getConfigRes.columns
-        .map((oldColumn) => {
-          const newColumn = config.find(
-            (value) => value.name === oldColumn.name
+      const newDatabaseConfig = produce(getConfigRes, (draft) => {
+        // update existing columns
+        draft.columns = getConfigRes.columns.map((oldColumn) => {
+          const newColumn = databaseColumns.find(
+            (column) => column.name === oldColumn.name
           );
-          return newColumn
-            ? {
-                ...oldColumn,
-                name: newColumn.name,
-                display_name: newColumn.display_name,
-              }
-            : oldColumn;
-        })
-        .concat(
-          config
-            .filter((value) => !existingNames.includes(value.name))
-            .map((value) => ({
-              name: value.name,
-              display_name: value.display_name,
-              dtype: "string",
-              aggregation: "first",
-            }))
-        );
+          return { ...oldColumn, ...newColumn };
+        });
 
-      const newConfig = produce(getConfigRes, (draft) => {
-        draft.columns = newColumns;
-        if (draft.data_browser_config) {
-          draft.data_browser_config.record_input_config = newInputConfig;
-        } else {
-          draft.data_browser_config = {
-            record_input_config: newInputConfig,
-          };
-        }
+        // add new columns
+        const addedColumns = databaseColumns
+          .filter((column) => {
+            const existingNames = getConfigRes.columns.map(
+              (column) => column.name
+            );
+            return !existingNames.includes(column.name);
+          })
+          .map((column) => ({
+            name: column.name,
+            display_name: column.display_name,
+            necessity: column.necessity,
+            dtype: "string" as const,
+            aggregation: "first" as const,
+          }));
+        draft.columns = draft.columns.concat(addedColumns);
       });
 
       const [data, error] = await fetchMetaStore(
@@ -170,7 +144,7 @@ const Container = ({
         metaStore.ConfigService.updateConfig,
         {
           databaseId,
-          requestBody: newConfig,
+          requestBody: newDatabaseConfig,
         }
       );
 
@@ -185,17 +159,27 @@ const Container = ({
     onClose();
   };
 
-  const onAdd: InputConfigAddModalProps["onSave"] = (newConfig) => {
-    setConfig((prev) => (prev ? [...prev, newConfig] : [newConfig]));
-    setOptions((prev) => {
+  const onAdd: InputConfigAddModalProps["onSave"] = (newColumn) => {
+    setDatabaseColumns((prev) => {
+      if (prev.some((prevColumn) => prevColumn.name === newColumn.name)) {
+        return prev.map((prevColumn) =>
+          prevColumn.name === newColumn.name
+            ? { ...prevColumn, ...newColumn }
+            : prevColumn
+        );
+      } else {
+        return [...prev, newColumn];
+      }
+    });
+    setDatabaseColumnOptions((prev) => {
       if (prev) {
-        const newOption = produce(prev, (prev) => {
+        const newOptions = produce(prev, (prev) => {
           prev.splice(
-            prev.findIndex((elem) => elem.name === newConfig.name),
+            prev.findIndex((elem) => elem.name === newColumn.name),
             1
           );
         });
-        return newOption;
+        return newOptions;
       } else {
         return prev;
       }
@@ -203,37 +187,55 @@ const Container = ({
   };
 
   const onChange: InputConfigListProps["onChange"] = (
-    index,
+    _,
     action,
-    newValue
+    newValue,
+    oldValue
   ) => {
-    if (getConfigRes && config) {
+    if (getConfigRes && databaseColumns) {
       if (action === "delete") {
-        setConfig(config.filter((_, i) => i !== index));
-        setOptions((prev) => {
+        setDatabaseColumns((prev) =>
+          prev.map((column) =>
+            column.name === oldValue.name
+              ? { ...column, necessity: "unnecessary" }
+              : column
+          )
+        );
+        setDatabaseColumnOptions((prev) => {
           if (prev) {
             const newOptions = produce(prev, (prev) => {
               prev.push({
-                name: newValue.name,
-                display_name: newValue.display_name,
+                name: oldValue.name,
+                display_name: oldValue.display_name,
               });
             });
             return newOptions;
           } else {
             return [
-              { name: newValue.name, display_name: newValue.display_name },
+              { name: oldValue.name, display_name: oldValue.display_name },
             ];
           }
         });
       } else if (action === "change") {
-        setConfig(
-          config.map((oldValue, i) => (i === index ? newValue : oldValue))
+        setDatabaseColumns((prev) =>
+          prev.map((column) =>
+            column.name === oldValue.name ? { ...column, ...newValue } : column
+          )
         );
       }
     }
   };
+
+  const inputConfig = databaseColumns
+    ?.filter((column) => column.necessity && column.necessity !== "unnecessary")
+    .sort(compInputFields);
+
   const alreadyUsedDisplayNames = [
-    ...new Set(getConfigRes?.columns.map((column) => column.display_name)),
+    ...new Set(inputConfig.map((column) => column.display_name)),
+  ];
+
+  const alreadyUsedNames = [
+    ...new Set(inputConfig.map((column) => column.name)),
   ];
 
   return (
@@ -243,7 +245,7 @@ const Container = ({
         <DialogTitle>
           {/* // TODO:Fix typeError */}
           {/* <NoticeableLetters> */}
-          <TextCenteringSpan>{title[configName] + " "}</TextCenteringSpan>
+          <TextCenteringSpan>Input columns</TextCenteringSpan>
           {/* </NoticeableLetters> */}
           {getConfigRes ? (
             <SquareIconButton
@@ -258,10 +260,10 @@ const Container = ({
               reason={JSON.stringify(getConfigError)}
               instruction="please reload this page"
             />
-          ) : getConfigRes && config ? (
+          ) : inputConfig ? (
             <DialogBody>
               <DialogMain>
-                <InputConfigList value={config} onChange={onChange} />
+                <InputConfigList value={inputConfig} onChange={onChange} />
               </DialogMain>
               <DialogToolBar
                 right={
@@ -272,13 +274,13 @@ const Container = ({
               />
             </DialogBody>
           ) : null}
-          {options ? (
+          {databaseColumnOptions ? (
             <InputConfigAddModal
-              options={options}
+              options={databaseColumnOptions}
               open={openAddModal}
               onClose={() => setOpenAddModal(false)}
-              onSave={(newConfig) => onAdd(newConfig)}
-              alreadyUsedNames={config?.map((config) => config.name) || []}
+              onSave={(newColumn) => onAdd(newColumn)}
+              alreadyUsedNames={alreadyUsedNames}
               alreadyUsedDisplayNames={alreadyUsedDisplayNames}
             />
           ) : null}
