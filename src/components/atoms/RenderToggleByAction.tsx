@@ -8,7 +8,6 @@ type ContainerProps = {
   children: ReactNode;
 };
 
-const actionDivider = ":";
 const Container = ({
   required,
   children,
@@ -18,17 +17,7 @@ const Container = ({
     return null;
   }
 
-  const divided = required.split(actionDivider);
-  const permittedActions: UserActionType[] = [];
-  for (let i = 1; i <= divided.length; i++) {
-    permittedActions.push(
-      divided.slice(0, i).join(actionDivider) as UserActionType
-    );
-  }
-
-  const isPermitted = permittedActions.some((action) =>
-    userActions.includes(action)
-  );
+  const isPermitted = userActions.some((action) => required.startsWith(action));
 
   return isPermitted ? <>{children}</> : null;
 };
