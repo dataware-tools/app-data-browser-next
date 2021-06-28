@@ -10,6 +10,7 @@ import {
   fetchMetaStore,
   ErrorMessageProps,
   ErrorMessage,
+  usePrevious,
 } from "@dataware-tools/app-common";
 import { useAuth0 } from "@auth0/auth0-react";
 import Dialog, { DialogProps } from "@material-ui/core/Dialog";
@@ -24,7 +25,6 @@ import {
   FieldError,
 } from "react-hook-form";
 import LoadingButton from "@material-ui/lab/LoadingButton";
-import { usePrevious } from "utils";
 
 type Props = {
   onSubmit: () => Promise<void>;

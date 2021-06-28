@@ -4,7 +4,6 @@ import LoadingButton from "@material-ui/lab/LoadingButton";
 import {
   DatabaseConfigType,
   useGetConfig,
-  usePrevious,
   fetchMetaStore,
   pydtkSystemColumns,
   compInputFields,
@@ -27,6 +26,7 @@ import {
   TextCenteringSpan,
   DialogWrapper,
   DialogMain,
+  usePrevious,
   // NoticeableLetters,
 } from "@dataware-tools/app-common";
 import {

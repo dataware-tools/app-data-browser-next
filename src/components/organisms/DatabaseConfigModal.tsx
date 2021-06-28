@@ -5,19 +5,19 @@ import {
 import {
   DisplayConfigEditModal,
   ConfigNameType as DisplayConfigNameType,
-} from "./DisplayConfigEditModal";
+} from "components/organisms/DisplayConfigEditModal";
 import {
   SearchConfigEditModal,
   ConfigNameType as SearchConfigNameType,
-} from "./SearchConfigEditModal";
+} from "components/organisms/SearchConfigEditModal";
 import {
   SecretConfigEditModal,
   ConfigNameType as SecretConfigNameType,
-} from "./SecretConfigEditModal";
+} from "components/organisms/SecretConfigEditModal";
 import {
   ExportMetadataModal,
   ConfigNameType as ExportMetadataNameType,
-} from "./ExportMetadataModal";
+} from "components/organisms/ExportMetadataModal";
 
 type ContainerProps = {
   open: boolean;

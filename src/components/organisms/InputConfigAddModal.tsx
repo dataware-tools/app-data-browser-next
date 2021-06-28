@@ -7,6 +7,7 @@ import {
   DialogContainer,
   DialogWrapper,
   DialogMain,
+  usePrevious,
 } from "@dataware-tools/app-common";
 import Autocomplete, {
   createFilterOptions,
@@ -14,7 +15,6 @@ import Autocomplete, {
 import TextField from "@material-ui/core/TextField";
 import { useState, useEffect } from "react";
 import {
-  usePrevious,
   DatabaseColumnsConfigType,
   DatabaseColumnsConfigNecessityType,
 } from "utils";

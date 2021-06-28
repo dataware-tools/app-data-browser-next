@@ -8,11 +8,12 @@ import {
   DialogCloseButton,
   DialogWrapper,
   DialogMain,
+  usePrevious,
 } from "@dataware-tools/app-common";
 import Dialog from "@material-ui/core/Dialog";
 import { useState, useEffect } from "react";
 import LoadingButton from "@material-ui/lab/LoadingButton";
-import { usePrevious, compInputFields } from "utils/index";
+import { compInputFields } from "utils/index";
 import {
   MetadataInputFieldList,
   MetadataInputFieldListProps,

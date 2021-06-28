@@ -1,5 +1,4 @@
 import { AUTH_CONFIG } from "@dataware-tools/app-common";
-import { useRef, useEffect } from "react";
 import { DatabaseColumnsConfigType } from "utils";
 
 const APP_ROUTE = {
@@ -20,18 +19,6 @@ const authConfig = {
 
 const redirectUri =
   typeof window === "undefined" ? null : window.location.origin;
-
-// See: https://ja.reactjs.org/docs/hooks-faq.html#how-to-get-the-previous-props-or-state
-const usePrevious = <T>(value: T): T | undefined => {
-  const ref = useRef<T>();
-  useEffect(() => {
-    ref.current = value;
-  });
-  return ref.current;
-};
-
-const sleep = (ms: number): Promise<void> =>
-  new Promise((resolve) => setTimeout(resolve, ms));
 
 const pydtkSystemColumns = ["record_id", "path", "contents"];
 
@@ -72,8 +59,6 @@ export {
   SwrOptions,
   authConfig,
   redirectUri,
-  usePrevious,
-  sleep,
   pydtkSystemColumns,
   compStr,
   compInputFields,
