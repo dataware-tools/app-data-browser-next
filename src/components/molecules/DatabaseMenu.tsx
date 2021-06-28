@@ -10,6 +10,7 @@ type ComponentProps = {
       | "Configure search target columns"
       | "Configure secret columns"
       | "Export metadata"
+      | "setting"
   ) => void;
   onClose: () => void;
   open: boolean;
@@ -77,6 +78,14 @@ const Component = ({
         }}
       >
         Export metadata
+      </MenuItem>
+      <MenuItem
+        onClick={() => {
+          onClick("setting");
+          onClose();
+        }}
+      >
+        setting
       </MenuItem>
     </Menu>
   );

@@ -18,6 +18,10 @@ import {
   ExportMetadataModal,
   ConfigNameType as ExportMetadataNameType,
 } from "./ExportMetadataModal";
+import {
+  DatabaseSetting,
+  ConfigNameType as DatabaseSettingNameType,
+} from "./DatabaseSetting";
 
 type ContainerProps = {
   open: boolean;
@@ -31,7 +35,8 @@ type DatabaseConfigNameType =
   | DisplayConfigNameType
   | SearchConfigNameType
   | ExportMetadataNameType
-  | SecretConfigNameType;
+  | SecretConfigNameType
+  | DatabaseSettingNameType;
 
 const Container = ({
   configName,
@@ -48,6 +53,8 @@ const Container = ({
       return <SecretConfigEditModal {...delegated} configName={configName} />;
     case "export_metadata":
       return <ExportMetadataModal {...delegated} />;
+    case "setting":
+      return <DatabaseSetting {...delegated} configName={configName} />;
   }
 };
 

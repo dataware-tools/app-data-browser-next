@@ -189,6 +189,9 @@ const Page = (): JSX.Element => {
       case "Export metadata":
         setEditingConfigName("export_metadata");
         break;
+      case "setting":
+        setEditingConfigName("setting");
+        break;
     }
   };
 
