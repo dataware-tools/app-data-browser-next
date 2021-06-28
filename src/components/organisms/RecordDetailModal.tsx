@@ -38,6 +38,7 @@ import EditIcon from "@material-ui/icons/Edit";
 import Button from "@material-ui/core/Button";
 import { produce } from "immer";
 import { FilePreviewModal } from "./FilePreviewModal";
+import { RenderToggleByAction } from "../atoms/RenderToggleByAction";
 
 type ContainerProps = {
   open: boolean;
@@ -279,17 +280,21 @@ const Container = ({
         <DialogToolBar
           right={
             <>
-              <FileUploadButton
-                onFileChange={onAddFile}
-                startIcon={<UploadIcon />}
-                pending={isAddingFile}
-              >
-                Add File
-              </FileUploadButton>
+              <RenderToggleByAction required="metadata:write:add">
+                <FileUploadButton
+                  onFileChange={onAddFile}
+                  startIcon={<UploadIcon />}
+                  pending={isAddingFile}
+                >
+                  Add File
+                </FileUploadButton>
+              </RenderToggleByAction>
               <Spacer direction="horizontal" size="10px" />
-              <Button onClick={onEditRecord} startIcon={<EditIcon />}>
-                Edit Record
-              </Button>
+              <RenderToggleByAction required="metadata:write:update">
+                <Button onClick={onEditRecord} startIcon={<EditIcon />}>
+                  Edit Record
+                </Button>
+              </RenderToggleByAction>
             </>
           }
         />

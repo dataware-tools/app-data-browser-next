@@ -4,6 +4,7 @@ import FileDownloadIcon from "@material-ui/icons/FileDownload";
 import EditIcon from "@material-ui/icons/Edit";
 import Menu from "@material-ui/core/Menu";
 import { FileMenuItem, FileMenuItemProps } from "components/atoms/FileMenuItem";
+import { RenderToggleByAction } from "../atoms/RenderToggleByAction";
 
 type ComponentProps = {
   onPreview?: FileMenuItemProps["onClick"];
@@ -62,11 +63,19 @@ const Component = ({
       ) : null}
 
       {_onEdit ? (
-        <FileMenuItem onClick={_onEdit} icon={<EditIcon />} text="Edit" />
+        <RenderToggleByAction required="metadata:write:update">
+          <FileMenuItem onClick={_onEdit} icon={<EditIcon />} text="Edit" />
+        </RenderToggleByAction>
       ) : null}
 
       {_onDelete ? (
-        <FileMenuItem onClick={_onDelete} icon={<DeleteIcon />} text="Delete" />
+        <RenderToggleByAction required="metadata:write:delete">
+          <FileMenuItem
+            onClick={_onDelete}
+            icon={<DeleteIcon />}
+            text="Delete"
+          />
+        </RenderToggleByAction>
       ) : null}
 
       {_onDownload ? (
@@ -79,6 +88,5 @@ const Component = ({
     </Menu>
   );
 };
-
 export { Component as FileMenu };
 export type { ComponentProps as FileMenuProps };

@@ -47,8 +47,9 @@ import {
   UserActionType,
 } from "utils";
 import { produce } from "immer";
-import { useSetRecoilState } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { userActionsState } from "../../globalStates";
+import { RenderToggleByAction } from "../atoms/RenderToggleByAction";
 
 const useStyles = makeStyles(() => ({
   fixedFlexShrink: {
@@ -85,6 +86,7 @@ const Page = (): JSX.Element => {
   >(undefined);
 
   const setUserActions = useSetRecoilState(userActionsState);
+  const userActions = useRecoilValue(userActionsState);
 
   const [getConfigRes, getConfigError] = (useGetConfig(getAccessToken, {
     databaseId,
@@ -228,14 +230,16 @@ const Page = (): JSX.Element => {
                       setPerPage={setPerPage}
                       values={[10, 20, 50, 100]}
                     />
-                    <Spacer direction="horizontal" size="15px" />
-                    <Button
-                      onClick={() => setIsRecordEditModalOpen(true)}
-                      startIcon={<AddCircle />}
-                      className={classes.fixedFlexShrink}
-                    >
-                      <TextCenteringSpan>Record</TextCenteringSpan>
-                    </Button>
+                    <RenderToggleByAction required="metadata:write:add">
+                      <Spacer direction="horizontal" size="15px" />
+                      <Button
+                        onClick={() => setIsRecordEditModalOpen(true)}
+                        startIcon={<AddCircle />}
+                        className={classes.fixedFlexShrink}
+                      >
+                        <TextCenteringSpan>Record</TextCenteringSpan>
+                      </Button>
+                    </RenderToggleByAction>
                   </>
                 ) : null}
                 {!getConfigError ? (
@@ -264,7 +268,13 @@ const Page = (): JSX.Element => {
                   columns={displayColumns}
                   records={listRecordsRes.data}
                   onSelectRecord={onSelectRecord}
-                  onDeleteRecord={onDeleteRecord}
+                  onDeleteRecord={
+                    userActions.some((action) =>
+                      "metadata:write:delete".startsWith(action)
+                    )
+                      ? onDeleteRecord
+                      : undefined
+                  }
                 />
               )
             ) : (
