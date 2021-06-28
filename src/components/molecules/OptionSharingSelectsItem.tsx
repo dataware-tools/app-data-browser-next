@@ -35,6 +35,9 @@ const useStyles = makeStyles({
     flexDirection: "row",
     justifyContent: "space-between",
   },
+  inputSelect: {
+    minWidth: 400,
+  },
 });
 
 const Component = ({
@@ -57,6 +60,7 @@ const Component = ({
         onChange={(event) =>
           onChange("update", index, event.target.value as string, value)
         }
+        className={classes.inputSelect}
       >
         <MenuItem {...menuItemProps} value={value}>
           {options.find((option) => option.value === value)?.label || value}

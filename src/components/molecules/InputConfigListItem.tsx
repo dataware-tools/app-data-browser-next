@@ -39,6 +39,9 @@ const useStyles = makeStyles({
     flexDirection: "row",
     justifyContent: "flex-end",
   },
+  inputSelect: {
+    minWidth: 160,
+  },
 });
 
 const Component = ({ classes, value, onChange }: Props): JSX.Element => {
@@ -64,6 +67,7 @@ const Component = ({ classes, value, onChange }: Props): JSX.Element => {
             )
           }
           variant="outlined"
+          className={classes.inputSelect}
         >
           <MenuItem value="required">Required</MenuItem>
           <MenuItem value="recommended">Recommended</MenuItem>
