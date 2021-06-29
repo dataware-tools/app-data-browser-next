@@ -18,6 +18,7 @@ import {
   TextCenteringSpan,
   DialogSubTitle,
   NoticeableLetters,
+  usePrevious,
   // NoticeableLetters,
 } from "@dataware-tools/app-common";
 import {
@@ -28,7 +29,6 @@ import LoadingButton from "@material-ui/lab/LoadingButton";
 import { SoloSelect } from "components/molecules/SoloSelect";
 import {
   useGetConfig,
-  usePrevious,
   DatabaseConfigType,
   fetchMetaStore,
   compStr,

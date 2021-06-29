@@ -1,12 +1,7 @@
 import Dialog from "@material-ui/core/Dialog";
 import { useState, useEffect } from "react";
 import LoadingButton from "@material-ui/lab/LoadingButton";
-import {
-  useGetConfig,
-  usePrevious,
-  DatabaseConfigType,
-  fetchMetaStore,
-} from "utils/index";
+import { useGetConfig, DatabaseConfigType, fetchMetaStore } from "utils/index";
 import {
   SearchConfigList,
   SearchConfigListProps,
@@ -25,6 +20,7 @@ import {
   TextCenteringSpan,
   DialogWrapper,
   DialogMain,
+  usePrevious,
   // NoticeableLetters,
 } from "@dataware-tools/app-common";
 import { produce } from "immer";

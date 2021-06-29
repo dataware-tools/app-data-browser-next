@@ -15,10 +15,11 @@ import {
   DialogWrapper,
   DialogTabBar,
   DialogMain,
+  usePrevious,
 } from "@dataware-tools/app-common";
 import Dialog from "@material-ui/core/Dialog";
 import { useState, useEffect } from "react";
-import { FileList } from "./FileList";
+import { FileList } from "components/organisms/FileList";
 import { RecordInfo } from "components/organisms/RecordInfo";
 import { mutate } from "swr";
 import { useAuth0 } from "@auth0/auth0-react";
@@ -26,7 +27,6 @@ import {
   fetchMetaStore,
   useGetRecord,
   useListFiles,
-  usePrevious,
   uploadFileToFileProvider,
   fetchFileProvider,
   useGetConfig,
@@ -37,8 +37,8 @@ import UploadIcon from "@material-ui/icons/Upload";
 import EditIcon from "@material-ui/icons/Edit";
 import Button from "@material-ui/core/Button";
 import { produce } from "immer";
-import { FilePreviewModal } from "./FilePreviewModal";
-import { RenderToggleByAction } from "../atoms/RenderToggleByAction";
+import { FilePreviewModal } from "components/organisms/FilePreviewModal";
+import { RenderToggleByAction } from "components/atoms/RenderToggleByAction";
 
 type ContainerProps = {
   open: boolean;

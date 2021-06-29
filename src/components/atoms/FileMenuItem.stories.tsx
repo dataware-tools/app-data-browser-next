@@ -1,7 +1,7 @@
 import { Story } from "@storybook/react";
 import { FileMenuItem, FileMenuItemProps } from "./FileMenuItem";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
-import { sleep } from "utils";
+import { sleep } from "@dataware-tools/app-common";
 
 export default {
   component: FileMenuItem,

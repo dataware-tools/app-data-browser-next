@@ -1,12 +1,7 @@
 import Dialog from "@material-ui/core/Dialog";
 import { useState, useEffect } from "react";
 import LoadingButton from "@material-ui/lab/LoadingButton";
-import {
-  useGetConfig,
-  usePrevious,
-  DatabaseConfigType,
-  fetchMetaStore,
-} from "utils/index";
+import { useGetConfig, DatabaseConfigType, fetchMetaStore } from "utils/index";
 import { useAuth0 } from "@auth0/auth0-react";
 import {
   ErrorMessage,
@@ -20,13 +15,14 @@ import {
   DialogWrapper,
   DialogMain,
   ErrorMessageProps,
+  usePrevious,
 } from "@dataware-tools/app-common";
 import { produce } from "immer";
 import { mutate } from "swr";
 import {
   OptionSharingSelects,
   OptionSharingSelectsProps,
-} from "./OptionSharingSelects";
+} from "components/organisms/OptionSharingSelects";
 
 type ConfigNameType = "secret_columns";
 

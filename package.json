@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@auth0/auth0-react": "^1.4.0",
-    "@dataware-tools/app-common": "git+ssh://git@github.com/dataware-tools/app-common.git",
+    "@dataware-tools/app-common": "=21.6.7",
     "@emotion/react": "^11.1.5",
     "@emotion/styled": "^11.1.5",
     "@material-ui/core": "^5.0.0-alpha.30",

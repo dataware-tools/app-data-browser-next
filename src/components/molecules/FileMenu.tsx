@@ -4,7 +4,7 @@ import FileDownloadIcon from "@material-ui/icons/FileDownload";
 import EditIcon from "@material-ui/icons/Edit";
 import Menu from "@material-ui/core/Menu";
 import { FileMenuItem, FileMenuItemProps } from "components/atoms/FileMenuItem";
-import { RenderToggleByAction } from "../atoms/RenderToggleByAction";
+import { RenderToggleByAction } from "components/atoms/RenderToggleByAction";
 
 type ComponentProps = {
   onPreview?: FileMenuItemProps["onClick"];

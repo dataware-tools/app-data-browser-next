@@ -6,7 +6,7 @@ import {
   DialogWrapper,
 } from "@dataware-tools/app-common";
 import { FileType } from "components/organisms/FileListItem";
-import { FileDownloadURLInjector } from "./FileDownloadUrlInjector";
+import { FileDownloadURLInjector } from "components/organisms/FileDownloadUrlInjector";
 import { FilePreviewer } from "components/molecules/FilePreviewer";
 
 type ContainerWithDialogProps = DialogProps & {
