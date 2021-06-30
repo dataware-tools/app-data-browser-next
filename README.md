@@ -30,6 +30,13 @@ After success of building image
 $ dc up
 ```
 
+If you want to change Auth0's configurations (i.e., client-id, domain, etc.),
+you need to set the following environment variables:
+
+- `NEXT_PUBLIC_DATAWARE_TOOLS_AUTH_CONFIG_DOMAIN`: Domain (default: `dataware-tools.us.auth0.com`)
+- `NEXT_PUBLIC_DATAWARE_TOOLS_AUTH_CONFIG_CLIENT_ID`: Client ID (default: the one for the demo page)
+- `NEXT_PUBLIC_DATAWARE_TOOLS_AUTH_CONFIG_API_URL`: API URL (default: `https://demo.dataware-tools.com/`)
+
 ## Getting started
 
 First, install all dependencies.

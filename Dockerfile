@@ -40,4 +40,6 @@ EXPOSE 3000
 # Uncomment the following line in case you want to disable telemetry.
 # RUN npx next telemetry disable
 
+COPY docker-entrypoint.sh /docker-entrypoint.sh
+ENTRYPOINT ["/docker-entrypoint.sh"]
 CMD ["node_modules/.bin/next", "start"]
