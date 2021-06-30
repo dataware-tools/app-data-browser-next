@@ -7,7 +7,6 @@ import MenuItem from "@material-ui/core/MenuItem";
 import { FormControl, InputLabel } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import {
-  Spacer,
   DialogBody,
   DialogContainer,
   DialogToolBar,
@@ -17,6 +16,8 @@ import {
   DialogMain,
   NoticeableLetters,
   usePrevious,
+  ErrorMessageProps,
+  ErrorMessage,
 } from "@dataware-tools/app-common";
 import { useAuth0 } from "@auth0/auth0-react";
 
@@ -26,14 +27,73 @@ import downloadCSV from "react-csv-downloader/dist/cjs/lib/csv";
 type ConfigNameType = "export_metadata";
 
 type ComponentProps = ContainerProps & {
-  isLoading: boolean;
-  exportMetadata: (exportType: string) => void;
+  classes: ReturnType<typeof useStyles>;
+  exportType: string;
+  onExport: () => Promise<void>;
+  onChangeExportType: (newExportType: string) => void;
+  error?: ErrorMessageProps;
+  isFetchComplete: boolean;
 };
 
 type ContainerProps = {
   open: boolean;
   onClose: () => void;
   databaseId: string;
+};
+
+const Component = ({
+  open,
+  error,
+  onClose,
+  databaseId,
+  classes,
+  exportType,
+  onExport,
+  onChangeExportType,
+  isFetchComplete,
+}: ComponentProps): JSX.Element => {
+  return (
+    <Dialog open={open} maxWidth="xl" onClose={onClose}>
+      <DialogWrapper>
+        <DialogCloseButton onClick={onClose} />
+        <DialogTitle>
+          <NoticeableLetters>{`Export metadata in ${databaseId}`}</NoticeableLetters>
+        </DialogTitle>
+        <DialogContainer height="auto">
+          <DialogBody>
+            {error ? (
+              <ErrorMessage {...error} />
+            ) : (
+              <DialogMain>
+                <div className={classes.body}>
+                  <FormControl>
+                    <InputLabel id="export-type-label">Format: </InputLabel>
+                    <Select
+                      labelId="export-type-label"
+                      value={exportType}
+                      onChange={(event) => {
+                        onChangeExportType(event.target.value);
+                      }}
+                    >
+                      <MenuItem value="JSON">JSON</MenuItem>
+                      <MenuItem value="CSV">CSV</MenuItem>
+                    </Select>
+                  </FormControl>
+                </div>
+              </DialogMain>
+            )}
+          </DialogBody>
+        </DialogContainer>
+        <DialogToolBar
+          right={
+            <LoadingButton onClick={onExport} pending={!isFetchComplete}>
+              Export
+            </LoadingButton>
+          }
+        />
+      </DialogWrapper>
+    </Dialog>
+  );
 };
 
 const useStyles = makeStyles({
@@ -46,21 +106,19 @@ const useStyles = makeStyles({
   },
 });
 
-const Component = ({
-  open,
-  onClose,
+const Container = ({
   databaseId,
-  isLoading,
-  exportMetadata,
-}: ComponentProps): JSX.Element => {
+  open,
+  ...delegated
+}: ContainerProps): JSX.Element => {
+  const { getAccessTokenSilently: getAccessToken } = useAuth0();
+  const classes = useStyles();
   const [exportType, setExportType] = useState<string>("JSON");
-
-  const styles = useStyles();
+  const [error, setError] = useState<ErrorMessageProps | undefined>(undefined);
 
   const initializeState = () => {
     setExportType("JSON");
   };
-  // See: https://stackoverflow.com/questions/58209791/set-initial-state-for-material-ui-dialog
   const prevOpen = usePrevious(open);
   useEffect(() => {
     if (open && !prevOpen) {
@@ -68,63 +126,20 @@ const Component = ({
     }
   }, [open, prevOpen]);
 
-  const onExport = async () => {
-    exportMetadata(exportType);
-  };
-
-  return (
-    <Dialog open={open} maxWidth="xl" onClose={onClose}>
-      <DialogWrapper>
-        <DialogCloseButton onClick={onClose} />
-        <DialogTitle>
-          <NoticeableLetters>{`Export metadata in ${databaseId}`}</NoticeableLetters>
-        </DialogTitle>
-        <DialogContainer height="auto">
-          <DialogBody>
-            <DialogMain>
-              <div className={styles.body}>
-                <FormControl>
-                  <InputLabel id="export-type-label">Format: </InputLabel>
-                  <Select
-                    labelId="export-type-label"
-                    value={exportType}
-                    onChange={(event) => {
-                      setExportType(event.target.value);
-                    }}
-                  >
-                    <MenuItem value="JSON">JSON</MenuItem>
-                    <MenuItem value="CSV">CSV</MenuItem>
-                  </Select>
-                </FormControl>
-              </div>
-            </DialogMain>
-            <Spacer direction="vertical" size="2vh" />
-          </DialogBody>
-        </DialogContainer>
-        <DialogToolBar
-          right={
-            <LoadingButton pending={isLoading} onClick={onExport}>
-              Export
-            </LoadingButton>
-          }
-        />
-      </DialogWrapper>
-    </Dialog>
-  );
-};
-
-const Container = ({
-  databaseId,
-  ...delegated
-}: ContainerProps): JSX.Element => {
-  const { getAccessTokenSilently: getAccessToken } = useAuth0();
-
-  const listRecords = useListRecords(getAccessToken, {
+  const [listRecordsRes, listRecordsError] = useListRecords(getAccessToken, {
     databaseId,
     perPage: 999999999, // FIXME
   });
-  const listRecordsRes = listRecords[0];
-  const isLoading = !listRecordsRes;
+
+  const fetchError = listRecordsError;
+  useEffect(() => {
+    if (fetchError) {
+      setError({
+        reason: JSON.stringify(fetchError),
+        instruction: "Please reload this page",
+      });
+    }
+  }, [fetchError]);
 
   const exportAsJSON = () => {
     if (listRecordsRes) {
@@ -172,27 +187,34 @@ const Container = ({
   };
 
   const exportMetadata = async (exportType: string) => {
-    if (isLoading) {
-      window.alert("Not ready");
-    } else {
-      switch (exportType) {
-        case "JSON":
-          exportAsJSON();
-          break;
-        case "CSV":
-          exportAsCSV();
-          break;
-        default:
-          window.alert("Unsupported format");
-      }
+    switch (exportType) {
+      case "JSON":
+        exportAsJSON();
+        break;
+      case "CSV":
+        exportAsCSV();
+        break;
+      default:
+        window.alert("Unsupported format");
     }
   };
 
+  const onExport = async () => {
+    exportMetadata(exportType);
+  };
+
+  const isFetchComplete = Boolean(!fetchError && listRecordsRes);
+
   return (
     <Component
-      isLoading={isLoading}
-      exportMetadata={exportMetadata}
+      classes={classes}
+      isFetchComplete={isFetchComplete}
+      exportType={exportType}
       databaseId={databaseId}
+      onChangeExportType={setExportType}
+      onExport={onExport}
+      open={open}
+      error={error}
       {...delegated}
     />
   );
