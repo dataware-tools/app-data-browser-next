@@ -17,11 +17,8 @@ type ActionType = "change" | "delete";
 type Props = { classes: ReturnType<typeof useStyles> } & ContainerProps;
 type ContainerProps = {
   value: ValueType;
-  onChange: (
-    action: ActionType,
-    newValue: ValueType | undefined,
-    oldValue: ValueType
-  ) => void;
+  onUpdate: (newValue: ValueType, oldValue: ValueType) => void;
+  onDelete: (deletedValue: ValueType) => void;
 };
 
 const useStyles = makeStyles({
@@ -44,7 +41,12 @@ const useStyles = makeStyles({
   },
 });
 
-const Component = ({ classes, value, onChange }: Props): JSX.Element => {
+const Component = ({
+  classes,
+  value,
+  onUpdate,
+  onDelete,
+}: Props): JSX.Element => {
   return (
     <div className={classes.root}>
       <ElemCenteringFlexDiv>
@@ -57,8 +59,7 @@ const Component = ({ classes, value, onChange }: Props): JSX.Element => {
         <Select
           value={value.necessity}
           onChange={(event) =>
-            onChange(
-              "change",
+            onUpdate(
               {
                 ...value,
                 necessity: event.target.value,
@@ -75,9 +76,7 @@ const Component = ({ classes, value, onChange }: Props): JSX.Element => {
         </Select>
         <Spacer direction="horizontal" size="10px" />
         <ElemCenteringFlexDiv>
-          <IconButton
-            onClick={() => onChange("delete", undefined, { ...value })}
-          >
+          <IconButton onClick={() => onDelete(value)}>
             <DeleteIcon />
           </IconButton>
         </ElemCenteringFlexDiv>
