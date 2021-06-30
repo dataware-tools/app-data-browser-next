@@ -58,7 +58,7 @@ const Component = ({
     <Dialog {...delegated}>
       <DialogWrapper>
         <DialogCloseButton onClick={onClose} />
-        <DialogTitle>Add Record</DialogTitle>
+        <DialogTitle>Add database</DialogTitle>
         <DialogContainer padding="0 0 20px">
           <DialogBody>
             <DialogMain>
@@ -158,10 +158,7 @@ const Container = ({
     setError(undefined);
     setIsSubmitting(false);
   };
-
-  // See: https://stackoverflow.com/questions/58209791/set-initial-state-for-material-ui-dialog
   const prevOpen = usePrevious(open);
-
   useEffect(() => {
     if (open && !prevOpen) {
       initializeState();

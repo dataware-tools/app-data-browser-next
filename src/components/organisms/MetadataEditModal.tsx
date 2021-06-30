@@ -14,7 +14,6 @@ import {
 import Dialog from "@material-ui/core/Dialog";
 import { useState, useEffect } from "react";
 import LoadingButton from "@material-ui/lab/LoadingButton";
-import { compInputFields } from "utils/index";
 import {
   MetadataInputFieldList,
   MetadataInputFieldListProps,
@@ -31,7 +30,7 @@ type ContainerProps = {
   open: boolean;
   onClose: () => void;
   create?: boolean;
-  currentMetadata?: MetadataInputFieldListProps["currentMetadata"];
+  currentMetadata: MetadataInputFieldListProps["currentMetadata"];
   fields: MetadataInputFieldListProps["fields"];
   error?: ErrorMessageProps;
   onSubmit: (newMetadata: Record<string, unknown>) => Promise<boolean>;
@@ -89,18 +88,10 @@ const Container = ({
   open,
   onClose,
   create,
-  fields: propFields,
+  fields,
   onSubmit,
   ...delegated
 }: ContainerProps): JSX.Element => {
-  const fields = create
-    ? propFields
-        .filter(
-          (config) => config.necessity && config.necessity !== "unnecessary"
-        )
-        .sort(compInputFields)
-    : propFields.sort(compInputFields);
-
   const [isSaving, setIsSaving] = useState(false);
   const [
     nonFilledRequiredFieldNames,
@@ -111,7 +102,6 @@ const Container = ({
     setIsSaving(false);
     setNonFilledRequiredFieldNames([]);
   };
-  // See: https://stackoverflow.com/questions/58209791/set-initial-state-for-material-ui-dialog
   const prevOpen = usePrevious(open);
   useEffect(() => {
     if (open && !prevOpen) {
