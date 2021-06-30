@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
-import AddCircleIcon from "@material-ui/icons/AddCircle";
 import Dialog from "@material-ui/core/Dialog";
 import { produce } from "immer";
 import { mutate } from "swr";
@@ -14,27 +13,41 @@ import {
   DialogTitle,
   DialogToolBar,
   DialogCloseButton,
-  SquareIconButton,
-  TextCenteringSpan,
   DialogSubTitle,
   NoticeableLetters,
   usePrevious,
-  // NoticeableLetters,
+  ErrorMessageProps,
 } from "@dataware-tools/app-common";
-import {
-  DisplayConfigList,
-  DisplayConfigListProps,
-} from "components/organisms/DisplayConfigList";
-import LoadingButton from "@material-ui/lab/LoadingButton";
-import { SoloSelect } from "components/molecules/SoloSelect";
+import LoadingButton, {
+  LoadingButtonProps,
+} from "@material-ui/lab/LoadingButton";
+import { SoloSelect, SoloSelectProps } from "components/molecules/SoloSelect";
 import {
   useGetConfig,
   DatabaseConfigType,
   fetchMetaStore,
   compStr,
 } from "utils/index";
+import {
+  OptionSharingSelects,
+  OptionSharingSelectsProps,
+} from "./OptionSharingSelects";
 
 type ConfigNameType = "record_list_display_columns";
+
+type Props = {
+  error?: ErrorMessageProps;
+  onChangeDisplayColumns: OptionSharingSelectsProps["onChange"];
+  displayColumns: OptionSharingSelectsProps["values"];
+  displayColumnsOptions: OptionSharingSelectsProps["options"];
+  isFetchComplete: boolean;
+  onChangeRecordTitleColumn: SoloSelectProps["onChange"];
+  recordTitleColumn: SoloSelectProps["value"];
+  recordTitleColumnOptions: SoloSelectProps["options"];
+  isDisableSaveButton: LoadingButtonProps["disabled"];
+  isSaving: LoadingButtonProps["pending"];
+  onSave: LoadingButtonProps["onClick"];
+} & ContainerProps;
 
 type ContainerProps = {
   open: boolean;
@@ -53,6 +66,69 @@ const compareOption = (a: OptionType, b: OptionType) => {
   }
 };
 
+const Component = ({
+  open,
+  onClose,
+  error,
+  onChangeDisplayColumns,
+  displayColumnsOptions,
+  displayColumns,
+  isFetchComplete,
+  onChangeRecordTitleColumn,
+  recordTitleColumn,
+  recordTitleColumnOptions,
+  isDisableSaveButton,
+  isSaving,
+  onSave,
+}: Props) => {
+  return (
+    <Dialog open={open} maxWidth="xl" onClose={onClose}>
+      <DialogWrapper>
+        <DialogCloseButton onClick={onClose} />
+        <DialogTitle>
+          <NoticeableLetters>Display config</NoticeableLetters>
+        </DialogTitle>
+        <DialogContainer padding="0 0 20px">
+          <DialogBody>
+            {error ? (
+              <ErrorMessage {...error} />
+            ) : isFetchComplete ? (
+              <>
+                <DialogMain>
+                  <DialogSubTitle>Record table columns</DialogSubTitle>
+                  <OptionSharingSelects
+                    onChange={onChangeDisplayColumns}
+                    options={displayColumnsOptions}
+                    values={displayColumns}
+                    creatable
+                    deletable
+                  />
+                  <DialogSubTitle>Record title</DialogSubTitle>
+                  <SoloSelect
+                    options={recordTitleColumnOptions}
+                    onChange={onChangeRecordTitleColumn}
+                    value={recordTitleColumn}
+                  />
+                </DialogMain>
+                <DialogToolBar
+                  right={
+                    <LoadingButton
+                      disabled={isDisableSaveButton}
+                      pending={isSaving}
+                      onClick={onSave}
+                    >
+                      Save
+                    </LoadingButton>
+                  }
+                />
+              </>
+            ) : null}
+          </DialogBody>
+        </DialogContainer>
+      </DialogWrapper>
+    </Dialog>
+  );
+};
 const Container = ({
   open,
   onClose,
@@ -61,11 +137,9 @@ const Container = ({
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const [isSaving, setIsSaving] = useState(false);
   const [displayColumns, setDisplayColumns] = useState<string[]>([]);
-  const [titleColumnName, setTitleColumnName] = useState("");
+  const [recordTitleColumn, setRecordTitleColumn] = useState("");
   const [columnOptions, setColumnOptions] = useState<OptionType[]>([]);
-  const [usedDisplayColumnOptions, setUsedDisplayColumnOptions] = useState<
-    string[]
-  >([]);
+  const [error, setError] = useState<ErrorMessageProps | undefined>(undefined);
 
   const [getConfigRes, getConfigError, getConfigCacheKey] = (useGetConfig(
     getAccessToken,
@@ -78,6 +152,16 @@ const Container = ({
     cacheKey: string
   ];
 
+  const fetchError = getConfigError;
+  useEffect(() => {
+    if (fetchError) {
+      setError({
+        reason: JSON.stringify(fetchError),
+        instruction: "Please reload this page",
+      });
+    }
+  }, [fetchError]);
+
   const initializeState = () => {
     setIsSaving(false);
   };
@@ -88,6 +172,28 @@ const Container = ({
       initializeState();
     }
   }, [open, prevOpen]);
+
+  useEffect(() => {
+    if (getConfigRes) {
+      setDisplayColumns(
+        getConfigRes.columns
+          .filter((column) => column.is_display_field)
+          .map((column) => column.name) || []
+      );
+      setRecordTitleColumn(
+        getConfigRes.columns.find((column) => column.is_record_title)?.name ||
+          ""
+      );
+      setColumnOptions(
+        getConfigRes.columns
+          .map((column) => ({
+            label: `${column.name} (display name: ${column.display_name})`,
+            value: column.name,
+          }))
+          .sort(compareOption)
+      );
+    }
+  }, [getConfigRes]);
 
   const onSave = async () => {
     if (getConfigRes) {
@@ -117,11 +223,11 @@ const Container = ({
 
         draft.columns = draft.columns.map((column) => ({
           ...column,
-          is_record_title: column.name === titleColumnName,
+          is_record_title: column.name === recordTitleColumn,
         }));
       });
 
-      const [data, error] = await fetchMetaStore(
+      const [updateConfigRes, updateConfigError] = await fetchMetaStore(
         getAccessToken,
         metaStore.ConfigService.updateConfig,
         {
@@ -130,10 +236,13 @@ const Container = ({
         }
       );
 
-      if (error) {
-        // TODO: show error
+      if (updateConfigError) {
+        setError({
+          reason: JSON.stringify(fetchError),
+          instruction: "Please reload this page",
+        });
       } else {
-        mutate(getConfigCacheKey, data);
+        mutate(getConfigCacheKey, updateConfigRes);
       }
 
       setIsSaving(false);
@@ -141,162 +250,27 @@ const Container = ({
     onClose();
   };
 
-  const onAdd = () =>
-    setDisplayColumns((prev) => {
-      return prev ? [...prev, ""] : [""];
-    });
-
-  const onChange: DisplayConfigListProps["onChange"] = (
-    action,
-    index,
-    newValue,
-    oldValue
-  ) => {
-    if (action === "change") {
-      setDisplayColumns((prev) => {
-        const newConfig = produce(prev, (draft) => {
-          draft[index] = newValue;
-        });
-        return newConfig;
-      });
-
-      setUsedDisplayColumnOptions((prev) => {
-        if (prev) {
-          const next = produce(prev, (draft) => {
-            if (draft.includes(oldValue)) {
-              draft.splice(draft.indexOf(oldValue), 1);
-            }
-            if (!draft.includes(newValue)) {
-              draft.push(newValue);
-            }
-          });
-
-          return next;
-        }
-        return [newValue];
-      });
-    }
-
-    if (action === "delete") {
-      setDisplayColumns((prev) => {
-        const newConfig = produce(prev, (draft) => {
-          draft.splice(index, 1);
-        });
-        return newConfig;
-      });
-
-      setUsedDisplayColumnOptions((prev) => {
-        if (prev) {
-          if (prev.includes(oldValue)) {
-            const next = produce(prev, (draft) => {
-              draft.splice(draft.indexOf(oldValue), 1);
-            });
-            return next;
-          } else {
-            return prev;
-          }
-        }
-        return prev;
-      });
-    }
-  };
-
-  useEffect(() => {
-    if (getConfigRes) {
-      setDisplayColumns(
-        getConfigRes.columns
-          .filter((column) => column.is_display_field)
-          .map((column) => column.name) || []
-      );
-
-      setTitleColumnName(
-        getConfigRes.columns.find((column) => column.is_record_title)?.name ||
-          ""
-      );
-
-      setColumnOptions(
-        getConfigRes.columns
-          .map((column) => ({
-            label: `${column.name} (display name: ${column.display_name})`,
-            value: column.name,
-          }))
-          .sort(compareOption)
-      );
-
-      setUsedDisplayColumnOptions(
-        getConfigRes.columns
-          .filter((column) => column.is_display_field)
-          .map((column) => column.name) || []
-      );
-    }
-  }, [getConfigRes]);
+  const isFetchComplete = Boolean(!fetchError && getConfigRes);
+  const isDisableSaveButton =
+    displayColumns.length <= 0 || displayColumns.includes("");
 
   return (
-    <Dialog open={open} maxWidth="xl" onClose={onClose}>
-      <DialogWrapper>
-        <DialogCloseButton onClick={onClose} />
-        <DialogTitle>
-          <NoticeableLetters>Display config</NoticeableLetters>
-        </DialogTitle>
-        <DialogContainer padding="0 0 20px">
-          <DialogBody>
-            {getConfigError ? (
-              <ErrorMessage
-                reason={JSON.stringify(getConfigError)}
-                instruction="please reload this page"
-              />
-            ) : getConfigRes ? (
-              columnOptions.length <= 0 ? (
-                <ErrorMessage
-                  reason="no available column"
-                  instruction="please add data or input field"
-                />
-              ) : (
-                <>
-                  <DialogMain>
-                    <DialogSubTitle>
-                      <TextCenteringSpan>
-                        {"Record table columns "}
-                      </TextCenteringSpan>
-                      <SquareIconButton
-                        onClick={onAdd}
-                        icon={<AddCircleIcon />}
-                      />
-                    </DialogSubTitle>
-                    <DisplayConfigList
-                      value={displayColumns}
-                      onChange={onChange}
-                      options={columnOptions}
-                      alreadySelectedOptions={usedDisplayColumnOptions}
-                    />
-                    <DialogSubTitle>Record title</DialogSubTitle>
-                    <SoloSelect
-                      options={columnOptions}
-                      onChange={setTitleColumnName}
-                      value={titleColumnName}
-                    />
-                  </DialogMain>
-                  <DialogToolBar
-                    right={
-                      <LoadingButton
-                        disabled={
-                          displayColumns.length <= 0 ||
-                          displayColumns.includes("")
-                        }
-                        pending={isSaving}
-                        onClick={onSave}
-                      >
-                        Save
-                      </LoadingButton>
-                    }
-                  />
-                </>
-              )
-            ) : null}
-          </DialogBody>
-        </DialogContainer>
-      </DialogWrapper>
-    </Dialog>
+    <Component
+      databaseId={databaseId}
+      displayColumns={displayColumns}
+      displayColumnsOptions={columnOptions}
+      error={error}
+      isDisableSaveButton={isDisableSaveButton}
+      isFetchComplete={isFetchComplete}
+      isSaving={isSaving}
+      onChangeDisplayColumns={setDisplayColumns}
+      onChangeRecordTitleColumn={setRecordTitleColumn}
+      onClose={onClose}
+      onSave={onSave}
+      open={open}
+      recordTitleColumn={recordTitleColumn}
+      recordTitleColumnOptions={columnOptions}
+    />
   );
 };
 
