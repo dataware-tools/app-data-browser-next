@@ -1,5 +1,19 @@
 import Dialog from "@material-ui/core/Dialog";
 import Button from "@material-ui/core/Button";
+import Autocomplete, {
+  AutocompleteProps,
+  createFilterOptions,
+} from "@material-ui/core/Autocomplete";
+import TextField from "@material-ui/core/TextField";
+import Select from "@material-ui/core/Select";
+import MenuItem from "@material-ui/core/MenuItem";
+import {
+  useForm,
+  Controller,
+  ControllerProps,
+  Control,
+  FieldErrors,
+} from "react-hook-form";
 import {
   DialogToolBar,
   DialogBody,
@@ -7,36 +21,170 @@ import {
   DialogContainer,
   DialogWrapper,
   DialogMain,
-  usePrevious,
+  DialogSubTitle,
 } from "@dataware-tools/app-common";
-import Autocomplete, {
-  createFilterOptions,
-} from "@material-ui/core/Autocomplete";
-import TextField from "@material-ui/core/TextField";
-import { useState, useEffect } from "react";
 import {
   DatabaseColumnsConfigType,
   DatabaseColumnsConfigNecessityType,
 } from "utils";
-import Select from "@material-ui/core/Select";
-import MenuItem from "@material-ui/core/MenuItem";
+import { FormControl, FormHelperText } from "@material-ui/core";
 
 type OptionType = {
   name: string;
   display_name: string;
-  inputValue?: string;
+  newOption?: boolean;
 };
-
-type NewConfigType = Required<
+type NewColumnType = Required<
   Pick<DatabaseColumnsConfigType[number], "display_name" | "name" | "necessity">
 >;
+type NameAutocompleteProps = AutocompleteProps<OptionType, false, false, true>;
+type ValidateRuleType = ControllerProps["rules"];
+
+type Props = {
+  formControl: Control<NewColumnType>;
+  validateRules: Record<keyof NewColumnType, ValidateRuleType>;
+  validateErrors: FieldErrors<NewColumnType>;
+  validateErrorMessages: Record<
+    keyof NewColumnType,
+    Record<keyof ValidateRuleType, string>
+  >;
+  filterNameOptions: NameAutocompleteProps["filterOptions"];
+  getNameOptionLabel: NameAutocompleteProps["getOptionLabel"];
+  necessity?: DatabaseColumnsConfigNecessityType;
+  onAdd: () => void;
+} & Omit<
+  ContainerProps,
+  "onSave" | "alreadyUsedNames" | "alreadyUsedDisplayNames"
+>;
+
 type ContainerProps = {
   options: OptionType[];
   open: boolean;
   onClose: () => void;
-  onSave: (newConfig: NewConfigType) => void;
+  onSave: (newConfig: NewColumnType) => void;
   alreadyUsedNames: string[];
   alreadyUsedDisplayNames: string[];
+};
+const Component = ({
+  open,
+  options,
+  onClose,
+  filterNameOptions,
+  getNameOptionLabel,
+  onAdd,
+  formControl,
+  validateRules,
+  validateErrors,
+  validateErrorMessages,
+}: Props) => {
+  return (
+    <Dialog open={open} onClose={onClose} fullWidth>
+      <DialogWrapper>
+        <DialogCloseButton onClick={onClose} />
+        <DialogContainer padding="0 0 20px">
+          <DialogBody>
+            <DialogMain>
+              <DialogSubTitle>Name</DialogSubTitle>
+              <Controller
+                name="name"
+                control={formControl}
+                rules={validateRules.name}
+                shouldUnregister
+                render={({ field }) => {
+                  return (
+                    <Autocomplete
+                      {...field}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          error={Boolean(validateErrors.name)}
+                          helperText={
+                            (validateErrors.name &&
+                              validateErrorMessages.name[
+                                validateErrors.name?.type
+                              ]) ||
+                            (field.value &&
+                              !options.some(
+                                (option) => option.name === field.value
+                              ) &&
+                              `"${field.value}" column not exist in DB, so this column will created`)
+                          }
+                        />
+                      )}
+                      options={options}
+                      onChange={(_, newValue) => {
+                        if (typeof newValue === "string") {
+                          field.onChange(newValue);
+                        } else if (newValue) {
+                          field.onChange(newValue.name);
+                        } else {
+                          field.onChange(null);
+                        }
+                      }}
+                      filterOptions={filterNameOptions}
+                      getOptionLabel={getNameOptionLabel}
+                      freeSolo
+                      filterSelectedOptions
+                      fullWidth
+                    />
+                  );
+                }}
+              />
+              <>
+                <DialogSubTitle>Display name</DialogSubTitle>
+                <Controller
+                  name="display_name"
+                  control={formControl}
+                  rules={validateRules.display_name}
+                  shouldUnregister
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      error={Boolean(validateErrors.display_name)}
+                      helperText={
+                        validateErrors.display_name &&
+                        validateErrorMessages.display_name[
+                          validateErrors.display_name.type
+                        ]
+                      }
+                      fullWidth
+                    />
+                  )}
+                />
+                <DialogSubTitle>Necessity</DialogSubTitle>
+                <Controller
+                  name="necessity"
+                  control={formControl}
+                  rules={validateRules.necessity}
+                  defaultValue="required"
+                  shouldUnregister
+                  render={({ field }) => (
+                    <FormControl error={Boolean(validateErrors.necessity)}>
+                      <Select {...field} variant="outlined">
+                        <MenuItem value="required">Required</MenuItem>
+                        <MenuItem value="recommended">Recommended</MenuItem>
+                        <MenuItem value="optional">Optional</MenuItem>
+                      </Select>
+                      {validateErrors.necessity ? (
+                        <FormHelperText>
+                          {
+                            validateErrorMessages.necessity[
+                              validateErrors.necessity.type
+                            ]
+                          }
+                        </FormHelperText>
+                      ) : null}
+                    </FormControl>
+                  )}
+                />
+              </>
+            </DialogMain>
+            <DialogToolBar right={<Button onClick={onAdd}>Add</Button>} />
+          </DialogBody>
+        </DialogContainer>
+      </DialogWrapper>
+    </Dialog>
+  );
 };
 const Container = ({
   options,
@@ -46,191 +194,93 @@ const Container = ({
   alreadyUsedNames,
   alreadyUsedDisplayNames,
 }: ContainerProps): JSX.Element => {
-  const [name, setName] = useState<OptionType | null>(null);
-  const [nameValidateError, setNameValidateError] = useState<string | null>(
-    null
-  );
-  const [displayName, setDisplayName] = useState<string | null>(null);
-  const [displayNameValidateError, setDisplayNameValidateError] = useState<
-    string | null
-  >(null);
-  const [
-    necessity,
-    setNecessity,
-  ] = useState<DatabaseColumnsConfigNecessityType | null>(null);
+  const {
+    control,
+    handleSubmit,
+    formState: { errors: validateErrors },
+  } = useForm<NewColumnType>();
 
-  const initializeState = () => {
-    setName(null);
-    setNameValidateError(null);
-    setDisplayName(null);
-    setDisplayNameValidateError(null);
-    setNecessity(null);
+  const validateRules = {
+    name: {
+      required: true,
+      validate: {
+        invalid: (name: string) => {
+          const reg = /^[a-zA-Z0-9]{1}[a-zA-Z0-9_\-()]*$/;
+          return reg.test(name);
+        },
+        duplicate: (name: string) => !alreadyUsedNames.includes(name),
+      },
+    },
+    display_name: {
+      required: true,
+      validate: {
+        duplicate: (displayName: string) =>
+          !alreadyUsedDisplayNames.includes(displayName),
+      },
+    },
+    necessity: {
+      required: true,
+    },
   };
-  const prevOpen = usePrevious(open);
-  useEffect(() => {
-    if (open && !prevOpen) {
-      initializeState();
-    }
-  }, [open, prevOpen]);
+  const validateErrorMessages = {
+    name: {
+      required: "Name is required",
+      invalid: "Invalid name",
+      duplicate: "This name is already existed on DB",
+    },
+    display_name: {
+      required: "Display name is required",
+      duplicate: "This display name is already used",
+    },
+    necessity: { required: "Necessity is required" },
+  };
 
   const filter = createFilterOptions<OptionType>();
+  const filterNameOptions: Props["filterNameOptions"] = (options, params) => {
+    const filtered = filter(options, params);
+    const { inputValue } = params;
 
-  useEffect(() => {
-    if (name) {
-      const reg = /^[a-zA-Z0-9]{1}[a-zA-Z0-9_\-()]*$/;
-      if (!reg.test(name.name) || name.name === "") {
-        setNameValidateError("invalid name");
-      } else if (alreadyUsedNames.includes(name.name)) {
-        setNameValidateError("duplicated name");
-      } else {
-        setNameValidateError(null);
-        if (!displayName) {
-          setDisplayName(name.display_name);
-        }
-      }
-    } else {
-      setNameValidateError(null);
+    const isExisting =
+      options.some((option) => inputValue === option.name) ||
+      alreadyUsedNames.includes(inputValue);
+    if (inputValue !== "" && !isExisting) {
+      filtered.push({
+        newOption: true,
+        name: inputValue,
+        display_name: inputValue,
+      });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [name, alreadyUsedDisplayNames]);
 
-  useEffect(() => {
-    if (displayName != null) {
-      if (
-        displayName !== name?.display_name &&
-        alreadyUsedDisplayNames.includes(displayName)
-      ) {
-        setDisplayNameValidateError("duplicated display name");
-      } else if (displayName === "") {
-        setDisplayNameValidateError("display name is required");
-      } else {
-        setDisplayNameValidateError(null);
-      }
+    return filtered;
+  };
+
+  const getNameOptionLabel: Props["getNameOptionLabel"] = (option) => {
+    if (typeof option === "string") {
+      return option;
     }
-  }, [displayName, alreadyUsedDisplayNames, name]);
+    return option.name;
+  };
+
+  const onAdd = handleSubmit((data) => {
+    onSave(data);
+    onClose();
+  });
 
   return (
-    <Dialog open={open} onClose={onClose} fullWidth>
-      <DialogWrapper>
-        <DialogCloseButton onClick={onClose} />
-        <DialogContainer padding="0 0 20px">
-          <DialogBody>
-            <DialogMain>
-              <div>Name</div>
-              <Autocomplete
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    error={Boolean(nameValidateError)}
-                    helperText={nameValidateError}
-                  />
-                )}
-                options={options}
-                value={name}
-                onChange={(_, newValue) => {
-                  if (typeof newValue === "string") {
-                    setName({
-                      name: newValue,
-                      display_name: newValue,
-                    });
-                  } else if (newValue && newValue.inputValue) {
-                    setName({
-                      name: newValue.inputValue,
-                      display_name: newValue.inputValue,
-                    });
-                  } else {
-                    setName(newValue);
-                  }
-                }}
-                filterOptions={(options, params) => {
-                  const filtered = filter(options, params);
-                  const { inputValue } = params;
-
-                  const isExisting = options.some(
-                    (option) => inputValue === option.name
-                  );
-                  if (inputValue !== "" && !isExisting) {
-                    filtered.push({
-                      inputValue,
-                      name: inputValue,
-                      display_name: inputValue,
-                    });
-                  }
-
-                  return filtered;
-                }}
-                getOptionLabel={(option) => {
-                  if (typeof option === "string") {
-                    return option;
-                  }
-                  if (option.inputValue) {
-                    return `Add ${option.inputValue}`;
-                  }
-                  return option.name;
-                }}
-                freeSolo
-                filterSelectedOptions
-                fullWidth
-              />
-
-              {name ? (
-                <>
-                  <div>Display name</div>
-                  <TextField
-                    value={displayName}
-                    error={Boolean(displayNameValidateError)}
-                    helperText={displayNameValidateError}
-                    onChange={(event) => {
-                      const currentValue = event.target.value;
-                      setDisplayName(currentValue);
-                    }}
-                    fullWidth
-                  />
-                  <div>Necessity</div>
-                  <Select
-                    value={necessity}
-                    onChange={(event) => setNecessity(event.target.value)}
-                    variant="outlined"
-                    error={Boolean(!necessity)}
-                  >
-                    <MenuItem value="required">Required</MenuItem>
-                    <MenuItem value="recommended">Recommended</MenuItem>
-                    <MenuItem value="optional">Optional</MenuItem>
-                  </Select>
-                </>
-              ) : null}
-            </DialogMain>
-            <DialogToolBar
-              right={
-                <Button
-                  onClick={() => {
-                    if (name && displayName && necessity) {
-                      onSave({
-                        name: name.name,
-                        display_name: displayName,
-                        necessity: necessity,
-                      });
-                    }
-                    onClose();
-                  }}
-                  disabled={Boolean(
-                    !name?.name ||
-                      !displayName ||
-                      !necessity ||
-                      nameValidateError ||
-                      displayNameValidateError
-                  )}
-                >
-                  Add
-                </Button>
-              }
-            />
-          </DialogBody>
-        </DialogContainer>
-      </DialogWrapper>
-    </Dialog>
+    <Component
+      validateErrors={validateErrors}
+      validateErrorMessages={validateErrorMessages}
+      validateRules={validateRules}
+      formControl={control}
+      filterNameOptions={filterNameOptions}
+      getNameOptionLabel={getNameOptionLabel}
+      onAdd={onAdd}
+      onClose={onClose}
+      open={open}
+      options={options}
+    />
   );
 };
 
 export { Container as InputConfigAddModal };
-export type { ContainerProps as InputConfigAddModalProps, NewConfigType };
+export type { ContainerProps as InputConfigAddModalProps, NewColumnType };
