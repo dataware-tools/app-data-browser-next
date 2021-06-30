@@ -16,6 +16,6 @@ Default.args = {
     { name: "test1", display_name: "Test1", necessity: "required" },
     { name: "test2", display_name: "Test2", necessity: "optional" },
   ],
-  onChange: (index, action, newValue) =>
-    window.alert(`${action} No.${index} "${JSON.stringify(newValue)}`),
+  onChange: (newValue) =>
+    window.alert(`new Config: ${JSON.stringify(newValue)}`),
 };
