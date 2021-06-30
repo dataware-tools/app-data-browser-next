@@ -1,5 +1,6 @@
-import { metaStore } from "@dataware-tools/app-common";
+import { ErrorMessageProps, metaStore } from "@dataware-tools/app-common";
 import { useAuth0 } from "@auth0/auth0-react";
+import { useEffect, useMemo, useState } from "react";
 import {
   MetadataEditModal,
   MetadataEditModalProps,
@@ -9,6 +10,7 @@ import {
   useGetRecord,
   DatabaseConfigType,
   useGetConfig,
+  pydtkSystemColumns,
 } from "utils";
 
 type ContainerProps = {
@@ -28,6 +30,7 @@ const Container = ({
   ...delegated
 }: ContainerProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
+  const [error, setError] = useState<ErrorMessageProps | undefined>(undefined);
 
   const [getRecordRes, getRecordError] = useGetRecord(getAccessToken, {
     databaseId,
@@ -42,18 +45,40 @@ const Container = ({
     cacheKey: string
   ];
 
-  const fields: MetadataEditModalProps["fields"] =
-    getConfigRes?.columns
-      .filter(
-        (column) =>
-          !["record_id", "path", "contents"].includes(column.name) &&
-          !column.name.startsWith("_")
-      )
-      .map((column) => ({
-        name: column.name,
-        display_name: column.display_name,
-        necessity: column.necessity || "unnecessary",
-      })) || [];
+  const fetchError = getRecordError || getConfigError;
+  useEffect(() => {
+    if (fetchError) {
+      setError({
+        reason: JSON.stringify(fetchError),
+        instruction: "Please reload this page",
+      });
+    }
+  }, [fetchError]);
+
+  const fields: MetadataEditModalProps["fields"] = useMemo(
+    () =>
+      getConfigRes?.columns
+        .filter(
+          (column) =>
+            !pydtkSystemColumns.includes(column.name) &&
+            !column.name.startsWith("_")
+        )
+        .map((column) => ({
+          name: column.name,
+          display_name: column.display_name,
+          necessity: column.necessity || "unnecessary",
+        })) || [],
+    [getConfigRes]
+  );
+
+  useEffect(() => {
+    if (fields.length <= 0) {
+      setError({
+        reason: "Input fields is not configured",
+        instruction: "please report administrator this error",
+      });
+    }
+  }, [fields]);
 
   const onSubmit: MetadataEditModalProps["onSubmit"] = async (
     newRecordInfo
@@ -93,7 +118,7 @@ const Container = ({
     <MetadataEditModal
       currentMetadata={getRecordRes}
       fields={fields}
-      error={getRecordError || getConfigError}
+      error={error}
       onSubmit={onSubmit}
       create={create}
       {...delegated}

@@ -14,6 +14,7 @@ type ComponentProps = {
   currentMetadata?: MetadataType;
   fields: FieldType[];
   nonFilledRequiredFieldNames: string[];
+  prefixInputElementId: string;
 };
 
 const useStyles = makeStyles({
@@ -33,6 +34,7 @@ const Component = ({
   currentMetadata,
   fields,
   nonFilledRequiredFieldNames,
+  prefixInputElementId,
 }: ComponentProps): JSX.Element => {
   const classes = useStyles();
   return (
@@ -43,7 +45,7 @@ const Component = ({
         const necessity = field.necessity;
         const required = necessity === "required";
         const recommended = necessity === "recommended";
-        const id = `RecordEditModalInputFields_${name.replace(/\s+/g, "")}`;
+        const id = `${prefixInputElementId}_${name.replace(/\s+/g, "")}`;
         return (
           <div key={name}>
             <label

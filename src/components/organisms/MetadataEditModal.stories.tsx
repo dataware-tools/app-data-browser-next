@@ -81,5 +81,8 @@ FetchErrorOccur.args = {
     return Math.random() > 0.5;
   },
   open: true,
-  error: "fetch error occur",
+  error: {
+    reason: "Fetch error occur!",
+    instruction: "Please reload this page",
+  },
 };
