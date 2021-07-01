@@ -55,17 +55,6 @@ type ContainerProps = {
   onClose: () => void;
 };
 
-type OptionType = { label: string; value: string };
-const compareOption = (a: OptionType, b: OptionType) => {
-  if (a.label > b.label) {
-    return 1;
-  } else if (a.label < b.label) {
-    return -1;
-  } else {
-    return 0;
-  }
-};
-
 const Component = ({
   open,
   onClose,
@@ -138,7 +127,6 @@ const Container = ({
   const [isSaving, setIsSaving] = useState(false);
   const [displayColumns, setDisplayColumns] = useState<string[]>([]);
   const [recordTitleColumn, setRecordTitleColumn] = useState("");
-  const [columnOptions, setColumnOptions] = useState<OptionType[]>([]);
   const [error, setError] = useState<ErrorMessageProps | undefined>(undefined);
 
   const [getConfigRes, getConfigError, getConfigCacheKey] = (useGetConfig(
@@ -152,6 +140,16 @@ const Container = ({
     cacheKey: string
   ];
 
+  const initializeState = () => {
+    setIsSaving(false);
+  };
+  const prevOpen = usePrevious(open);
+  useEffect(() => {
+    if (open && !prevOpen) {
+      initializeState();
+    }
+  }, [open, prevOpen]);
+
   const fetchError = getConfigError;
   useEffect(() => {
     if (fetchError) {
@@ -161,17 +159,6 @@ const Container = ({
       });
     }
   }, [fetchError]);
-
-  const initializeState = () => {
-    setIsSaving(false);
-  };
-  // See: https://stackoverflow.com/questions/58209791/set-initial-state-for-material-ui-dialog
-  const prevOpen = usePrevious(open);
-  useEffect(() => {
-    if (open && !prevOpen) {
-      initializeState();
-    }
-  }, [open, prevOpen]);
 
   useEffect(() => {
     if (getConfigRes) {
@@ -183,14 +170,6 @@ const Container = ({
       setRecordTitleColumn(
         getConfigRes.columns.find((column) => column.is_record_title)?.name ||
           ""
-      );
-      setColumnOptions(
-        getConfigRes.columns
-          .map((column) => ({
-            label: `${column.name} (display name: ${column.display_name})`,
-            value: column.name,
-          }))
-          .sort(compareOption)
       );
     }
   }, [getConfigRes]);
@@ -250,6 +229,11 @@ const Container = ({
     onClose();
   };
 
+  const columnOptions =
+    getConfigRes?.columns.map((column) => ({
+      label: `${column.name} (display name: ${column.display_name})`,
+      value: column.name,
+    })) || [];
   const isFetchComplete = Boolean(!fetchError && getConfigRes);
   const isDisableSaveButton =
     displayColumns.length <= 0 || displayColumns.includes("");
