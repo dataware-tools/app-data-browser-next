@@ -16,11 +16,13 @@ import {
   DialogTabBar,
   DialogMain,
   usePrevious,
+  DialogTabBarProps,
+  ErrorMessageProps,
 } from "@dataware-tools/app-common";
 import Dialog from "@material-ui/core/Dialog";
 import { useState, useEffect } from "react";
-import { FileList } from "components/organisms/FileList";
-import { RecordInfo } from "components/organisms/RecordInfo";
+import { FileList, FileListProps } from "components/organisms/FileList";
+import { RecordInfo, RecordInfoProps } from "components/organisms/RecordInfo";
 import { mutate } from "swr";
 import { useAuth0 } from "@auth0/auth0-react";
 import {
@@ -32,19 +34,158 @@ import {
   useGetConfig,
   DatabaseConfigType,
 } from "utils";
-import { RecordEditModal } from "components/organisms/RecordEditModal";
+import {
+  RecordEditModal,
+  RecordEditModalProps,
+} from "components/organisms/RecordEditModal";
 import UploadIcon from "@material-ui/icons/Upload";
 import EditIcon from "@material-ui/icons/Edit";
 import Button from "@material-ui/core/Button";
 import { produce } from "immer";
-import { FilePreviewModal } from "components/organisms/FilePreviewModal";
+import {
+  FilePreviewModal,
+  FilePreviewModalProps,
+} from "components/organisms/FilePreviewModal";
 import { RenderToggleByAction } from "components/atoms/RenderToggleByAction";
+
+type Props = {
+  title?: string;
+  onChangeTab: DialogTabBarProps["onChange"];
+  tabNames: DialogTabBarProps["tabNames"];
+  selectedTabIndex: DialogTabBarProps["value"];
+  error?: ErrorMessageProps;
+  recordDetail?: RecordInfoProps["record"];
+  files?: FileListProps["files"];
+  isOpenRecordEditModal: boolean;
+  previewingFile?: FilePreviewModalProps["file"];
+  isAddingFile: boolean;
+  onPreviewFile: FileListProps["onPreview"];
+  onDownloadFile: FileListProps["onDownload"];
+  onEditFile: FileListProps["onEdit"];
+  onDeleteFile: FileListProps["onDelete"];
+  onCloseRecordEditModal: RecordEditModalProps["onClose"];
+  onEditRecordSucceeded: RecordEditModalProps["onSubmitSucceeded"];
+  onCloseFilePreviewModal: FilePreviewModalProps["onClose"];
+  onAddFile: FileUploadButtonProps["onFileChange"];
+  onEditRecord: () => void;
+} & ContainerProps;
 
 type ContainerProps = {
   open: boolean;
   onClose: () => void;
   recordId: string;
   databaseId: string;
+};
+
+const Component = ({
+  open,
+  onClose,
+  recordId,
+  databaseId,
+  title,
+  onChangeTab,
+  tabNames,
+  selectedTabIndex,
+  error,
+  recordDetail,
+  files,
+  isOpenRecordEditModal,
+  previewingFile,
+  isAddingFile,
+  onPreviewFile,
+  onDownloadFile,
+  onEditFile,
+  onDeleteFile,
+  onCloseRecordEditModal,
+  onEditRecordSucceeded,
+  onCloseFilePreviewModal,
+  onAddFile,
+  onEditRecord,
+}: Props) => {
+  const currentTabName = tabNames[selectedTabIndex];
+  return (
+    <Dialog open={open} fullWidth maxWidth="xl" onClose={onClose}>
+      <DialogWrapper>
+        <DialogCloseButton onClick={onClose} />
+        {title && <DialogTitle>{title}</DialogTitle>}
+        <DialogContainer height="60vh">
+          <DialogTabBar
+            onChange={onChangeTab}
+            tabNames={tabNames}
+            value={selectedTabIndex}
+          />
+          {error ? (
+            <ErrorMessage {...error} />
+          ) : (
+            <>
+              <DialogBody>
+                <DialogMain>
+                  {currentTabName === "Info" ? (
+                    recordDetail ? (
+                      <RecordInfo record={recordDetail} />
+                    ) : (
+                      <LoadingIndicator />
+                    )
+                  ) : currentTabName === "Files" ? (
+                    files ? (
+                      <FileList
+                        files={files}
+                        onPreview={onPreviewFile}
+                        onDownload={onDownloadFile}
+                        onEdit={onEditFile}
+                        onDelete={onDeleteFile}
+                      />
+                    ) : (
+                      <LoadingIndicator />
+                    )
+                  ) : null}
+                </DialogMain>
+              </DialogBody>
+              <RecordEditModal
+                databaseId={databaseId}
+                recordId={recordId}
+                open={isOpenRecordEditModal}
+                onClose={onCloseRecordEditModal}
+                onSubmitSucceeded={onEditRecordSucceeded}
+              />
+              <FilePreviewModal
+                open={Boolean(previewingFile)}
+                onClose={
+                  onCloseFilePreviewModal
+                  // () => setPreviewingFile(undefined);
+                }
+                file={previewingFile || {}}
+                fullWidth
+                maxWidth="md"
+                height="auto"
+              />
+            </>
+          )}
+        </DialogContainer>
+        <DialogToolBar
+          right={
+            <>
+              <RenderToggleByAction required="metadata:write:add">
+                <FileUploadButton
+                  onFileChange={onAddFile}
+                  startIcon={<UploadIcon />}
+                  pending={isAddingFile}
+                >
+                  Add File
+                </FileUploadButton>
+              </RenderToggleByAction>
+              <Spacer direction="horizontal" size="10px" />
+              <RenderToggleByAction required="metadata:write:update">
+                <Button onClick={onEditRecord} startIcon={<EditIcon />}>
+                  Edit Record
+                </Button>
+              </RenderToggleByAction>
+            </>
+          }
+        />
+      </DialogWrapper>
+    </Dialog>
+  );
 };
 
 const Container = ({
@@ -54,25 +195,13 @@ const Container = ({
   recordId,
 }: ContainerProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
-  const [tab, setTab] = useState(0);
-  const [isRecordEditModalOpen, setIsRecordEditModalOpen] = useState(false);
+  const [selectedTabIndex, setSelectedTabIndex] = useState(0);
+  const [error, setError] = useState<ErrorMessageProps | undefined>(undefined);
+  const [isOpenRecordEditModal, setIsOpenRecordEditModal] = useState(false);
   const [isAddingFile, setIsAddingFile] = useState(false);
   const [previewingFile, setPreviewingFile] = useState<
     metaStore.FileModel | undefined
   >(undefined);
-
-  const initializeState = () => {
-    setTab(0);
-    setIsRecordEditModalOpen(false);
-    setIsAddingFile(false);
-    setPreviewingFile(undefined);
-  };
-  const prevOpen = usePrevious(open);
-  useEffect(() => {
-    if (open && !prevOpen) {
-      initializeState();
-    }
-  }, [open, prevOpen]);
 
   const [getRecordRes, getRecordError, getRecordCacheKey] = useGetRecord(
     getAccessToken,
@@ -92,7 +221,29 @@ const Container = ({
     databaseId,
   }) as unknown) as [data: DatabaseConfigType | undefined];
 
-  const onChangeTab = (tabNum: number) => setTab(tabNum);
+  const fetchError = getRecordError || listFilesError;
+  useEffect(() => {
+    if (fetchError) {
+      setError({
+        reason: JSON.stringify(fetchError),
+        instruction: "Please reload this page",
+      });
+    }
+  }, [fetchError]);
+
+  const initializeState = () => {
+    setSelectedTabIndex(0);
+    setIsOpenRecordEditModal(false);
+    setIsAddingFile(false);
+    setPreviewingFile(undefined);
+  };
+  const prevOpen = usePrevious(open);
+  useEffect(() => {
+    if (open && !prevOpen) {
+      initializeState();
+    }
+  }, [open, prevOpen]);
+
   const tabNames = ["Info", "Files"];
 
   const onPreviewFile = (file: metaStore.FileModel) => {
@@ -207,101 +358,46 @@ const Container = ({
     setIsAddingFile(false);
   };
 
-  const onEditRecord = () => setIsRecordEditModalOpen(true);
+  const onEditRecord = () => setIsOpenRecordEditModal(true);
+  const onCloseFilePreviewModal = () => setPreviewingFile(undefined);
+  const onCloseRecordEditModal = () => setIsOpenRecordEditModal(false);
+  const onEditRecordSucceeded: Props["onEditRecordSucceeded"] = (newRecord) =>
+    mutate(getRecordCacheKey, newRecord);
 
   const titleColumn = getConfigRes?.columns.find(
     (column) => column.is_record_title
   )?.name;
   const title = titleColumn ? getRecordRes?.[titleColumn] : "No title";
+  const files = listFilesRes?.data;
+  const recordDetail = getRecordRes;
 
   return (
-    <Dialog open={open} fullWidth maxWidth="xl" onClose={onClose}>
-      <DialogWrapper>
-        <DialogCloseButton onClick={onClose} />
-        {title && <DialogTitle>{title}</DialogTitle>}
-        <DialogContainer height="60vh">
-          <DialogTabBar
-            onChange={onChangeTab}
-            tabNames={tabNames}
-            value={tab}
-          />
-          {getRecordError || listFilesError ? (
-            <ErrorMessage
-              reason={JSON.stringify(getRecordError || listFilesError)}
-              instruction="please reload this page"
-            />
-          ) : (
-            <>
-              <DialogBody>
-                <DialogMain>
-                  {tabNames[tab] === "Info" ? (
-                    getRecordRes ? (
-                      <RecordInfo record={getRecordRes} />
-                    ) : (
-                      <LoadingIndicator />
-                    )
-                  ) : tabNames[tab] === "Files" ? (
-                    listFilesRes ? (
-                      <FileList
-                        files={listFilesRes.data}
-                        onPreview={onPreviewFile}
-                        onDownload={onDownloadFile}
-                        onEdit={onEditFile}
-                        onDelete={onDeleteFile}
-                      />
-                    ) : (
-                      <LoadingIndicator />
-                    )
-                  ) : null}
-                </DialogMain>
-              </DialogBody>
-              <RecordEditModal
-                databaseId={databaseId}
-                recordId={recordId}
-                open={isRecordEditModalOpen}
-                onClose={() => setIsRecordEditModalOpen(false)}
-                onSubmitSucceeded={(newRecord) =>
-                  mutate(getRecordCacheKey, newRecord)
-                }
-              />
-              <FilePreviewModal
-                open={previewingFile !== undefined}
-                onClose={() => {
-                  setPreviewingFile(undefined);
-                }}
-                file={previewingFile || {}}
-                fullWidth
-                maxWidth="md"
-                height="auto"
-              />
-            </>
-          )}
-        </DialogContainer>
-        <DialogToolBar
-          right={
-            <>
-              <RenderToggleByAction required="metadata:write:add">
-                <FileUploadButton
-                  onFileChange={onAddFile}
-                  startIcon={<UploadIcon />}
-                  pending={isAddingFile}
-                >
-                  Add File
-                </FileUploadButton>
-              </RenderToggleByAction>
-              <Spacer direction="horizontal" size="10px" />
-              <RenderToggleByAction required="metadata:write:update">
-                <Button onClick={onEditRecord} startIcon={<EditIcon />}>
-                  Edit Record
-                </Button>
-              </RenderToggleByAction>
-            </>
-          }
-        />
-      </DialogWrapper>
-    </Dialog>
+    <Component
+      databaseId={databaseId}
+      error={error}
+      isAddingFile={isAddingFile}
+      isOpenRecordEditModal={isOpenRecordEditModal}
+      onAddFile={onAddFile}
+      onChangeTab={setSelectedTabIndex}
+      onClose={onClose}
+      onCloseFilePreviewModal={onCloseFilePreviewModal}
+      onCloseRecordEditModal={onCloseRecordEditModal}
+      onDeleteFile={onDeleteFile}
+      onDownloadFile={onDownloadFile}
+      onEditFile={onEditFile}
+      onEditRecord={onEditRecord}
+      onEditRecordSucceeded={onEditRecordSucceeded}
+      onPreviewFile={onPreviewFile}
+      open={open}
+      recordId={recordId}
+      selectedTabIndex={selectedTabIndex}
+      tabNames={tabNames}
+      files={files}
+      recordDetail={recordDetail}
+      title={title}
+      previewingFile={previewingFile}
+    />
   );
 };
-
 export { Container as RecordDetailModal };
 export type { ContainerProps as RecordDetailModalProps };
