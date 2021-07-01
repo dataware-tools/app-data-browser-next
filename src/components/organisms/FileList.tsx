@@ -4,9 +4,7 @@ import {
 } from "components/organisms/FileListItem";
 import List from "@material-ui/core/List";
 
-type Props = ContainerProps;
-
-type ContainerProps = {
+type Props = {
   files: FileListItemProps["file"][];
   onPreview: FileListItemProps["onPreview"];
   onDelete: FileListItemProps["onDelete"];
@@ -24,9 +22,5 @@ const Component = ({ files, ...delegated }: Props): JSX.Element => {
   );
 };
 
-const Container = ({ ...delegated }: ContainerProps): JSX.Element => {
-  return <Component {...delegated} />;
-};
-
-export { Container as FileList };
-export type { ContainerProps as FileListProps };
+export { Component as FileList };
+export type { Props as FileListProps };
