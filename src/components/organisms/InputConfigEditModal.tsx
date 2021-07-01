@@ -176,7 +176,7 @@ const Container = ({
         draft.columns = draft.columns.concat(addedColumns);
       });
 
-      const [data, error] = await fetchMetaStore(
+      const [updateConfigRes, updateConfigError] = await fetchMetaStore(
         getAccessToken,
         metaStore.ConfigService.updateConfig,
         {
@@ -185,10 +185,13 @@ const Container = ({
         }
       );
 
-      if (error) {
-        // TODO: show error
+      if (updateConfigError) {
+        setError({
+          reason: JSON.stringify(updateConfigError),
+          instruction: "Please reload this page",
+        });
       } else {
-        mutate(getConfigCacheKey, data);
+        mutate(getConfigCacheKey, updateConfigRes);
       }
 
       setIsSaving(false);
