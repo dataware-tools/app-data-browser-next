@@ -12,9 +12,15 @@ import {
   PageBody,
   PageMain,
   TextCenteringSpan,
+  ErrorMessageProps,
+  SearchFormProps,
+  PerPageSelectProps,
 } from "@dataware-tools/app-common";
 import { useAuth0 } from "@auth0/auth0-react";
-import { DatabaseList } from "components/organisms/DatabaseList";
+import {
+  DatabaseList,
+  DatabaseListProps,
+} from "components/organisms/DatabaseList";
 import { useEffect, useState } from "react";
 import Pagination from "@material-ui/core/Pagination";
 import { useHistory } from "react-router";
@@ -28,7 +34,110 @@ import {
 } from "components/organisms/DatabaseAddModal";
 import { mutate } from "swr";
 
-const Page = (): JSX.Element => {
+type Props = {
+  error?: ErrorMessageProps;
+  searchText: SearchFormProps["defaultValue"];
+  perPageOptions: PerPageSelectProps["values"];
+  isFetchComplete: boolean;
+  databases: DatabaseListProps["databases"];
+  totalPage: number;
+  page: number;
+  isOpenDatabaseAddModal: boolean;
+  perPage: PerPageSelectProps["perPage"];
+  onChangeSearchText: SearchFormProps["onSearch"];
+  onChangePerPage: PerPageSelectProps["setPerPage"];
+  onOpenDatabaseAddModal: () => void;
+  onSelectDatabase: DatabaseListProps["onSelectDatabase"];
+  onChangePage: (newPage: number) => void;
+  onCloseDatabaseAddModal: () => void;
+  onAddDatabaseSucceeded: DatabaseAddModalProps["onSubmitSucceeded"];
+};
+
+const Component = ({
+  error,
+  searchText,
+  perPage,
+  perPageOptions,
+  isFetchComplete,
+  databases,
+  totalPage,
+  page,
+  isOpenDatabaseAddModal,
+  onChangeSearchText,
+  onChangePerPage,
+  onOpenDatabaseAddModal,
+  onSelectDatabase,
+  onChangePage,
+  onCloseDatabaseAddModal,
+  onAddDatabaseSucceeded,
+}: Props) => {
+  return (
+    <>
+      <PageContainer>
+        <PageBody>
+          <PageToolBar
+            right={
+              isFetchComplete ? (
+                <>
+                  <SearchForm
+                    onSearch={onChangeSearchText}
+                    defaultValue={searchText}
+                  />
+                  <Spacer direction="horizontal" size="15px" />
+                  <PerPageSelect
+                    perPage={perPage}
+                    setPerPage={onChangePerPage}
+                    values={perPageOptions}
+                  />
+                  <Spacer direction="horizontal" size="15px" />
+                  <Button
+                    onClick={onOpenDatabaseAddModal}
+                    startIcon={<AddCircle />}
+                  >
+                    <TextCenteringSpan>Database</TextCenteringSpan>
+                  </Button>
+                </>
+              ) : null
+            }
+          />
+          <PageMain>
+            {error ? (
+              <ErrorMessage {...error} />
+            ) : isFetchComplete ? (
+              <DatabaseList
+                databases={databases}
+                onSelectDatabase={onSelectDatabase}
+              />
+            ) : (
+              <LoadingIndicator />
+            )}
+          </PageMain>
+          {isFetchComplete ? (
+            <>
+              <Spacer direction="vertical" size="3vh" />
+              <ElemCenteringFlexDiv>
+                <Pagination
+                  count={totalPage}
+                  page={page}
+                  onChange={(_, newPage) => onChangePage(newPage)}
+                />
+              </ElemCenteringFlexDiv>
+            </>
+          ) : null}
+        </PageBody>
+      </PageContainer>
+      {isOpenDatabaseAddModal ? (
+        <DatabaseAddModal
+          open={isOpenDatabaseAddModal}
+          onClose={onCloseDatabaseAddModal}
+          onSubmitSucceeded={onAddDatabaseSucceeded}
+        />
+      ) : null}
+    </>
+  );
+};
+
+const Container = (): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const history = useHistory();
 
@@ -39,8 +148,8 @@ const Page = (): JSX.Element => {
     Number(getQueryString("perPage")) || 20
   );
   const [page, setPage] = useState(Number(getQueryString("page")) || 1);
-
-  const [isDatabaseAddModalOpen, setIsDatabaseAddModalOpen] = useState(false);
+  const [isOpenDatabaseAddModal, setIsOpenDatabaseAddModal] = useState(false);
+  const [error, setError] = useState<ErrorMessageProps | undefined>(undefined);
 
   const [
     listDatabasesRes,
@@ -48,11 +157,21 @@ const Page = (): JSX.Element => {
     listDatabaseCacheKey,
   ] = useListDatabases(getAccessToken, { page, perPage, search: searchText });
 
+  const fetchError = listDatabasesError;
+  useEffect(() => {
+    if (fetchError) {
+      setError({
+        reason: JSON.stringify(fetchError),
+        instruction: "Please reload this page",
+      });
+    }
+  }, [fetchError]);
+
   useEffect(() => {
     addQueryString({ page, perPage, searchText }, "replace");
   }, [page, perPage, searchText]);
 
-  const onSelectDatabases = (database: metaStore.DatabaseModel) =>
+  const onSelectDatabase = (database: metaStore.DatabaseModel) =>
     history.push(`/databases/${database.database_id}/records`);
 
   const onAddDatabaseSucceeded: DatabaseAddModalProps["onSubmitSucceeded"] = () => {
@@ -61,69 +180,32 @@ const Page = (): JSX.Element => {
     }
   };
 
+  const onCloseDatabaseAddModal = () => setIsOpenDatabaseAddModal(false);
+  const onOpenDatabaseAddModal = () => setIsOpenDatabaseAddModal(true);
+
+  const databases = listDatabasesRes?.data || [];
+  const isFetchComplete = Boolean(!fetchError && listDatabasesRes);
+  const totalPage = listDatabasesRes?.number_of_pages || 0;
   return (
-    <>
-      <PageContainer>
-        <PageBody>
-          <PageToolBar
-            right={
-              <>
-                <SearchForm
-                  onSearch={(newSearchText) => setSearchText(newSearchText)}
-                  defaultValue={searchText}
-                />
-                <Spacer direction="horizontal" size="15px" />
-                <PerPageSelect
-                  perPage={perPage}
-                  setPerPage={setPerPage}
-                  values={[10, 20, 50, 100]}
-                />
-                <Spacer direction="horizontal" size="15px" />
-                <Button
-                  onClick={() => setIsDatabaseAddModalOpen(true)}
-                  startIcon={<AddCircle />}
-                >
-                  <TextCenteringSpan>Database</TextCenteringSpan>
-                </Button>
-              </>
-            }
-          />
-          <PageMain>
-            {listDatabasesError ? (
-              <ErrorMessage
-                reason={JSON.stringify(listDatabasesError)}
-                instruction="please reload this page"
-              />
-            ) : listDatabasesRes ? (
-              <DatabaseList
-                databases={listDatabasesRes.data}
-                onSelectDatabase={onSelectDatabases}
-              />
-            ) : (
-              <LoadingIndicator />
-            )}
-          </PageMain>
-          <Spacer direction="vertical" size="3vh" />
-          {listDatabasesRes ? (
-            <ElemCenteringFlexDiv>
-              <Pagination
-                count={Math.ceil(listDatabasesRes.number_of_pages)}
-                page={page}
-                onChange={(_, newPage) => setPage(newPage)}
-              />
-            </ElemCenteringFlexDiv>
-          ) : null}
-        </PageBody>
-      </PageContainer>
-      {isDatabaseAddModalOpen ? (
-        <DatabaseAddModal
-          open={isDatabaseAddModalOpen}
-          onClose={() => setIsDatabaseAddModalOpen(false)}
-          onSubmitSucceeded={onAddDatabaseSucceeded}
-        />
-      ) : null}
-    </>
+    <Component
+      databases={databases}
+      error={error}
+      isFetchComplete={isFetchComplete}
+      isOpenDatabaseAddModal={isOpenDatabaseAddModal}
+      onAddDatabaseSucceeded={onAddDatabaseSucceeded}
+      onChangePage={setPage}
+      onChangePerPage={setPerPage}
+      onChangeSearchText={setSearchText}
+      onCloseDatabaseAddModal={onCloseDatabaseAddModal}
+      onOpenDatabaseAddModal={onOpenDatabaseAddModal}
+      onSelectDatabase={onSelectDatabase}
+      page={page}
+      perPage={perPage}
+      searchText={searchText}
+      perPageOptions={[10, 20, 50, 100]}
+      totalPage={totalPage}
+    />
   );
 };
 
-export { Page as DatabasesPage };
+export { Container as DatabasesPage };

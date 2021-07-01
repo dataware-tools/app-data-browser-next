@@ -14,8 +14,10 @@ import {
   fetchMetaStore,
   metaStore,
   confirm,
+  ErrorMessageProps,
+  SearchFormProps,
+  PerPageSelectProps,
 } from "@dataware-tools/app-common";
-import { makeStyles } from "@material-ui/core/styles";
 
 import { useAuth0 } from "@auth0/auth0-react";
 import { mutate } from "swr";
@@ -23,16 +25,23 @@ import { useEffect, useState } from "react";
 import Pagination from "@material-ui/core/Pagination";
 import { useParams } from "react-router";
 import { RecordList, RecordListProps } from "components/organisms/RecordList";
-import { RecordDetailModal } from "components/organisms/RecordDetailModal";
+import {
+  RecordDetailModal,
+  RecordDetailModalProps,
+} from "components/organisms/RecordDetailModal";
 import Button from "@material-ui/core/Button";
 import AddCircle from "@material-ui/icons/AddCircle";
-import { RecordEditModal } from "components/organisms/RecordEditModal";
+import {
+  RecordEditModal,
+  RecordEditModalProps,
+} from "components/organisms/RecordEditModal";
 import {
   DatabaseMenuButton,
   DatabaseMenuButtonProps,
 } from "components/molecules/DatabaseMenuButton";
 import {
   DatabaseConfigModal,
+  DatabaseConfigModalProps,
   DatabaseConfigNameType,
 } from "components/organisms/DatabaseConfigModal";
 
@@ -47,22 +56,170 @@ import {
   UserActionType,
 } from "utils";
 import { produce } from "immer";
-import { useRecoilValue, useSetRecoilState } from "recoil";
+import { useRecoilState } from "recoil";
 import { userActionsState } from "../../globalStates";
 import { RenderToggleByAction } from "../atoms/RenderToggleByAction";
 
-const useStyles = makeStyles(() => ({
-  fixedFlexShrink: {
-    flexShrink: 0,
-  },
-}));
+type Props = {
+  error?: ErrorMessageProps;
+  searchText: SearchFormProps["defaultValue"];
+  perPageOptions: PerPageSelectProps["values"];
+  isFetchComplete: boolean;
+  records: RecordListProps["records"];
+  databaseId: RecordEditModalProps["databaseId"];
+  totalPage: number;
+  page: number;
+  isOpenRecordAddModal: boolean;
+  perPage: PerPageSelectProps["perPage"];
+  displayColumns: RecordListProps["columns"];
+  editingConfigName?: DatabaseConfigModalProps["configName"];
+  selectedRecordId?: RecordDetailModalProps["recordId"];
+  onChangeSearchText: SearchFormProps["onSearch"];
+  onChangePerPage: PerPageSelectProps["setPerPage"];
+  onOpenRecordAddModal: () => void;
+  onSelectRecord: RecordListProps["onSelectRecord"];
+  onChangePage: (newPage: number) => void;
+  onCloseRecordAddModal: () => void;
+  onAddRecordSucceeded: RecordEditModalProps["onSubmitSucceeded"];
+  onDatabaseMenuSelect: DatabaseMenuButtonProps["onMenuSelect"];
+  onDeleteRecord: RecordListProps["onDeleteRecord"];
+  onCloseRecordDetailModal: RecordDetailModalProps["onClose"];
+  onCloseDatabaseConfigModal: DatabaseConfigModalProps["onClose"];
+};
+
+const Component = ({
+  error,
+  searchText,
+  perPage,
+  perPageOptions,
+  isFetchComplete,
+  records,
+  totalPage,
+  page,
+  isOpenRecordAddModal,
+  databaseId,
+  displayColumns,
+  editingConfigName,
+  selectedRecordId,
+  onChangeSearchText,
+  onChangePerPage,
+  onOpenRecordAddModal,
+  onSelectRecord,
+  onChangePage,
+  onCloseRecordAddModal,
+  onAddRecordSucceeded,
+  onDatabaseMenuSelect,
+  onDeleteRecord,
+  onCloseRecordDetailModal,
+  onCloseDatabaseConfigModal,
+}: Props) => {
+  return (
+    <>
+      <PageContainer>
+        <PageBody>
+          <PageToolBar
+            left={
+              <Link to="/">
+                <ElemCenteringFlexDiv>
+                  <HomeIcon />
+                  Home
+                </ElemCenteringFlexDiv>
+              </Link>
+            }
+            right={
+              isFetchComplete ? (
+                <>
+                  <SearchForm
+                    onSearch={onChangeSearchText}
+                    defaultValue={searchText}
+                  />
+                  <Spacer direction="horizontal" size="15px" />
+                  <PerPageSelect
+                    perPage={perPage}
+                    setPerPage={onChangePerPage}
+                    values={perPageOptions}
+                  />
+                  <RenderToggleByAction required="metadata:write:add">
+                    <Spacer direction="horizontal" size="15px" />
+                    <Button
+                      onClick={onOpenRecordAddModal}
+                      startIcon={<AddCircle />}
+                    >
+                      <TextCenteringSpan>Record</TextCenteringSpan>
+                    </Button>
+                  </RenderToggleByAction>
+                  <Spacer direction="horizontal" size="15px" />
+                  <DatabaseMenuButton onMenuSelect={onDatabaseMenuSelect} />
+                </>
+              ) : null
+            }
+          />
+          <PageMain>
+            {error ? (
+              <ErrorMessage {...error} />
+            ) : isFetchComplete ? (
+              <RecordList
+                columns={displayColumns}
+                records={records}
+                onSelectRecord={onSelectRecord}
+                onDeleteRecord={onDeleteRecord}
+              />
+            ) : (
+              <LoadingIndicator />
+            )}
+          </PageMain>
+          {isFetchComplete ? (
+            <>
+              <Spacer direction="vertical" size="3vh" />
+              <ElemCenteringFlexDiv>
+                <Pagination
+                  count={totalPage}
+                  page={page}
+                  onChange={(_, newPage) => onChangePage(newPage)}
+                />
+              </ElemCenteringFlexDiv>
+            </>
+          ) : null}
+        </PageBody>
+      </PageContainer>
+      {isOpenRecordAddModal ? (
+        <RecordEditModal
+          open={isOpenRecordAddModal}
+          onClose={onCloseRecordAddModal}
+          databaseId={databaseId}
+          onSubmitSucceeded={onAddRecordSucceeded}
+          create
+        />
+      ) : null}
+      {selectedRecordId ? (
+        <RecordDetailModal
+          open={Boolean(selectedRecordId)}
+          recordId={selectedRecordId}
+          databaseId={databaseId}
+          onClose={onCloseRecordDetailModal}
+        />
+      ) : null}
+      {editingConfigName ? (
+        <DatabaseConfigModal
+          databaseId={databaseId}
+          open={Boolean(editingConfigName)}
+          onClose={
+            onCloseDatabaseConfigModal
+            //
+          }
+          configName={editingConfigName}
+        />
+      ) : null}
+    </>
+  );
+};
 
 type ParamType = { databaseId: string };
 
 const Page = (): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
-  const classes = useStyles();
   const { databaseId } = useParams<ParamType>();
+  const [userActions, setUserActions] = useRecoilState(userActionsState);
 
   const [searchText, setSearchText] = useState(
     getQueryString("searchText") || ""
@@ -71,22 +228,14 @@ const Page = (): JSX.Element => {
     Number(getQueryString("perPage")) || 20
   );
   const [page, setPage] = useState(Number(getQueryString("page")) || 1);
-
-  const [isRecordDetailModalOpen, setIsRecordDetailModalOpen] = useState(false);
-  const [isRecordEditModalOpen, setIsRecordEditModalOpen] = useState(false);
-  const [
-    editingConfigName,
-    setEditingConfigName,
-  ] = useState<DatabaseConfigNameType | null>(null);
-  const [currentSelectedRecordId, setCurrentSelectedRecordId] = useState<
-    string | null
-  >(null);
-  const [error, setError] = useState<
-    { reason: string; instruction: string } | undefined
+  const [isOpenRecordAddModal, setIsOpenRecordAddModal] = useState(false);
+  const [editingConfigName, setEditingConfigName] = useState<
+    DatabaseConfigNameType | undefined
   >(undefined);
-
-  const setUserActions = useSetRecoilState(userActionsState);
-  const userActions = useRecoilValue(userActionsState);
+  const [selectedRecordId, setSelectedRecordId] = useState<string | undefined>(
+    undefined
+  );
+  const [error, setError] = useState<ErrorMessageProps | undefined>(undefined);
 
   const [getConfigRes, getConfigError] = (useGetConfig(getAccessToken, {
     databaseId,
@@ -117,17 +266,21 @@ const Page = (): JSX.Element => {
     searchKey: searchColumn,
   });
 
-  const displayColumns =
-    getConfigRes?.columns
-      .filter((column) => column.is_display_field)
-      .map((column) => ({
-        field: column.name,
-        label: column.display_name,
-      })) || [];
+  const fetchError =
+    listRecordsError || getConfigError || listPermittedActionError;
+  useEffect(() => {
+    if (fetchError) {
+      setError({
+        reason: JSON.stringify(fetchError),
+        instruction: "Please reload this page",
+      });
+    }
+  }, [fetchError]);
 
   useEffect(() => {
     addQueryString({ page, perPage, searchText }, "replace");
   }, [page, perPage, searchText]);
+
   useEffect(() => {
     if (listPermittedActionRes) {
       setUserActions(listPermittedActionRes as UserActionType[]);
@@ -136,8 +289,7 @@ const Page = (): JSX.Element => {
 
   const onSelectRecord: RecordListProps["onSelectRecord"] = (record) => {
     if (listRecordsRes) {
-      setIsRecordDetailModalOpen(true);
-      setCurrentSelectedRecordId(listRecordsRes.data[record.index].record_id);
+      setSelectedRecordId(listRecordsRes.data[record.index].record_id);
     }
   };
 
@@ -196,139 +348,68 @@ const Page = (): JSX.Element => {
     }
   };
 
-  const fetchError =
-    listRecordsError || getConfigError || listPermittedActionError;
+  const onAddRecordSucceeded: Props["onAddRecordSucceeded"] = (newRecord) => {
+    if (listRecordsRes) {
+      const newRecordList = { ...listRecordsRes };
+      newRecordList.data.push(newRecord);
+      setSelectedRecordId(newRecord.record_id);
+    }
+  };
+
+  const onCloseDatabaseConfigModal = () => setEditingConfigName(undefined);
+  const onOpenRecordAddModal = () => setIsOpenRecordAddModal(true);
+  const onCloseRecordAddModal = () => setIsOpenRecordAddModal(false);
+
+  const onCloseRecordDetailModal = () => {
+    setSelectedRecordId(undefined);
+    mutate(listRecordsCacheKey);
+  };
+
+  const displayColumns =
+    getConfigRes?.columns
+      .filter((column) => column.is_display_field)
+      .map((column) => ({
+        field: column.name,
+        label: column.display_name,
+      })) || [];
+  const records = listRecordsRes?.data || [];
+  const isFetchComplete = Boolean(
+    !fetchError && listRecordsRes && getConfigRes && listPermittedActionRes
+  );
+  const totalPage = listRecordsRes
+    ? Math.ceil(listRecordsRes.total / listRecordsRes.per_page)
+    : 0;
+  const isPermittedDeleteRecord = userActions.some((action) =>
+    "metadata:write:delete".startsWith(action)
+  );
 
   return (
-    <>
-      <PageContainer>
-        <PageBody>
-          <PageToolBar
-            left={
-              <Link to="/">
-                <ElemCenteringFlexDiv>
-                  <HomeIcon />
-                  Home
-                </ElemCenteringFlexDiv>
-              </Link>
-            }
-            right={
-              <>
-                {!listRecordsError ? (
-                  <>
-                    <div className={classes.fixedFlexShrink}>
-                      <SearchForm
-                        onSearch={(newSearchText) =>
-                          setSearchText(newSearchText)
-                        }
-                        defaultValue={searchText}
-                      />
-                    </div>
-                    <Spacer direction="horizontal" size="15px" />
-                    <PerPageSelect
-                      perPage={perPage}
-                      setPerPage={setPerPage}
-                      values={[10, 20, 50, 100]}
-                    />
-                    <RenderToggleByAction required="metadata:write:add">
-                      <Spacer direction="horizontal" size="15px" />
-                      <Button
-                        onClick={() => setIsRecordEditModalOpen(true)}
-                        startIcon={<AddCircle />}
-                        className={classes.fixedFlexShrink}
-                      >
-                        <TextCenteringSpan>Record</TextCenteringSpan>
-                      </Button>
-                    </RenderToggleByAction>
-                  </>
-                ) : null}
-                {!getConfigError ? (
-                  <>
-                    <Spacer direction="horizontal" size="15px" />
-                    <DatabaseMenuButton onMenuSelect={onDatabaseMenuSelect} />
-                  </>
-                ) : null}
-              </>
-            }
-          />
-          <PageMain>
-            {fetchError || error ? (
-              <ErrorMessage
-                reason={JSON.stringify(fetchError || error)}
-                instruction="please reload this page"
-              />
-            ) : listRecordsRes && getConfigRes ? (
-              displayColumns.length <= 0 ? (
-                <ErrorMessage
-                  reason="Display columns is not configured"
-                  instruction="please report administrator this error"
-                />
-              ) : (
-                <RecordList
-                  columns={displayColumns}
-                  records={listRecordsRes.data}
-                  onSelectRecord={onSelectRecord}
-                  onDeleteRecord={
-                    userActions.some((action) =>
-                      "metadata:write:delete".startsWith(action)
-                    )
-                      ? onDeleteRecord
-                      : undefined
-                  }
-                />
-              )
-            ) : (
-              <LoadingIndicator />
-            )}
-          </PageMain>
-          <Spacer direction="vertical" size="3vh" />
-          {listRecordsRes ? (
-            <ElemCenteringFlexDiv>
-              <Pagination
-                count={Math.ceil(
-                  listRecordsRes.total / listRecordsRes.per_page
-                )}
-                page={page}
-                onChange={(_, newPage) => setPage(newPage)}
-              />
-            </ElemCenteringFlexDiv>
-          ) : null}
-        </PageBody>
-      </PageContainer>
-      {listRecordsRes ? (
-        <RecordEditModal
-          open={isRecordEditModalOpen}
-          onClose={() => setIsRecordEditModalOpen(false)}
-          databaseId={databaseId}
-          onSubmitSucceeded={(newRecord) => {
-            const newRecordList = { ...listRecordsRes };
-            newRecordList.data.push(newRecord);
-            setCurrentSelectedRecordId(newRecord.record_id);
-            setIsRecordDetailModalOpen(true);
-          }}
-          create
-        />
-      ) : null}
-      {currentSelectedRecordId ? (
-        <RecordDetailModal
-          open={isRecordDetailModalOpen}
-          recordId={currentSelectedRecordId}
-          databaseId={databaseId}
-          onClose={() => {
-            setIsRecordDetailModalOpen(false);
-            mutate(listRecordsCacheKey);
-          }}
-        />
-      ) : null}
-      {editingConfigName ? (
-        <DatabaseConfigModal
-          databaseId={databaseId}
-          open={Boolean(editingConfigName)}
-          onClose={() => setEditingConfigName(null)}
-          configName={editingConfigName}
-        />
-      ) : null}
-    </>
+    <Component
+      error={error}
+      databaseId={databaseId}
+      displayColumns={displayColumns}
+      editingConfigName={editingConfigName}
+      isFetchComplete={isFetchComplete}
+      isOpenRecordAddModal={isOpenRecordAddModal}
+      onAddRecordSucceeded={onAddRecordSucceeded}
+      onChangePage={setPage}
+      onChangePerPage={setPerPage}
+      onChangeSearchText={setSearchText}
+      onCloseDatabaseConfigModal={onCloseDatabaseConfigModal}
+      onCloseRecordAddModal={onCloseRecordAddModal}
+      onCloseRecordDetailModal={onCloseRecordDetailModal}
+      onDatabaseMenuSelect={onDatabaseMenuSelect}
+      onDeleteRecord={isPermittedDeleteRecord ? onDeleteRecord : undefined}
+      onOpenRecordAddModal={onOpenRecordAddModal}
+      onSelectRecord={onSelectRecord}
+      page={page}
+      perPage={perPage}
+      perPageOptions={[10, 20, 50, 100]}
+      records={records}
+      searchText={searchText}
+      selectedRecordId={selectedRecordId}
+      totalPage={totalPage}
+    />
   );
 };
 
