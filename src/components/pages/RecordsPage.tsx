@@ -203,10 +203,7 @@ const Component = ({
         <DatabaseConfigModal
           databaseId={databaseId}
           open={Boolean(editingConfigName)}
-          onClose={
-            onCloseDatabaseConfigModal
-            //
-          }
+          onClose={onCloseDatabaseConfigModal}
           configName={editingConfigName}
         />
       ) : null}

@@ -116,7 +116,6 @@ const useListPermittedActions: UseAPI<
         return res;
       }
     : null;
-  // See: https://swr.vercel.app/docs/conditional-fetching
   const { data, error } = useSWR(
     shouldFetch && databaseId ? cacheKey : null,
     fetcher
@@ -135,7 +134,6 @@ const useListDatabases: UseAPI<
     const res = await metaStore.DatabaseService.listDatabases(query);
     return res;
   };
-  // See: https://swr.vercel.app/docs/conditional-fetching
   const { data, error } = useSWR(shouldFetch ? cacheKey : null, fetcher);
   return [data, error, cacheKey];
 };

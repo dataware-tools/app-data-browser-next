@@ -150,10 +150,7 @@ const Component = ({
               />
               <FilePreviewModal
                 open={Boolean(previewingFile)}
-                onClose={
-                  onCloseFilePreviewModal
-                  // () => setPreviewingFile(undefined);
-                }
+                onClose={onCloseFilePreviewModal}
                 file={previewingFile || {}}
                 fullWidth
                 maxWidth="md"
