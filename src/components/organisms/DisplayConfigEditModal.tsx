@@ -37,15 +37,15 @@ type ConfigNameType = "record_list_display_columns";
 
 type Props = {
   error?: ErrorMessageProps;
-  onChangeDisplayColumns: OptionSharingSelectsProps["onChange"];
   displayColumns: OptionSharingSelectsProps["values"];
   displayColumnsOptions: OptionSharingSelectsProps["options"];
   isFetchComplete: boolean;
-  onChangeRecordTitleColumn: SoloSelectProps["onChange"];
   recordTitleColumn: SoloSelectProps["value"];
   recordTitleColumnOptions: SoloSelectProps["options"];
   isDisableSaveButton: LoadingButtonProps["disabled"];
   isSaving: LoadingButtonProps["pending"];
+  onChangeDisplayColumns: OptionSharingSelectsProps["onChange"];
+  onChangeRecordTitleColumn: SoloSelectProps["onChange"];
   onSave: LoadingButtonProps["onClick"];
 } & ContainerProps;
 
@@ -57,17 +57,17 @@ type ContainerProps = {
 
 const Component = ({
   open,
-  onClose,
   error,
-  onChangeDisplayColumns,
   displayColumnsOptions,
   displayColumns,
   isFetchComplete,
-  onChangeRecordTitleColumn,
   recordTitleColumn,
   recordTitleColumnOptions,
   isDisableSaveButton,
   isSaving,
+  onClose,
+  onChangeDisplayColumns,
+  onChangeRecordTitleColumn,
   onSave,
 }: Props) => {
   return (

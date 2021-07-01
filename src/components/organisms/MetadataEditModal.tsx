@@ -28,24 +28,24 @@ type Props = {
 
 type ContainerProps = {
   open: boolean;
-  onClose: () => void;
   create?: boolean;
   currentMetadata: MetadataInputFieldListProps["currentMetadata"];
   fields: MetadataInputFieldListProps["fields"];
   error?: ErrorMessageProps;
+  onClose: () => void;
   onSubmit: (newMetadata: Record<string, unknown>) => Promise<boolean>;
 };
 
 const Component = ({
   open,
   error,
-  onClose,
   create,
   currentMetadata,
   fields,
   nonFilledRequiredFieldNames,
   prefixInputElementId,
   isSaving,
+  onClose,
   onSave,
 }: Props) => {
   return (
