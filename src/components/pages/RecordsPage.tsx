@@ -35,15 +35,6 @@ import {
   RecordEditModal,
   RecordEditModalProps,
 } from "components/organisms/RecordEditModal";
-import {
-  DatabaseMenuButton,
-  DatabaseMenuButtonProps,
-} from "components/molecules/DatabaseMenuButton";
-import {
-  DatabaseConfigModal,
-  DatabaseConfigModalProps,
-  DatabaseConfigNameType,
-} from "components/organisms/DatabaseConfigModal";
 
 import { Link } from "react-router-dom";
 import HomeIcon from "@material-ui/icons/Home";
@@ -59,6 +50,7 @@ import { produce } from "immer";
 import { useRecoilState } from "recoil";
 import { userActionsState } from "../../globalStates";
 import { RenderToggleByAction } from "../atoms/RenderToggleByAction";
+import { ControlledDatabaseMenuButton } from "components/organisms/ControlledDatabaseMenuButton";
 
 type Props = {
   error?: ErrorMessageProps;
@@ -72,7 +64,6 @@ type Props = {
   isOpenRecordAddModal: boolean;
   perPage: PerPageSelectProps["perPage"];
   displayColumns: RecordListProps["columns"];
-  editingConfigName?: DatabaseConfigModalProps["configName"];
   selectedRecordId?: RecordDetailModalProps["recordId"];
   onChangeSearchText: SearchFormProps["onSearch"];
   onChangePerPage: PerPageSelectProps["setPerPage"];
@@ -81,10 +72,8 @@ type Props = {
   onChangePage: (newPage: number) => void;
   onCloseRecordAddModal: () => void;
   onAddRecordSucceeded: RecordEditModalProps["onSubmitSucceeded"];
-  onDatabaseMenuSelect: DatabaseMenuButtonProps["onMenuSelect"];
   onDeleteRecord: RecordListProps["onDeleteRecord"];
   onCloseRecordDetailModal: RecordDetailModalProps["onClose"];
-  onCloseDatabaseConfigModal: DatabaseConfigModalProps["onClose"];
 };
 
 const Component = ({
@@ -99,7 +88,6 @@ const Component = ({
   isOpenRecordAddModal,
   databaseId,
   displayColumns,
-  editingConfigName,
   selectedRecordId,
   onChangeSearchText,
   onChangePerPage,
@@ -108,10 +96,8 @@ const Component = ({
   onChangePage,
   onCloseRecordAddModal,
   onAddRecordSucceeded,
-  onDatabaseMenuSelect,
   onDeleteRecord,
   onCloseRecordDetailModal,
-  onCloseDatabaseConfigModal,
 }: Props) => {
   return (
     <>
@@ -149,7 +135,7 @@ const Component = ({
                     </Button>
                   </RenderToggleByAction>
                   <Spacer direction="horizontal" size="15px" />
-                  <DatabaseMenuButton onMenuSelect={onDatabaseMenuSelect} />
+                  <ControlledDatabaseMenuButton databaseId={databaseId} />
                 </>
               ) : null
             }
@@ -199,14 +185,6 @@ const Component = ({
           onClose={onCloseRecordDetailModal}
         />
       ) : null}
-      {editingConfigName ? (
-        <DatabaseConfigModal
-          databaseId={databaseId}
-          open={Boolean(editingConfigName)}
-          onClose={onCloseDatabaseConfigModal}
-          configName={editingConfigName}
-        />
-      ) : null}
     </>
   );
 };
@@ -226,9 +204,6 @@ const Page = (): JSX.Element => {
   );
   const [page, setPage] = useState(Number(getQueryString("page")) || 1);
   const [isOpenRecordAddModal, setIsOpenRecordAddModal] = useState(false);
-  const [editingConfigName, setEditingConfigName] = useState<
-    DatabaseConfigNameType | undefined
-  >(undefined);
   const [selectedRecordId, setSelectedRecordId] = useState<string | undefined>(
     undefined
   );
@@ -323,28 +298,6 @@ const Page = (): JSX.Element => {
     }
   };
 
-  const onDatabaseMenuSelect: DatabaseMenuButtonProps["onMenuSelect"] = (
-    targetName
-  ) => {
-    switch (targetName) {
-      case "Configure display columns":
-        setEditingConfigName("record_list_display_columns");
-        break;
-      case "Configure input columns":
-        setEditingConfigName("record_add_editable_columns");
-        break;
-      case "Configure search target columns":
-        setEditingConfigName("record_search_target_columns");
-        break;
-      case "Configure secret columns":
-        setEditingConfigName("secret_columns");
-        break;
-      case "Export metadata":
-        setEditingConfigName("export_metadata");
-        break;
-    }
-  };
-
   const onAddRecordSucceeded: Props["onAddRecordSucceeded"] = (newRecord) => {
     if (listRecordsRes) {
       const newRecordList = { ...listRecordsRes };
@@ -353,7 +306,6 @@ const Page = (): JSX.Element => {
     }
   };
 
-  const onCloseDatabaseConfigModal = () => setEditingConfigName(undefined);
   const onOpenRecordAddModal = () => setIsOpenRecordAddModal(true);
   const onCloseRecordAddModal = () => setIsOpenRecordAddModal(false);
 
@@ -385,17 +337,14 @@ const Page = (): JSX.Element => {
       error={error}
       databaseId={databaseId}
       displayColumns={displayColumns}
-      editingConfigName={editingConfigName}
       isFetchComplete={isFetchComplete}
       isOpenRecordAddModal={isOpenRecordAddModal}
       onAddRecordSucceeded={onAddRecordSucceeded}
       onChangePage={setPage}
       onChangePerPage={setPerPage}
       onChangeSearchText={setSearchText}
-      onCloseDatabaseConfigModal={onCloseDatabaseConfigModal}
       onCloseRecordAddModal={onCloseRecordAddModal}
       onCloseRecordDetailModal={onCloseRecordDetailModal}
-      onDatabaseMenuSelect={onDatabaseMenuSelect}
       onDeleteRecord={isPermittedDeleteRecord ? onDeleteRecord : undefined}
       onOpenRecordAddModal={onOpenRecordAddModal}
       onSelectRecord={onSelectRecord}
