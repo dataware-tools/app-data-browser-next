@@ -5,7 +5,6 @@ import {
   DatabaseMenuProps,
 } from "components/molecules/DatabaseMenu";
 import { SquareIconButton } from "@dataware-tools/app-common";
-import { DatabaseConfigNameType } from "components/organisms/DatabaseConfigModal";
 
 type Props = {
   onOpen: (event: MouseEvent<HTMLDivElement>) => void | Promise<void>;
@@ -15,7 +14,8 @@ type Props = {
 } & ContainerProps;
 
 type ContainerProps = {
-  onMenuSelect: DatabaseMenuProps["onClick"];
+  onMenuSelect: (targetValue: string) => void;
+  menu: DatabaseMenuProps["menu"];
 };
 
 const Component = ({
@@ -56,7 +56,4 @@ const Container = ({ ...delegated }: ContainerProps): JSX.Element => {
 };
 
 export { Container as DatabaseMenuButton };
-export type {
-  ContainerProps as DatabaseMenuButtonProps,
-  DatabaseConfigNameType,
-};
+export type { ContainerProps as DatabaseMenuButtonProps };
