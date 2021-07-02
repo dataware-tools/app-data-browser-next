@@ -47,8 +47,8 @@ import {
   UserActionType,
 } from "utils";
 import { produce } from "immer";
-import { useRecoilState } from "recoil";
-import { userActionsState } from "../../globalStates";
+import { useSetRecoilState } from "recoil";
+import { userActionsState, useIsActionPermitted } from "../../globalStates";
 import { RenderToggleByAction } from "../atoms/RenderToggleByAction";
 import { ControlledDatabaseMenuButton } from "components/organisms/ControlledDatabaseMenuButton";
 
@@ -194,7 +194,8 @@ type ParamType = { databaseId: string };
 const Page = (): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const { databaseId } = useParams<ParamType>();
-  const [userActions, setUserActions] = useRecoilState(userActionsState);
+  const setUserActions = useSetRecoilState(userActionsState);
+  const isPermittedDeleteRecord = useIsActionPermitted("metadata:write:delete");
 
   const [searchText, setSearchText] = useState(
     getQueryString("searchText") || ""
@@ -328,9 +329,6 @@ const Page = (): JSX.Element => {
   const totalPage = listRecordsRes
     ? Math.ceil(listRecordsRes.total / listRecordsRes.per_page)
     : 0;
-  const isPermittedDeleteRecord = userActions.some((action) =>
-    "metadata:write:delete".startsWith(action)
-  );
 
   return (
     <Component
