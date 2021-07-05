@@ -8,7 +8,7 @@ import { InputConfigEditModal } from "components/organisms/InputConfigEditModal"
 import { SearchConfigEditModal } from "components/organisms/SearchConfigEditModal";
 import { SecretConfigEditModal } from "components/organisms/SecretConfigEditModal";
 import { useState } from "react";
-import { useIsActionPermitted } from "../../globalStates";
+import { useIsActionPermitted } from "globalStates";
 
 type Props = {
   menu: DatabaseMenuButtonProps["menu"];

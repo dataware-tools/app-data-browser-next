@@ -31,7 +31,7 @@ import {
 import {
   OptionSharingSelects,
   OptionSharingSelectsProps,
-} from "./OptionSharingSelects";
+} from "components/organisms/OptionSharingSelects";
 
 type ConfigNameType = "record_list_display_columns";
 

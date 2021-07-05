@@ -23,7 +23,7 @@ import { mutate } from "swr";
 import {
   OptionSharingSelects,
   OptionSharingSelectsProps,
-} from "./OptionSharingSelects";
+} from "components/organisms/OptionSharingSelects";
 
 type ConfigNameType = "record_search_target_columns";
 

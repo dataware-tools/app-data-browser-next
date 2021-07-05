@@ -12,7 +12,7 @@ import { produce } from "immer";
 import {
   InputConfigAddModal,
   InputConfigAddModalProps,
-} from "./InputConfigAddModal";
+} from "components/organisms/InputConfigAddModal";
 
 type ValueType = InputConfigListItemProps["value"][];
 type Props = {
