@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
 import Dialog from "@material-ui/core/Dialog";
 import { produce } from "immer";
-import { mutate } from "swr";
 import {
   ErrorMessage,
   metaStore,
@@ -127,7 +126,7 @@ const Container = ({
   const {
     data: getConfigRes,
     error: getConfigError,
-    cacheKey: getConfigCacheKey,
+    mutate: getConfigMutate,
   } = useGetConfig(getAccessToken, {
     databaseId,
   });
@@ -213,7 +212,7 @@ const Container = ({
           instruction: "Please reload this page",
         });
       } else {
-        mutate(getConfigCacheKey, updateConfigRes);
+        getConfigMutate(updateConfigRes);
       }
 
       setIsSaving(false);

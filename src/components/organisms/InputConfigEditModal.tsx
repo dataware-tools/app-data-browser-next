@@ -23,7 +23,6 @@ import {
   ErrorMessageProps,
 } from "@dataware-tools/app-common";
 import { produce } from "immer";
-import { mutate } from "swr";
 
 type ConfigNameType = "record_add_editable_columns";
 type Props = {
@@ -102,7 +101,7 @@ const Container = ({
   const {
     data: getConfigRes,
     error: getConfigError,
-    cacheKey: getConfigCacheKey,
+    mutate: getConfigMutate,
   } = useGetConfig(getAccessToken, {
     databaseId,
   });
@@ -183,7 +182,7 @@ const Container = ({
           instruction: "Please reload this page",
         });
       } else {
-        mutate(getConfigCacheKey, updateConfigRes);
+        getConfigMutate(updateConfigRes);
       }
 
       setIsSaving(false);

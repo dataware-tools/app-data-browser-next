@@ -19,7 +19,6 @@ import {
   LoadingIndicator,
 } from "@dataware-tools/app-common";
 import { produce } from "immer";
-import { mutate } from "swr";
 import {
   OptionSharingSelects,
   OptionSharingSelectsProps,
@@ -110,7 +109,7 @@ const Container = ({
   const {
     data: getConfigRes,
     error: getConfigError,
-    cacheKey: getConfigCacheKey,
+    mutate: getConfigMutate,
   } = useGetConfig(getAccessToken, {
     databaseId,
   });
@@ -175,7 +174,7 @@ const Container = ({
           instruction: "Please reload this page",
         });
       } else {
-        mutate(getConfigCacheKey, data);
+        getConfigMutate(data);
       }
 
       setIsSaving(false);
