@@ -155,7 +155,7 @@ const Container = ({
     .sort(compInputFields);
 
   const alreadyUsedColumnDisplayNames = [
-    ...new Set(inputConfig.map((column) => column.display_name)),
+    ...new Set(value.map((column) => column.display_name)),
   ];
 
   const alreadyUsedColumnNames = [
