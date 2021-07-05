@@ -5,8 +5,8 @@ import {
   objToQueryString,
   permissionManager,
 } from "@dataware-tools/app-common";
-import useSWR from "swr";
-import { AwaitType } from "./utilTypes";
+import useSWR, { SWRResponse } from "swr";
+import { AwaitType, DatabaseConfigType } from "utils/utilTypes";
 import { useState, useEffect } from "react";
 
 type Data<T> = T extends void | undefined | null
@@ -91,14 +91,14 @@ interface UseAPI<T extends (...args: any) => Promise<any>> {
     token: string | (() => Promise<string>),
     param: Partial<Parameters<T>[number]>,
     shouldFetch?: boolean
-  ): [data: AwaitType<ReturnType<T>> | undefined, error: any, cacheKey: string];
+  ): SWRResponse<AwaitType<ReturnType<T>>, any> & { cacheKey: string };
 }
 
 interface UseAPIWithoutCache<T extends (...args: any) => Promise<any>> {
-  (...args: Parameters<UseAPI<T>>): [
-    ReturnType<UseAPI<T>>[0],
-    ReturnType<UseAPI<T>>[1]
-  ];
+  (...args: Parameters<UseAPI<T>>): {
+    data: AwaitType<ReturnType<T>> | undefined;
+    error: any;
+  };
 }
 
 const useListPermittedActions: UseAPI<
@@ -116,11 +116,8 @@ const useListPermittedActions: UseAPI<
         return res;
       }
     : null;
-  const { data, error } = useSWR(
-    shouldFetch && databaseId ? cacheKey : null,
-    fetcher
-  );
-  return [data, error, cacheKey];
+  const resSWR = useSWR(shouldFetch && databaseId ? cacheKey : null, fetcher);
+  return { ...resSWR, cacheKey };
 };
 
 const useListDatabases: UseAPI<
@@ -134,11 +131,16 @@ const useListDatabases: UseAPI<
     const res = await metaStore.DatabaseService.listDatabases(query);
     return res;
   };
-  const { data, error } = useSWR(shouldFetch ? cacheKey : null, fetcher);
-  return [data, error, cacheKey];
+  const swrRes = useSWR(shouldFetch ? cacheKey : null, fetcher);
+  return { ...swrRes, cacheKey };
 };
 
-const useGetConfig: UseAPI<typeof metaStore.ConfigService.getConfig> = (
+interface UseGetConfig<T extends (...args: any) => Promise<any>> {
+  (...args: Parameters<UseAPI<T>>): {
+    data: DatabaseConfigType | undefined;
+  } & Omit<ReturnType<UseAPI<T>>, "data">;
+}
+const useGetConfig: UseGetConfig<typeof metaStore.ConfigService.getConfig> = (
   token,
   { databaseId },
   shouldFetch = true
@@ -155,11 +157,11 @@ const useGetConfig: UseAPI<typeof metaStore.ConfigService.getConfig> = (
       }
     : null;
 
-  const { data, error } = useSWR(
+  const { data, ...rest } = useSWR(
     shouldFetch && databaseId ? cacheKey : null,
     fetcher
   );
-  return [data, error, cacheKey];
+  return { data: data as DatabaseConfigType | undefined, ...rest, cacheKey };
 };
 
 const useGetRecord: UseAPI<typeof metaStore.RecordService.getRecord> = (
@@ -181,11 +183,11 @@ const useGetRecord: UseAPI<typeof metaStore.RecordService.getRecord> = (
         }
       : null;
 
-  const { data, error } = useSWR(
+  const swrRes = useSWR(
     shouldFetch && databaseId && recordId ? cacheKey : null,
     fetcher
   );
-  return [data, error, cacheKey];
+  return { ...swrRes, cacheKey };
 };
 
 const useListRecords: UseAPI<typeof metaStore.RecordService.listRecords> = (
@@ -206,11 +208,11 @@ const useListRecords: UseAPI<typeof metaStore.RecordService.listRecords> = (
         return listRecordsRes;
       }
     : null;
-  const { data, error } = useSWR(
+  const swrRes = useSWR(
     shouldFetch && databaseId ? cacheKey : null,
     listRecords
   );
-  return [data, error, cacheKey];
+  return { ...swrRes, cacheKey };
 };
 
 const useListFiles: UseAPI<typeof metaStore.FileService.listFiles> = (
@@ -231,11 +233,8 @@ const useListFiles: UseAPI<typeof metaStore.FileService.listFiles> = (
         return res;
       }
     : null;
-  const { data, error } = useSWR(
-    shouldFetch && databaseId ? cacheKey : null,
-    fetcher
-  );
-  return [data, error, cacheKey];
+  const swrRes = useSWR(shouldFetch && databaseId ? cacheKey : null, fetcher);
+  return { ...swrRes, cacheKey };
 };
 
 const useCreateJwtToDownloadFile: UseAPIWithoutCache<
@@ -273,7 +272,7 @@ const useCreateJwtToDownloadFile: UseAPIWithoutCache<
     }
   }, [token, shouldFetch]);
 
-  return [res.data, res.error];
+  return res;
 };
 
 export {
