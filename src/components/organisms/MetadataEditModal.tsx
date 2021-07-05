@@ -161,13 +161,11 @@ const Container = ({
 
       const isSubmitSucceed = await onSubmit(newRecordInfo);
 
+      setIsSaving(false);
       if (!isSubmitSucceed) {
-        setIsSaving(false);
         window.alert("save failed. please retry saving");
         return;
       }
-
-      setIsSaving(false);
     }
     onClose();
   };

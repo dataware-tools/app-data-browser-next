@@ -1,10 +1,6 @@
 import {
   Spacer,
-  metaStore,
   ErrorMessage,
-  LoadingIndicator,
-  fileProvider,
-  API_ROUTE,
   DialogTitle,
   DialogCloseButton,
   DialogContainer,
@@ -21,18 +17,14 @@ import {
 } from "@dataware-tools/app-common";
 import Dialog from "@material-ui/core/Dialog";
 import { useState, useEffect } from "react";
-import { FileList, FileListProps } from "components/organisms/FileList";
-import { RecordInfo, RecordInfoProps } from "components/organisms/RecordInfo";
-import { mutate } from "swr";
+import { FileList } from "components/organisms/FileList";
+import { RecordInfo } from "components/organisms/RecordInfo";
 import { useAuth0 } from "@auth0/auth0-react";
 import {
-  fetchMetaStore,
   useGetRecord,
   useListFiles,
   uploadFileToFileProvider,
-  fetchFileProvider,
   useGetConfig,
-  DatabaseConfigType,
 } from "utils";
 import {
   RecordEditModal,
@@ -42,10 +34,6 @@ import UploadIcon from "@material-ui/icons/Upload";
 import EditIcon from "@material-ui/icons/Edit";
 import Button from "@material-ui/core/Button";
 import { produce } from "immer";
-import {
-  FilePreviewModal,
-  FilePreviewModalProps,
-} from "components/organisms/FilePreviewModal";
 import { RenderToggleByAction } from "components/atoms/RenderToggleByAction";
 
 type Props = {
@@ -54,18 +42,9 @@ type Props = {
   tabNames: DialogTabBarProps["tabNames"];
   selectedTabIndex: DialogTabBarProps["value"];
   error?: ErrorMessageProps;
-  recordDetail?: RecordInfoProps["record"];
-  files?: FileListProps["files"];
   isOpenRecordEditModal: boolean;
-  previewingFile?: FilePreviewModalProps["file"];
   isAddingFile: boolean;
-  onPreviewFile: FileListProps["onPreview"];
-  onDownloadFile: FileListProps["onDownload"];
-  onEditFile: FileListProps["onEdit"];
-  onDeleteFile: FileListProps["onDelete"];
   onCloseRecordEditModal: RecordEditModalProps["onClose"];
-  onEditRecordSucceeded: RecordEditModalProps["onSubmitSucceeded"];
-  onCloseFilePreviewModal: FilePreviewModalProps["onClose"];
   onAddFile: FileUploadButtonProps["onFileChange"];
   onEditRecord: () => void;
 } & ContainerProps;
@@ -87,18 +66,9 @@ const Component = ({
   tabNames,
   selectedTabIndex,
   error,
-  recordDetail,
-  files,
   isOpenRecordEditModal,
-  previewingFile,
   isAddingFile,
-  onPreviewFile,
-  onDownloadFile,
-  onEditFile,
-  onDeleteFile,
   onCloseRecordEditModal,
-  onEditRecordSucceeded,
-  onCloseFilePreviewModal,
   onAddFile,
   onEditRecord,
 }: Props) => {
@@ -121,23 +91,9 @@ const Component = ({
               <DialogBody>
                 <DialogMain>
                   {currentTabName === "Info" ? (
-                    recordDetail ? (
-                      <RecordInfo record={recordDetail} />
-                    ) : (
-                      <LoadingIndicator />
-                    )
+                    <RecordInfo databaseId={databaseId} recordId={recordId} />
                   ) : currentTabName === "Files" ? (
-                    files ? (
-                      <FileList
-                        files={files}
-                        onPreview={onPreviewFile}
-                        onDownload={onDownloadFile}
-                        onEdit={onEditFile}
-                        onDelete={onDeleteFile}
-                      />
-                    ) : (
-                      <LoadingIndicator />
-                    )
+                    <FileList databaseId={databaseId} recordId={recordId} />
                   ) : null}
                 </DialogMain>
               </DialogBody>
@@ -146,15 +102,6 @@ const Component = ({
                 recordId={recordId}
                 open={isOpenRecordEditModal}
                 onClose={onCloseRecordEditModal}
-                onSubmitSucceeded={onEditRecordSucceeded}
-              />
-              <FilePreviewModal
-                open={Boolean(previewingFile)}
-                onClose={onCloseFilePreviewModal}
-                file={previewingFile || {}}
-                fullWidth
-                maxWidth="md"
-                height="auto"
               />
             </>
           )}
@@ -193,46 +140,30 @@ const Container = ({
 }: ContainerProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
-  const [error, setError] = useState<ErrorMessageProps | undefined>(undefined);
   const [isOpenRecordEditModal, setIsOpenRecordEditModal] = useState(false);
   const [isAddingFile, setIsAddingFile] = useState(false);
-  const [previewingFile, setPreviewingFile] = useState<
-    metaStore.FileModel | undefined
-  >(undefined);
 
-  const [getRecordRes, getRecordError, getRecordCacheKey] = useGetRecord(
-    getAccessToken,
-    {
-      databaseId,
-      recordId,
-    }
-  );
-  const [listFilesRes, listFilesError, listFilesCacheKey] = useListFiles(
-    getAccessToken,
-    {
-      databaseId,
-      recordId,
-    }
-  );
-  const [getConfigRes] = (useGetConfig(getAccessToken, {
+  const { data: getRecordRes } = useGetRecord(getAccessToken, {
     databaseId,
-  }) as unknown) as [data: DatabaseConfigType | undefined];
+    recordId,
+  });
 
-  const fetchError = getRecordError || listFilesError;
-  useEffect(() => {
-    if (fetchError) {
-      setError({
-        reason: JSON.stringify(fetchError),
-        instruction: "Please reload this page",
-      });
+  const { data: listFilesRes, mutate: listFilesMutate } = useListFiles(
+    getAccessToken,
+    {
+      databaseId,
+      recordId,
     }
-  }, [fetchError]);
+  );
+
+  const { data: getConfigRes } = useGetConfig(getAccessToken, {
+    databaseId,
+  });
 
   const initializeState = () => {
     setSelectedTabIndex(0);
     setIsOpenRecordEditModal(false);
     setIsAddingFile(false);
-    setPreviewingFile(undefined);
   };
   const prevOpen = usePrevious(open);
   useEffect(() => {
@@ -242,75 +173,6 @@ const Container = ({
   }, [open, prevOpen]);
 
   const tabNames = ["Info", "Files"];
-
-  const onPreviewFile = (file: metaStore.FileModel) => {
-    setPreviewingFile(file);
-  };
-
-  // ! this is dummy func
-  // TODO: implement method
-  const onEditFile = (file: metaStore.FileModel) =>
-    window.alert(`edit: ${JSON.stringify(file)}`);
-
-  const onDeleteFile = async (file: metaStore.FileModel) => {
-    if (!window.confirm("Are you sure you want to delete file?")) return;
-
-    const [, deleteFileEntityError] = await fetchFileProvider(
-      getAccessToken,
-      fileProvider.DeleteService.deleteFile,
-      {
-        path: file.path,
-      }
-    );
-
-    if (deleteFileEntityError) {
-      window.alert(`Error occur! : ${JSON.stringify(deleteFileEntityError)}`);
-      return;
-    }
-
-    const [deleteFileMetaRes, deleteFileMetaError] = await fetchMetaStore(
-      getAccessToken,
-      metaStore.FileService.deleteFile,
-      {
-        databaseId,
-        uuid: file.uuid,
-      }
-    );
-
-    if (deleteFileMetaError) {
-      window.alert(`Error occur! : ${JSON.stringify(deleteFileMetaError)}`);
-      return;
-    }
-
-    if (deleteFileMetaRes && listFilesRes) {
-      const newFiles = listFilesRes.data.filter((oldFile) => {
-        return oldFile.uuid !== deleteFileMetaRes.uuid;
-      });
-      const newListFilesRes = { ...listFilesRes };
-      newListFilesRes.data = newFiles;
-
-      mutate(listFilesCacheKey, newListFilesRes, false);
-    }
-  };
-
-  const onDownloadFile = (file: metaStore.FileModel) => {
-    getAccessToken().then((accessToken: string) => {
-      fileProvider.OpenAPI.TOKEN = accessToken;
-      fileProvider.OpenAPI.BASE = API_ROUTE.FILE.BASE;
-      fileProvider.DownloadService.createJwtToDownloadFile({
-        requestBody: {
-          path: file.path,
-          content_type: file["content-type"],
-        },
-      })
-        .then((res: fileProvider.DownloadsPostedModel) => {
-          window.open(API_ROUTE.FILE.BASE + "/download/" + res.token, "_blank");
-        })
-        .catch((e) => {
-          alert("Failed to download the file: " + e);
-        });
-    });
-  };
 
   const onAddFile: FileUploadButtonProps["onFileChange"] = async (files) => {
     if (!files || !files[0]) {
@@ -349,50 +211,35 @@ const Container = ({
         draft.data.push(createFileRes);
       });
 
-      mutate(listFilesCacheKey, newListFilesRes, false);
+      listFilesMutate(newListFilesRes, false);
     }
 
     setIsAddingFile(false);
   };
 
-  const onEditRecord = () => setIsOpenRecordEditModal(true);
-  const onCloseFilePreviewModal = () => setPreviewingFile(undefined);
   const onCloseRecordEditModal = () => setIsOpenRecordEditModal(false);
-  const onEditRecordSucceeded: Props["onEditRecordSucceeded"] = (newRecord) =>
-    mutate(getRecordCacheKey, newRecord);
 
+  const onEditRecord = () => setIsOpenRecordEditModal(true);
   const titleColumn = getConfigRes?.columns.find(
     (column) => column.is_record_title
   )?.name;
   const title = titleColumn ? getRecordRes?.[titleColumn] : "No title";
-  const files = listFilesRes?.data;
-  const recordDetail = getRecordRes;
 
   return (
     <Component
+      onEditRecord={onEditRecord}
       databaseId={databaseId}
-      error={error}
       isAddingFile={isAddingFile}
       isOpenRecordEditModal={isOpenRecordEditModal}
       onAddFile={onAddFile}
       onChangeTab={setSelectedTabIndex}
       onClose={onClose}
-      onCloseFilePreviewModal={onCloseFilePreviewModal}
       onCloseRecordEditModal={onCloseRecordEditModal}
-      onDeleteFile={onDeleteFile}
-      onDownloadFile={onDownloadFile}
-      onEditFile={onEditFile}
-      onEditRecord={onEditRecord}
-      onEditRecordSucceeded={onEditRecordSucceeded}
-      onPreviewFile={onPreviewFile}
       open={open}
       recordId={recordId}
       selectedTabIndex={selectedTabIndex}
       tabNames={tabNames}
-      files={files}
-      recordDetail={recordDetail}
       title={title}
-      previewingFile={previewingFile}
     />
   );
 };

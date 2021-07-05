@@ -22,12 +22,7 @@ import LoadingButton, {
   LoadingButtonProps,
 } from "@material-ui/lab/LoadingButton";
 import { SoloSelect, SoloSelectProps } from "components/molecules/SoloSelect";
-import {
-  useGetConfig,
-  DatabaseConfigType,
-  fetchMetaStore,
-  compStr,
-} from "utils/index";
+import { useGetConfig, fetchMetaStore, compStr } from "utils/index";
 import {
   OptionSharingSelects,
   OptionSharingSelectsProps,
@@ -129,16 +124,13 @@ const Container = ({
   const [recordTitleColumn, setRecordTitleColumn] = useState("");
   const [error, setError] = useState<ErrorMessageProps | undefined>(undefined);
 
-  const [getConfigRes, getConfigError, getConfigCacheKey] = (useGetConfig(
-    getAccessToken,
-    {
-      databaseId,
-    }
-  ) as unknown) as [
-    data: DatabaseConfigType | undefined,
-    error: any,
-    cacheKey: string
-  ];
+  const {
+    data: getConfigRes,
+    error: getConfigError,
+    cacheKey: getConfigCacheKey,
+  } = useGetConfig(getAccessToken, {
+    databaseId,
+  });
 
   const initializeState = () => {
     setIsSaving(false);

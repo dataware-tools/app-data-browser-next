@@ -1,12 +1,7 @@
 import Dialog from "@material-ui/core/Dialog";
 import { useState, useEffect } from "react";
 import LoadingButton from "@material-ui/lab/LoadingButton";
-import {
-  DatabaseConfigType,
-  useGetConfig,
-  fetchMetaStore,
-  pydtkSystemColumns,
-} from "utils/index";
+import { useGetConfig, fetchMetaStore, pydtkSystemColumns } from "utils/index";
 import {
   InputConfigList,
   InputConfigListProps,
@@ -104,16 +99,13 @@ const Container = ({
     InputConfigListProps["value"]
   >([]);
 
-  const [getConfigRes, getConfigError, getConfigCacheKey] = (useGetConfig(
-    getAccessToken,
-    {
-      databaseId,
-    }
-  ) as unknown) as [
-    data: DatabaseConfigType | undefined,
-    error: any,
-    cacheKey: string
-  ];
+  const {
+    data: getConfigRes,
+    error: getConfigError,
+    cacheKey: getConfigCacheKey,
+  } = useGetConfig(getAccessToken, {
+    databaseId,
+  });
 
   const fetchError = getConfigError;
   useEffect(() => {

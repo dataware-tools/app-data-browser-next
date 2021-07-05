@@ -1,7 +1,7 @@
 import Dialog from "@material-ui/core/Dialog";
 import { useState, useEffect } from "react";
 import LoadingButton from "@material-ui/lab/LoadingButton";
-import { useGetConfig, DatabaseConfigType, fetchMetaStore } from "utils/index";
+import { useGetConfig, fetchMetaStore } from "utils/index";
 import { useAuth0 } from "@auth0/auth0-react";
 import {
   ErrorMessage,
@@ -108,16 +108,13 @@ const Container = ({
   const [searchTargetColumns, setSearchTargetColumns] = useState<string[]>([]);
   const [error, setError] = useState<ErrorMessageProps | undefined>(undefined);
 
-  const [getConfigRes, getConfigError, getConfigCacheKey] = (useGetConfig(
-    getAccessToken,
-    {
-      databaseId,
-    }
-  ) as unknown) as [
-    data: DatabaseConfigType | undefined,
-    error: any,
-    cacheKey: string
-  ];
+  const {
+    data: getConfigRes,
+    error: getConfigError,
+    cacheKey: getConfigCacheKey,
+  } = useGetConfig(getAccessToken, {
+    databaseId,
+  });
 
   const initializeState = () => {
     setIsSaving(false);

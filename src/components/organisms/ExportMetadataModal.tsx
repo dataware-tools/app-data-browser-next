@@ -126,10 +126,13 @@ const Container = ({
     }
   }, [open, prevOpen]);
 
-  const [listRecordsRes, listRecordsError] = useListRecords(getAccessToken, {
-    databaseId,
-    perPage: 999999999, // FIXME
-  });
+  const { data: listRecordsRes, error: listRecordsError } = useListRecords(
+    getAccessToken,
+    {
+      databaseId,
+      perPage: 999999999, // FIXME
+    }
+  );
 
   const fetchError = listRecordsError;
   useEffect(() => {

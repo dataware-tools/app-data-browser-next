@@ -25,6 +25,9 @@ import {
   FieldError,
 } from "react-hook-form";
 import LoadingButton from "@material-ui/lab/LoadingButton";
+import { useRecoilValue } from "recoil";
+import { databasePaginateState } from "globalStates";
+import { useListDatabases } from "utils";
 
 type Props = {
   onSubmit: () => Promise<void>;
@@ -36,7 +39,7 @@ type Props = {
 
 type ContainerProps = {
   onClose: () => void;
-  onSubmitSucceeded: (newDatabase: metaStore.DatabaseModel) => void;
+  onSubmitSucceeded?: (newDatabase: metaStore.DatabaseModel) => void;
 } & Omit<DialogProps, "onClose" | "onSubmit">;
 
 type FormInput = {
@@ -150,9 +153,14 @@ const Container = ({
     formState: { errors: formErrors },
     handleSubmit,
   } = useForm<FormInput>();
-
+  const { page, perPage, search } = useRecoilValue(databasePaginateState);
   const [error, setError] = useState<ErrorMessageProps | undefined>(undefined);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const {
+    data: listDatabasesRes,
+    mutate: listDatabasesMutate,
+  } = useListDatabases(getAccessToken, { page, perPage, search });
 
   const initializeState = () => {
     setError(undefined);
@@ -182,7 +190,15 @@ const Container = ({
       });
       return;
     } else if (createDatabaseRes) {
-      onSubmitSucceeded(createDatabaseRes);
+      if (listDatabasesRes) {
+        listDatabasesMutate({
+          ...listDatabasesRes,
+          data: [createDatabaseRes, ...listDatabasesRes.data],
+        });
+      } else {
+        listDatabasesMutate();
+      }
+      onSubmitSucceeded && onSubmitSucceeded(createDatabaseRes);
     }
 
     setIsSubmitting(false);
