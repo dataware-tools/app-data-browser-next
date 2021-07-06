@@ -1,13 +1,7 @@
-## First thing to do
+# app-data-browser-next
 
-The things you have to do after creating a repository based on this template are as follows:
+Web-application for browsing data in Dataware-tools.
 
-- Change `name` in `package.json` to the name of your application
-- Change `repository` in `package.json` to the newly created repository
-- Change `homepage` in `package.json` to your application name
-  - This should be the same as `urlPrefix` in
-    [App Catalog](https://github.com/dataware-tools/protocols/blob/master/catalogs/app.json)
-    if you want to register your application to dataware-tools
 
 ## How to build docker-image
 
