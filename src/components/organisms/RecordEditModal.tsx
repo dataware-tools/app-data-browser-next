@@ -94,6 +94,7 @@ const Container = ({
           name: column.name,
           display_name: column.display_name,
           necessity: column.necessity || "unnecessary",
+          order_of_input: column.order_of_input,
         }))
         .sort(compInputFields) || [],
     [getConfigRes, create]

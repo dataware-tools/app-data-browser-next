@@ -41,16 +41,28 @@ const compStr = (a: string, b: string): number => {
 };
 
 const compInputFields = (
-  a: Pick<DatabaseColumnsConfigType[number], "necessity" | "name">,
-  b: Pick<DatabaseColumnsConfigType[number], "necessity" | "name">
+  a: Pick<
+    DatabaseColumnsConfigType[number],
+    "order_of_input" | "necessity" | "name"
+  >,
+  b: Pick<
+    DatabaseColumnsConfigType[number],
+    "order_of_input" | "necessity" | "name"
+  >
 ): number => {
-  const diffNecessity =
-    inputFieldsNecessityOrder.indexOf(a.necessity) -
-    inputFieldsNecessityOrder.indexOf(b.necessity);
-  if (diffNecessity !== 0) {
-    return diffNecessity;
+  if (a.necessity === "unnecessary" || b.necessity === "unnecessary") {
+    return 0;
+  } else if (a.order_of_input != null && b.order_of_input != null) {
+    return a.order_of_input - b.order_of_input;
   } else {
-    return compStr(a.name, b.name);
+    const diffNecessity =
+      inputFieldsNecessityOrder.indexOf(a.necessity) -
+      inputFieldsNecessityOrder.indexOf(b.necessity);
+    if (diffNecessity !== 0) {
+      return diffNecessity;
+    } else {
+      return compStr(a.name, b.name);
+    }
   }
 };
 

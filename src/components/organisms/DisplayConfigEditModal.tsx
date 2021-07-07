@@ -85,6 +85,7 @@ const Component = ({
                     values={displayColumns}
                     creatable
                     deletable
+                    draggable
                   />
                   <DialogSubTitle>Record title</DialogSubTitle>
                   <SoloSelect

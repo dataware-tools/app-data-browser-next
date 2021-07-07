@@ -26,6 +26,8 @@ const useStyles = makeStyles((theme: typeof themeInstance) => ({
     display: "flex",
     height: "40px",
     justifyContent: "center",
+    maxHeight: "40px",
+    minHeight: "40px",
     "&:hover": {
       backgroundColor: theme.palette.grey[400],
     },
