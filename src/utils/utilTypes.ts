@@ -1,3 +1,4 @@
+import { metaStore } from "@dataware-tools/app-common";
 type AwaitType<T> = T extends Promise<infer U>
   ? U
   : T extends (...args: Array<any>) => Promise<infer V>
@@ -62,7 +63,17 @@ type UserActionType =
   | "metadata:write:update"
   | "metadata:write:delete";
 
+type ParamTypeListRecords = Parameters<
+  typeof metaStore.RecordService.listRecords
+>["0"];
+
+type ParamTypeListDatabases = Parameters<
+  typeof metaStore.DatabaseService.listDatabases
+>["0"];
+
 export type {
+  ParamTypeListRecords,
+  ParamTypeListDatabases,
   AwaitType,
   DatabaseConfigType,
   DatabaseColumnsConfigType,

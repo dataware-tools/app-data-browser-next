@@ -9,43 +9,89 @@ import {
   DialogWrapper,
   DialogMain,
   usePrevious,
+  ErrorMessageProps,
 } from "@dataware-tools/app-common";
 import Dialog from "@material-ui/core/Dialog";
 import { useState, useEffect } from "react";
 import LoadingButton from "@material-ui/lab/LoadingButton";
-import { compInputFields } from "utils/index";
 import {
   MetadataInputFieldList,
   MetadataInputFieldListProps,
 } from "components/organisms/MetadataInputFieldList";
 
+type Props = {
+  nonFilledRequiredFieldNames: MetadataInputFieldListProps["nonFilledRequiredFieldNames"];
+  prefixInputElementId: MetadataInputFieldListProps["prefixInputElementId"];
+  isSaving: boolean;
+  onSave: () => void;
+} & Omit<ContainerProps, "onSubmit">;
+
 type ContainerProps = {
   open: boolean;
-  onClose: () => void;
   create?: boolean;
-  currentMetadata?: MetadataInputFieldListProps["currentMetadata"];
+  currentMetadata: MetadataInputFieldListProps["currentMetadata"];
   fields: MetadataInputFieldListProps["fields"];
-  error: any;
+  error?: ErrorMessageProps;
+  onClose: () => void;
   onSubmit: (newMetadata: Record<string, unknown>) => Promise<boolean>;
 };
 
+const Component = ({
+  open,
+  error,
+  create,
+  currentMetadata,
+  fields,
+  nonFilledRequiredFieldNames,
+  prefixInputElementId,
+  isSaving,
+  onClose,
+  onSave,
+}: Props) => {
+  return (
+    <Dialog open={open} maxWidth="xl" onClose={onClose}>
+      <DialogWrapper>
+        <DialogCloseButton onClick={onClose} />
+        <DialogTitle>{create ? "Add" : "Edit"} Record</DialogTitle>
+        <DialogContainer padding="0 0 20px" height="65vh">
+          {error ? (
+            <ErrorMessage {...error} />
+          ) : currentMetadata || create ? (
+            <>
+              <DialogBody>
+                <DialogMain>
+                  <MetadataInputFieldList
+                    currentMetadata={currentMetadata}
+                    fields={fields}
+                    nonFilledRequiredFieldNames={nonFilledRequiredFieldNames}
+                    prefixInputElementId={prefixInputElementId}
+                  />
+                </DialogMain>
+                <DialogToolBar
+                  right={
+                    <LoadingButton pending={isSaving} onClick={onSave}>
+                      Save
+                    </LoadingButton>
+                  }
+                />
+              </DialogBody>
+            </>
+          ) : (
+            <LoadingIndicator />
+          )}
+        </DialogContainer>
+      </DialogWrapper>
+    </Dialog>
+  );
+};
 const Container = ({
   open,
   onClose,
   create,
-  currentMetadata,
-  fields: propFields,
-  error,
+  fields,
   onSubmit,
+  ...delegated
 }: ContainerProps): JSX.Element => {
-  const fields = create
-    ? propFields
-        .filter(
-          (config) => config.necessity && config.necessity !== "unnecessary"
-        )
-        .sort(compInputFields)
-    : propFields.sort(compInputFields);
-
   const [isSaving, setIsSaving] = useState(false);
   const [
     nonFilledRequiredFieldNames,
@@ -56,7 +102,6 @@ const Container = ({
     setIsSaving(false);
     setNonFilledRequiredFieldNames([]);
   };
-  // See: https://stackoverflow.com/questions/58209791/set-initial-state-for-material-ui-dialog
   const prevOpen = usePrevious(open);
   useEffect(() => {
     if (open && !prevOpen) {
@@ -64,6 +109,7 @@ const Container = ({
     }
   }, [open, prevOpen]);
 
+  const prefixInputElementId = "MetadataEditModal";
   const onSave = async () => {
     if (fields) {
       setIsSaving(true);
@@ -74,7 +120,7 @@ const Container = ({
 
       fields.forEach((config) => {
         const inputEl = document.getElementById(
-          `RecordEditModalInputFields_${config.name.replace(/\s+/g, "")}`
+          `${prefixInputElementId}_${config.name.replace(/\s+/g, "")}`
         ) as HTMLInputElement;
         if (config.necessity === "required" && !inputEl.value) {
           nonFilledRequired.push(config.name);
@@ -108,65 +154,34 @@ const Container = ({
 
       fields.forEach((config) => {
         const inputEl = document.getElementById(
-          `RecordEditModalInputFields_${config.name.replace(/\s+/g, "")}`
+          `${prefixInputElementId}_${config.name.replace(/\s+/g, "")}`
         ) as HTMLInputElement;
         newRecordInfo[config.name] = inputEl.value;
       });
 
       const isSubmitSucceed = await onSubmit(newRecordInfo);
 
+      setIsSaving(false);
       if (!isSubmitSucceed) {
-        setIsSaving(false);
         window.alert("save failed. please retry saving");
         return;
       }
-
-      setIsSaving(false);
     }
     onClose();
   };
 
   return (
-    <Dialog open={open} maxWidth="xl" onClose={onClose}>
-      <DialogWrapper>
-        <DialogCloseButton onClick={onClose} />
-        <DialogTitle>{create ? "Add" : "Edit"} Record</DialogTitle>
-        <DialogContainer padding="0 0 20px" height="65vh">
-          {error ? (
-            <ErrorMessage
-              reason={JSON.stringify(error)}
-              instruction="please reload this page"
-            />
-          ) : !fields || fields.length <= 0 ? (
-            <ErrorMessage
-              reason="Input fields is not configured"
-              instruction="please report administrator this error"
-            />
-          ) : currentMetadata || create ? (
-            <>
-              <DialogBody>
-                <DialogMain>
-                  <MetadataInputFieldList
-                    currentMetadata={currentMetadata}
-                    fields={fields}
-                    nonFilledRequiredFieldNames={nonFilledRequiredFieldNames}
-                  />
-                </DialogMain>
-                <DialogToolBar
-                  right={
-                    <LoadingButton pending={isSaving} onClick={onSave}>
-                      Save
-                    </LoadingButton>
-                  }
-                />
-              </DialogBody>
-            </>
-          ) : (
-            <LoadingIndicator />
-          )}
-        </DialogContainer>
-      </DialogWrapper>
-    </Dialog>
+    <Component
+      {...delegated}
+      fields={fields}
+      isSaving={isSaving}
+      nonFilledRequiredFieldNames={nonFilledRequiredFieldNames}
+      onClose={onClose}
+      onSave={onSave}
+      open={open}
+      prefixInputElementId={prefixInputElementId}
+      create={create}
+    />
   );
 };
 

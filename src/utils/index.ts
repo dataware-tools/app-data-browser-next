@@ -20,7 +20,7 @@ const authConfig = {
 const redirectUri =
   typeof window === "undefined" ? null : window.location.origin;
 
-const pydtkSystemColumns = ["record_id", "path", "contents"];
+const pydtkSystemColumns = ["database_id", "record_id", "path", "contents"];
 
 const inputFieldsNecessityOrder = [
   "required",

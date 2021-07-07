@@ -25,6 +25,9 @@ import {
   FieldError,
 } from "react-hook-form";
 import LoadingButton from "@material-ui/lab/LoadingButton";
+import { useRecoilValue } from "recoil";
+import { databasePaginateState } from "globalStates";
+import { useListDatabases } from "utils";
 
 type Props = {
   onSubmit: () => Promise<void>;
@@ -36,7 +39,7 @@ type Props = {
 
 type ContainerProps = {
   onClose: () => void;
-  onSubmitSucceeded: (newDatabase: metaStore.DatabaseModel) => void;
+  onSubmitSucceeded?: (newDatabase: metaStore.DatabaseModel) => void;
 } & Omit<DialogProps, "onClose" | "onSubmit">;
 
 type FormInput = {
@@ -58,7 +61,7 @@ const Component = ({
     <Dialog {...delegated}>
       <DialogWrapper>
         <DialogCloseButton onClick={onClose} />
-        <DialogTitle>Add Record</DialogTitle>
+        <DialogTitle>Add database</DialogTitle>
         <DialogContainer padding="0 0 20px">
           <DialogBody>
             <DialogMain>
@@ -150,18 +153,20 @@ const Container = ({
     formState: { errors: formErrors },
     handleSubmit,
   } = useForm<FormInput>();
-
+  const { page, perPage, search } = useRecoilValue(databasePaginateState);
   const [error, setError] = useState<ErrorMessageProps | undefined>(undefined);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const {
+    data: listDatabasesRes,
+    mutate: listDatabasesMutate,
+  } = useListDatabases(getAccessToken, { page, perPage, search });
 
   const initializeState = () => {
     setError(undefined);
     setIsSubmitting(false);
   };
-
-  // See: https://stackoverflow.com/questions/58209791/set-initial-state-for-material-ui-dialog
   const prevOpen = usePrevious(open);
-
   useEffect(() => {
     if (open && !prevOpen) {
       initializeState();
@@ -185,7 +190,15 @@ const Container = ({
       });
       return;
     } else if (createDatabaseRes) {
-      onSubmitSucceeded(createDatabaseRes);
+      if (listDatabasesRes) {
+        listDatabasesMutate({
+          ...listDatabasesRes,
+          data: [createDatabaseRes, ...listDatabasesRes.data],
+        });
+      } else {
+        listDatabasesMutate();
+      }
+      onSubmitSucceeded && onSubmitSucceeded(createDatabaseRes);
     }
 
     setIsSubmitting(false);

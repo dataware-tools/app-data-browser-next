@@ -26,6 +26,7 @@ export const Default = (): JSX.Element => {
         onClick={(target) => window.alert(`click ${target}!`)}
         onClose={onMenuClose}
         anchorEl={menuAnchorEl}
+        menu={[{ label: "Test", value: "Test value" }]}
       />
     </div>
   );

@@ -9,32 +9,21 @@ import {
   PageContainer,
   PageToolBar,
   PageBody,
-  TextCenteringSpan,
   PageMain,
-  fetchMetaStore,
-  metaStore,
-  confirm,
+  ErrorMessageProps,
+  SearchFormProps,
+  PerPageSelectProps,
 } from "@dataware-tools/app-common";
-import { makeStyles } from "@material-ui/core/styles";
 
 import { useAuth0 } from "@auth0/auth0-react";
-import { mutate } from "swr";
 import { useEffect, useState } from "react";
 import Pagination from "@material-ui/core/Pagination";
 import { useParams } from "react-router";
 import { RecordList, RecordListProps } from "components/organisms/RecordList";
-import { RecordDetailModal } from "components/organisms/RecordDetailModal";
-import Button from "@material-ui/core/Button";
-import AddCircle from "@material-ui/icons/AddCircle";
-import { RecordEditModal } from "components/organisms/RecordEditModal";
 import {
-  DatabaseMenuButton,
-  DatabaseMenuButtonProps,
-} from "components/molecules/DatabaseMenuButton";
-import {
-  DatabaseConfigModal,
-  DatabaseConfigNameType,
-} from "components/organisms/DatabaseConfigModal";
+  RecordDetailModal,
+  RecordDetailModalProps,
+} from "components/organisms/RecordDetailModal";
 
 import { Link } from "react-router-dom";
 import HomeIcon from "@material-ui/icons/Home";
@@ -42,163 +31,53 @@ import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
 import {
   useListRecords,
   useGetConfig,
-  DatabaseConfigType,
   useListPermittedActions,
   UserActionType,
 } from "utils";
-import { produce } from "immer";
-import { useRecoilValue, useSetRecoilState } from "recoil";
-import { userActionsState } from "../../globalStates";
-import { RenderToggleByAction } from "../atoms/RenderToggleByAction";
+import { useRecoilState, useSetRecoilState } from "recoil";
+import { userActionsState, recordPaginateState } from "globalStates";
+import { RenderToggleByAction } from "components/atoms/RenderToggleByAction";
+import { ControlledDatabaseMenuButton } from "components/organisms/ControlledDatabaseMenuButton";
+import {
+  RecordAddButton,
+  RecordAddButtonProps,
+} from "components/organisms/RecordAddButton";
 
-const useStyles = makeStyles(() => ({
-  fixedFlexShrink: {
-    flexShrink: 0,
-  },
-}));
+type Props = {
+  error?: ErrorMessageProps;
+  searchText: SearchFormProps["defaultValue"];
+  perPageOptions: PerPageSelectProps["values"];
+  isFetchComplete: boolean;
+  databaseId: string;
+  searchColumns: RecordListProps["searchKey"];
+  totalPage: number;
+  page: number;
+  perPage: PerPageSelectProps["perPage"];
+  addedRecordId?: RecordDetailModalProps["recordId"];
+  onChangeSearchText: SearchFormProps["onSearch"];
+  onChangePerPage: PerPageSelectProps["setPerPage"];
+  onChangePage: (newPage: number) => void;
+  onAddRecordSucceeded: RecordAddButtonProps["onAddRecordSucceeded"];
+  onCloseRecordDetailModal: RecordDetailModalProps["onClose"];
+};
 
-type ParamType = { databaseId: string };
-
-const Page = (): JSX.Element => {
-  const { getAccessTokenSilently: getAccessToken } = useAuth0();
-  const classes = useStyles();
-  const { databaseId } = useParams<ParamType>();
-
-  const [searchText, setSearchText] = useState(
-    getQueryString("searchText") || ""
-  );
-  const [perPage, setPerPage] = useState(
-    Number(getQueryString("perPage")) || 20
-  );
-  const [page, setPage] = useState(Number(getQueryString("page")) || 1);
-
-  const [isRecordDetailModalOpen, setIsRecordDetailModalOpen] = useState(false);
-  const [isRecordEditModalOpen, setIsRecordEditModalOpen] = useState(false);
-  const [
-    editingConfigName,
-    setEditingConfigName,
-  ] = useState<DatabaseConfigNameType | null>(null);
-  const [currentSelectedRecordId, setCurrentSelectedRecordId] = useState<
-    string | null
-  >(null);
-  const [error, setError] = useState<
-    { reason: string; instruction: string } | undefined
-  >(undefined);
-
-  const setUserActions = useSetRecoilState(userActionsState);
-  const userActions = useRecoilValue(userActionsState);
-
-  const [getConfigRes, getConfigError] = (useGetConfig(getAccessToken, {
-    databaseId,
-  }) as unknown) as [
-    data: DatabaseConfigType | undefined,
-    error: any,
-    cacheKey: string
-  ];
-
-  const [
-    listPermittedActionRes,
-    listPermittedActionError,
-  ] = useListPermittedActions(getAccessToken, { databaseId });
-
-  const searchColumn = getConfigRes?.columns
-    .filter((column) => column.is_search_target)
-    .map((column) => column.name) || ["record_id"];
-
-  const [
-    listRecordsRes,
-    listRecordsError,
-    listRecordsCacheKey,
-  ] = useListRecords(getAccessToken, {
-    databaseId,
-    perPage,
-    page,
-    search: searchText,
-    searchKey: searchColumn,
-  });
-
-  const displayColumns =
-    getConfigRes?.columns
-      .filter((column) => column.is_display_field)
-      .map((column) => ({
-        field: column.name,
-        label: column.display_name,
-      })) || [];
-
-  useEffect(() => {
-    addQueryString({ page, perPage, searchText }, "replace");
-  }, [page, perPage, searchText]);
-  useEffect(() => {
-    if (listPermittedActionRes) {
-      setUserActions(listPermittedActionRes as UserActionType[]);
-    }
-  }, [listPermittedActionRes, setUserActions]);
-
-  const onSelectRecord: RecordListProps["onSelectRecord"] = (record) => {
-    if (listRecordsRes) {
-      setIsRecordDetailModalOpen(true);
-      setCurrentSelectedRecordId(listRecordsRes.data[record.index].record_id);
-    }
-  };
-
-  const onDeleteRecord: RecordListProps["onDeleteRecord"] = async (target) => {
-    if (listRecordsRes) {
-      if (
-        !(await confirm({ title: "Are you sure you want to delete record?" }))
-      ) {
-        return;
-      }
-
-      const newRecordList = produce(listRecordsRes, (draft) => {
-        draft.data.splice(target.index, 1);
-      });
-      mutate(listRecordsCacheKey, newRecordList, false);
-
-      const [deleteRecordRes, deleteRecordError] = await fetchMetaStore(
-        getAccessToken,
-        metaStore.RecordService.deleteRecord,
-        {
-          databaseId,
-          recordId: listRecordsRes.data[target.index].record_id,
-        }
-      );
-
-      if (deleteRecordError) {
-        setError({
-          reason: JSON.stringify(deleteRecordError),
-          instruction: "Please reload this page",
-        });
-      } else if (deleteRecordRes) {
-        mutate(listRecordsCacheKey);
-      }
-    }
-  };
-
-  const onDatabaseMenuSelect: DatabaseMenuButtonProps["onMenuSelect"] = (
-    targetName
-  ) => {
-    switch (targetName) {
-      case "Configure display columns":
-        setEditingConfigName("record_list_display_columns");
-        break;
-      case "Configure input columns":
-        setEditingConfigName("record_add_editable_columns");
-        break;
-      case "Configure search target columns":
-        setEditingConfigName("record_search_target_columns");
-        break;
-      case "Configure secret columns":
-        setEditingConfigName("secret_columns");
-        break;
-      case "Export metadata":
-        setEditingConfigName("export_metadata");
-        break;
-    }
-  };
-
-  const fetchError =
-    listRecordsError || getConfigError || listPermittedActionError;
-
+const Component = ({
+  error,
+  searchText,
+  perPage,
+  perPageOptions,
+  isFetchComplete,
+  totalPage,
+  page,
+  databaseId,
+  addedRecordId,
+  onChangeSearchText,
+  onChangePerPage,
+  onChangePage,
+  onAddRecordSucceeded,
+  onCloseRecordDetailModal,
+  searchColumns,
+}: Props) => {
   return (
     <>
       <PageContainer>
@@ -213,122 +92,191 @@ const Page = (): JSX.Element => {
               </Link>
             }
             right={
-              <>
-                {!listRecordsError ? (
-                  <>
-                    <div className={classes.fixedFlexShrink}>
-                      <SearchForm
-                        onSearch={(newSearchText) =>
-                          setSearchText(newSearchText)
-                        }
-                        defaultValue={searchText}
-                      />
-                    </div>
+              isFetchComplete ? (
+                <>
+                  <SearchForm
+                    onSearch={onChangeSearchText}
+                    defaultValue={searchText}
+                  />
+                  <Spacer direction="horizontal" size="15px" />
+                  <PerPageSelect
+                    perPage={perPage}
+                    setPerPage={onChangePerPage}
+                    values={perPageOptions}
+                  />
+                  <RenderToggleByAction required="metadata:write:add">
                     <Spacer direction="horizontal" size="15px" />
-                    <PerPageSelect
-                      perPage={perPage}
-                      setPerPage={setPerPage}
-                      values={[10, 20, 50, 100]}
+                    <RecordAddButton
+                      databaseId={databaseId}
+                      onAddRecordSucceeded={onAddRecordSucceeded}
                     />
-                    <RenderToggleByAction required="metadata:write:add">
-                      <Spacer direction="horizontal" size="15px" />
-                      <Button
-                        onClick={() => setIsRecordEditModalOpen(true)}
-                        startIcon={<AddCircle />}
-                        className={classes.fixedFlexShrink}
-                      >
-                        <TextCenteringSpan>Record</TextCenteringSpan>
-                      </Button>
-                    </RenderToggleByAction>
-                  </>
-                ) : null}
-                {!getConfigError ? (
-                  <>
-                    <Spacer direction="horizontal" size="15px" />
-                    <DatabaseMenuButton onMenuSelect={onDatabaseMenuSelect} />
-                  </>
-                ) : null}
-              </>
+                  </RenderToggleByAction>
+                  <Spacer direction="horizontal" size="15px" />
+                  <ControlledDatabaseMenuButton databaseId={databaseId} />
+                </>
+              ) : null
             }
           />
           <PageMain>
-            {fetchError || error ? (
-              <ErrorMessage
-                reason={JSON.stringify(fetchError || error)}
-                instruction="please reload this page"
-              />
-            ) : listRecordsRes && getConfigRes ? (
-              displayColumns.length <= 0 ? (
-                <ErrorMessage
-                  reason="Display columns is not configured"
-                  instruction="please report administrator this error"
-                />
-              ) : (
+            {error ? (
+              <ErrorMessage {...error} />
+            ) : isFetchComplete ? (
+              <>
                 <RecordList
-                  columns={displayColumns}
-                  records={listRecordsRes.data}
-                  onSelectRecord={onSelectRecord}
-                  onDeleteRecord={
-                    userActions.some((action) =>
-                      "metadata:write:delete".startsWith(action)
-                    )
-                      ? onDeleteRecord
-                      : undefined
-                  }
+                  databaseId={databaseId}
+                  page={page}
+                  perPage={perPage}
+                  search={searchText}
+                  searchKey={searchColumns}
                 />
-              )
+              </>
             ) : (
               <LoadingIndicator />
             )}
           </PageMain>
-          <Spacer direction="vertical" size="3vh" />
-          {listRecordsRes ? (
-            <ElemCenteringFlexDiv>
-              <Pagination
-                count={Math.ceil(
-                  listRecordsRes.total / listRecordsRes.per_page
-                )}
-                page={page}
-                onChange={(_, newPage) => setPage(newPage)}
-              />
-            </ElemCenteringFlexDiv>
+          {isFetchComplete ? (
+            <>
+              <Spacer direction="vertical" size="3vh" />
+              <ElemCenteringFlexDiv>
+                <Pagination
+                  count={totalPage}
+                  page={page}
+                  onChange={(_, newPage) => onChangePage(newPage)}
+                />
+              </ElemCenteringFlexDiv>
+            </>
           ) : null}
         </PageBody>
       </PageContainer>
-      {listRecordsRes ? (
-        <RecordEditModal
-          open={isRecordEditModalOpen}
-          onClose={() => setIsRecordEditModalOpen(false)}
-          databaseId={databaseId}
-          onSubmitSucceeded={(newRecord) => {
-            const newRecordList = { ...listRecordsRes };
-            newRecordList.data.push(newRecord);
-            setCurrentSelectedRecordId(newRecord.record_id);
-            setIsRecordDetailModalOpen(true);
-          }}
-          create
-        />
-      ) : null}
-      {currentSelectedRecordId ? (
+      {addedRecordId ? (
         <RecordDetailModal
-          open={isRecordDetailModalOpen}
-          recordId={currentSelectedRecordId}
+          open={Boolean(addedRecordId)}
+          recordId={addedRecordId}
           databaseId={databaseId}
-          onClose={() => {
-            setIsRecordDetailModalOpen(false);
-            mutate(listRecordsCacheKey);
-          }}
-        />
-      ) : null}
-      {editingConfigName ? (
-        <DatabaseConfigModal
-          databaseId={databaseId}
-          open={Boolean(editingConfigName)}
-          onClose={() => setEditingConfigName(null)}
-          configName={editingConfigName}
+          onClose={onCloseRecordDetailModal}
         />
       ) : null}
     </>
+  );
+};
+
+type ParamType = { databaseId: string };
+
+const Page = (): JSX.Element => {
+  const { getAccessTokenSilently: getAccessToken } = useAuth0();
+  const { databaseId } = useParams<ParamType>();
+  const [
+    { page, perPage, search, searchKey },
+    setRecordPaginateState,
+  ] = useRecoilState(recordPaginateState);
+  const setUserActions = useSetRecoilState(userActionsState);
+  const [addedRecordId, serAddedRecordId] = useState<string | undefined>(
+    undefined
+  );
+  const [error, setError] = useState<ErrorMessageProps | undefined>(undefined);
+
+  const { data: getConfigRes, error: getConfigError } = useGetConfig(
+    getAccessToken,
+    {
+      databaseId,
+    }
+  );
+
+  const {
+    data: listPermittedActionRes,
+    error: listPermittedActionError,
+  } = useListPermittedActions(getAccessToken, { databaseId });
+
+  const {
+    data: listRecordsRes,
+    error: listRecordsError,
+    mutate: listRecordsMutate,
+  } = useListRecords(
+    getAccessToken,
+    { databaseId, page, perPage, search, searchKey },
+    Boolean(getConfigRes)
+  );
+
+  const fetchError =
+    listRecordsError || getConfigError || listPermittedActionError;
+  useEffect(() => {
+    if (fetchError) {
+      setError({
+        reason: JSON.stringify(fetchError),
+        instruction: "Please reload this page",
+      });
+    }
+  }, [fetchError]);
+
+  useEffect(() => {
+    addQueryString(
+      {
+        page,
+        perPage,
+        search,
+      },
+      "replace"
+    );
+  }, [page, perPage, search]);
+
+  useEffect(() => {
+    setRecordPaginateState({
+      page: Number(getQueryString("page")) || 1,
+      perPage: Number(getQueryString("perPage")) || 20,
+      search: getQueryString("searchText") || "",
+      searchKey: getConfigRes?.columns
+        .filter((column) => column.is_search_target)
+        .map((column) => column.name) || ["record_id"],
+    });
+  }, [getConfigRes, setRecordPaginateState, databaseId]);
+
+  useEffect(() => {
+    if (listPermittedActionRes) {
+      setUserActions((listPermittedActionRes || []) as UserActionType[]);
+    }
+  }, [listPermittedActionRes, setUserActions]);
+
+  const onAddRecordSucceeded: Props["onAddRecordSucceeded"] = (newRecord) => {
+    serAddedRecordId(newRecord.record_id);
+  };
+  const onCloseRecordDetailModal = () => {
+    serAddedRecordId(undefined);
+    listRecordsMutate();
+  };
+  const onChangePage: Props["onChangePage"] = (page) =>
+    setRecordPaginateState((prev) => ({ ...prev, page }));
+  const onChangePerPage: Props["onChangePerPage"] = (perPage) => {
+    setRecordPaginateState((prev) => ({ ...prev, perPage }));
+  };
+  const onChangeSearchText: Props["onChangeSearchText"] = (searchText) => {
+    setRecordPaginateState((prev) => ({ ...prev, search: searchText }));
+  };
+
+  const isFetchComplete = Boolean(
+    !fetchError && listRecordsRes && getConfigRes && listPermittedActionRes
+  );
+  const totalPage = listRecordsRes
+    ? Math.ceil(listRecordsRes.total / listRecordsRes.per_page)
+    : 0;
+
+  return (
+    <Component
+      error={error}
+      databaseId={databaseId}
+      isFetchComplete={isFetchComplete}
+      onAddRecordSucceeded={onAddRecordSucceeded}
+      onChangePage={onChangePage}
+      onChangePerPage={onChangePerPage}
+      onChangeSearchText={onChangeSearchText}
+      onCloseRecordDetailModal={onCloseRecordDetailModal}
+      page={page}
+      perPage={perPage}
+      perPageOptions={[10, 20, 50, 100]}
+      searchText={search}
+      addedRecordId={addedRecordId}
+      totalPage={totalPage}
+      searchColumns={searchKey}
+    />
   );
 };
 

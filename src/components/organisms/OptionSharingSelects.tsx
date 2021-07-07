@@ -1,4 +1,4 @@
-import { Spacer, theme as themeInstance } from "@dataware-tools/app-common";
+import { Spacer } from "@dataware-tools/app-common";
 import { makeStyles } from "@material-ui/core/styles";
 import { useState, Fragment } from "react";
 import {
@@ -7,7 +7,7 @@ import {
   OptionSharingSelectsItemProps,
 } from "components/molecules/OptionSharingSelectsItem";
 import { produce } from "immer";
-import AddIcon from "@material-ui/icons/Add";
+import { AddListItemButton } from "components/atoms/AddListItemButton";
 
 type ValuesType = OptionSharingSelectsItemProps["value"][];
 type OptionType = OptionSharingSelectsItemProps["options"][number];
@@ -64,36 +64,20 @@ const Component = ({
       {creatable ? (
         <>
           <Spacer direction="vertical" size={space || "3vh"} />
-          <div
-            onClick={() => onChange("create", 0, "", "")}
-            className={classes.addButton}
-          >
-            <AddIcon />
-          </div>
+          <AddListItemButton onClick={() => onChange("create", 0, "", "")} />
         </>
       ) : null}
     </div>
   );
 };
 
-const useStyles = makeStyles((theme: typeof themeInstance) => ({
+const useStyles = makeStyles({
   root: {
     display: "flex",
     flex: 1,
     flexDirection: "column",
   },
-  addButton: {
-    alignItems: "center",
-    backgroundColor: theme.palette.grey[300],
-    cursor: "pointer",
-    display: "flex",
-    height: "40px",
-    justifyContent: "center",
-    "&:hover": {
-      backgroundColor: theme.palette.grey[400],
-    },
-  },
-}));
+});
 
 const Container = ({
   options,

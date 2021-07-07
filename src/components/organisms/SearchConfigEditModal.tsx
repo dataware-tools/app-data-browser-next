@@ -1,12 +1,7 @@
 import Dialog from "@material-ui/core/Dialog";
 import { useState, useEffect } from "react";
 import LoadingButton from "@material-ui/lab/LoadingButton";
-import { useGetConfig, DatabaseConfigType, fetchMetaStore } from "utils/index";
-import {
-  SearchConfigList,
-  SearchConfigListProps,
-} from "components/organisms/SearchConfigList";
-import AddCircleIcon from "@material-ui/icons/AddCircle";
+import { useGetConfig, fetchMetaStore } from "utils/index";
 import { useAuth0 } from "@auth0/auth0-react";
 import {
   ErrorMessage,
@@ -16,17 +11,31 @@ import {
   DialogBody,
   DialogContainer,
   DialogToolBar,
-  SquareIconButton,
-  TextCenteringSpan,
   DialogWrapper,
   DialogMain,
   usePrevious,
-  // NoticeableLetters,
+  NoticeableLetters,
+  LoadingIndicator,
+  ErrorMessageProps,
 } from "@dataware-tools/app-common";
 import { produce } from "immer";
-import { mutate } from "swr";
+import {
+  OptionSharingSelects,
+  OptionSharingSelectsProps,
+} from "components/organisms/OptionSharingSelects";
 
 type ConfigNameType = "record_search_target_columns";
+
+type Props = {
+  error?: ErrorMessageProps;
+  isFetchComplete: boolean;
+  onChangeSearchTargetColumns: OptionSharingSelectsProps["onChange"];
+  searchTargetColumnsOptions: OptionSharingSelectsProps["options"];
+  searchTargetColumns: OptionSharingSelectsProps["values"];
+  isDisableSaveButton: boolean;
+  isSaving: boolean;
+  onSave: () => void;
+} & Omit<ContainerProps, "databaseId">;
 
 type ContainerProps = {
   open: boolean;
@@ -34,15 +43,58 @@ type ContainerProps = {
   onClose: () => void;
 };
 
-type OptionType = { label: string; value: string };
-const compareOption = (a: OptionType, b: OptionType) => {
-  if (a.label > b.label) {
-    return 1;
-  } else if (a.label < b.label) {
-    return -1;
-  } else {
-    return 0;
-  }
+const Component = ({
+  open,
+  onClose,
+  error,
+  isFetchComplete,
+  onChangeSearchTargetColumns,
+  searchTargetColumnsOptions,
+  searchTargetColumns,
+  isDisableSaveButton,
+  isSaving,
+  onSave,
+}: Props) => {
+  return (
+    <Dialog open={open} maxWidth="xl" onClose={onClose}>
+      <DialogWrapper>
+        <DialogCloseButton onClick={onClose} />
+        <DialogTitle>
+          <NoticeableLetters>Search target columns</NoticeableLetters>
+        </DialogTitle>
+        <DialogContainer padding="0 0 20px">
+          {error ? (
+            <ErrorMessage {...error} />
+          ) : isFetchComplete ? (
+            <DialogBody>
+              <DialogMain>
+                <OptionSharingSelects
+                  onChange={onChangeSearchTargetColumns}
+                  options={searchTargetColumnsOptions}
+                  values={searchTargetColumns}
+                  creatable
+                  deletable
+                />
+              </DialogMain>
+              <DialogToolBar
+                right={
+                  <LoadingButton
+                    disabled={isDisableSaveButton}
+                    pending={isSaving}
+                    onClick={onSave}
+                  >
+                    Save
+                  </LoadingButton>
+                }
+              />
+            </DialogBody>
+          ) : (
+            <LoadingIndicator />
+          )}
+        </DialogContainer>
+      </DialogWrapper>
+    </Dialog>
+  );
 };
 
 const Container = ({
@@ -52,35 +104,20 @@ const Container = ({
 }: ContainerProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const [isSaving, setIsSaving] = useState(false);
-  const [config, setConfig] = useState<string[]>([]);
-  const [options, setOptions] = useState<OptionType[] | null>(null);
-  const [alreadySelectedOptions, setAlreadySelectedOptions] = useState<
-    string[]
-  >([]);
+  const [searchTargetColumns, setSearchTargetColumns] = useState<string[]>([]);
+  const [error, setError] = useState<ErrorMessageProps | undefined>(undefined);
 
-  const [getConfigRes, getConfigError, getConfigCacheKey] = (useGetConfig(
-    getAccessToken,
-    {
-      databaseId,
-    }
-  ) as unknown) as [
-    data: DatabaseConfigType | undefined,
-    error: any,
-    cacheKey: string
-  ];
-
-  useEffect(() => {
-    setConfig(
-      getConfigRes?.columns
-        .filter((column) => column.is_search_target)
-        .map((column) => column.name) || []
-    );
-  }, [getConfigRes]);
+  const {
+    data: getConfigRes,
+    error: getConfigError,
+    mutate: getConfigMutate,
+  } = useGetConfig(getAccessToken, {
+    databaseId,
+  });
 
   const initializeState = () => {
     setIsSaving(false);
   };
-  // See: https://stackoverflow.com/questions/58209791/set-initial-state-for-material-ui-dialog
   const prevOpen = usePrevious(open);
   useEffect(() => {
     if (open && !prevOpen) {
@@ -88,17 +125,42 @@ const Container = ({
     }
   }, [open, prevOpen]);
 
+  const fetchError = getConfigError;
+  useEffect(() => {
+    if (fetchError) {
+      setError({
+        reason: JSON.stringify(fetchError),
+        instruction: "Please reload this page",
+      });
+    }
+  }, [fetchError]);
+
+  useEffect(() => {
+    setSearchTargetColumns(
+      getConfigRes?.columns
+        .filter((column) => column.is_search_target)
+        .map((column) => column.name) || []
+    );
+
+    if (getConfigRes && getConfigRes.columns.length <= 0) {
+      setError({
+        reason: "No available column",
+        instruction: "Please add data or input field",
+      });
+    }
+  }, [getConfigRes]);
+
   const onSave = async () => {
     if (getConfigRes) {
       setIsSaving(true);
       const newConfig = produce(getConfigRes, (draft) => {
         draft.columns = draft.columns.map((column) => ({
           ...column,
-          is_search_target: config.includes(column.name),
+          is_search_target: searchTargetColumns.includes(column.name),
         }));
       });
 
-      const [data, error] = await fetchMetaStore(
+      const [updateConfigRes, updateConfigError] = await fetchMetaStore(
         getAccessToken,
         metaStore.ConfigService.updateConfig,
         {
@@ -107,10 +169,14 @@ const Container = ({
         }
       );
 
-      if (error) {
-        // TODO: show error
+      if (updateConfigError) {
+        setError({
+          reason: JSON.stringify(updateConfigError),
+          instruction: "Please reload this page",
+        });
+        return;
       } else {
-        mutate(getConfigCacheKey, data);
+        getConfigMutate(updateConfigRes);
       }
 
       setIsSaving(false);
@@ -118,136 +184,28 @@ const Container = ({
     onClose();
   };
 
-  const onAdd = () =>
-    setConfig((prev) => {
-      return prev ? [...prev, ""] : [""];
-    });
-
-  const onChange: SearchConfigListProps["onChange"] = (
-    action,
-    index,
-    newValue,
-    oldValue
-  ) => {
-    if (action === "change") {
-      setConfig((prev) => {
-        const newConfig = produce(prev, (draft) => {
-          draft[index] = newValue;
-        });
-        return newConfig;
-      });
-
-      setAlreadySelectedOptions((prev) => {
-        if (prev) {
-          const next = produce(prev, (draft) => {
-            if (draft.includes(oldValue)) {
-              draft.splice(draft.indexOf(oldValue), 1);
-            }
-            if (!draft.includes(newValue)) {
-              draft.push(newValue);
-            }
-          });
-
-          return next;
-        }
-        return [newValue];
-      });
-    }
-
-    if (action === "delete") {
-      setConfig((prev) => {
-        const newConfig = produce(prev, (draft) => {
-          draft.splice(index, 1);
-        });
-        return newConfig;
-      });
-
-      setAlreadySelectedOptions((prev) => {
-        if (prev) {
-          if (prev.includes(oldValue)) {
-            const next = produce(prev, (draft) => {
-              draft.splice(draft.indexOf(oldValue), 1);
-            });
-            return next;
-          } else {
-            return prev;
-          }
-        }
-        return prev;
-      });
-    }
-  };
-
-  useEffect(() => {
-    if (getConfigRes) {
-      const options = getConfigRes.columns
-        .map((column) => ({
-          label: `${column.name} (display name: ${column.display_name})`,
-          value: column.name,
-        }))
-        .sort(compareOption);
-      setOptions(options.length > 0 ? options : null);
-
-      setAlreadySelectedOptions(
-        getConfigRes.columns
-          .filter((column) => column.is_search_target)
-          .map((column) => column.name) || []
-      );
-    }
-  }, [getConfigRes]);
+  const searchTargetColumnsOptions =
+    getConfigRes?.columns.map((column) => ({
+      label: `${column.name} (display name: ${column.display_name})`,
+      value: column.name,
+    })) || [];
+  const isFetchComplete = Boolean(!fetchError && getConfigRes);
+  const isDisableSaveButton =
+    searchTargetColumns.length <= 0 || searchTargetColumns.includes("");
 
   return (
-    <Dialog open={open} maxWidth="xl" onClose={onClose}>
-      <DialogWrapper>
-        <DialogCloseButton onClick={onClose} />
-        <DialogTitle>
-          {/* //TODO: Fix typeError */}
-          {/* <NoticeableLetters> */}
-          <TextCenteringSpan>Search target columns</TextCenteringSpan>
-          {/* </NoticeableLetters> */}
-          {getConfigRes ? (
-            <SquareIconButton onClick={onAdd} icon={<AddCircleIcon />} />
-          ) : null}
-        </DialogTitle>
-        <DialogContainer padding="0 0 20px">
-          {getConfigError ? (
-            <ErrorMessage
-              reason={JSON.stringify(getConfigError)}
-              instruction="please reload this page"
-            />
-          ) : getConfigRes ? (
-            options == null ? (
-              <ErrorMessage
-                reason="no available column"
-                instruction="please add data or input field"
-              />
-            ) : (
-              <DialogBody>
-                <DialogMain>
-                  <SearchConfigList
-                    value={config}
-                    onChange={onChange}
-                    options={options}
-                    alreadySelectedOptions={alreadySelectedOptions}
-                  />
-                </DialogMain>
-                <DialogToolBar
-                  right={
-                    <LoadingButton
-                      disabled={config.length <= 0 || config.includes("")}
-                      pending={isSaving}
-                      onClick={onSave}
-                    >
-                      Save
-                    </LoadingButton>
-                  }
-                />
-              </DialogBody>
-            )
-          ) : null}
-        </DialogContainer>
-      </DialogWrapper>
-    </Dialog>
+    <Component
+      isDisableSaveButton={isDisableSaveButton}
+      isFetchComplete={isFetchComplete}
+      isSaving={isSaving}
+      onChangeSearchTargetColumns={setSearchTargetColumns}
+      onClose={onClose}
+      onSave={onSave}
+      open={open}
+      searchTargetColumns={searchTargetColumns}
+      searchTargetColumnsOptions={searchTargetColumnsOptions}
+      error={error}
+    />
   );
 };
 

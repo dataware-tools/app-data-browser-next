@@ -1,7 +1,7 @@
 import Dialog from "@material-ui/core/Dialog";
 import { useState, useEffect } from "react";
 import LoadingButton from "@material-ui/lab/LoadingButton";
-import { useGetConfig, DatabaseConfigType, fetchMetaStore } from "utils/index";
+import { useGetConfig, fetchMetaStore } from "utils/index";
 import { useAuth0 } from "@auth0/auth0-react";
 import {
   ErrorMessage,
@@ -11,14 +11,14 @@ import {
   DialogBody,
   DialogContainer,
   DialogToolBar,
-  TextCenteringSpan,
   DialogWrapper,
   DialogMain,
   ErrorMessageProps,
   usePrevious,
+  NoticeableLetters,
+  LoadingIndicator,
 } from "@dataware-tools/app-common";
 import { produce } from "immer";
-import { mutate } from "swr";
 import {
   OptionSharingSelects,
   OptionSharingSelectsProps,
@@ -26,12 +26,76 @@ import {
 
 type ConfigNameType = "secret_columns";
 
+type Props = {
+  error?: ErrorMessageProps;
+  isFetchComplete: boolean;
+  onChangeSecretColumns: OptionSharingSelectsProps["onChange"];
+  secretColumnsOptions: OptionSharingSelectsProps["options"];
+  secretColumns: OptionSharingSelectsProps["values"];
+  isDisableSaveButton: boolean;
+  isSaving: boolean;
+  onSave: () => void;
+} & Omit<ContainerProps, "databaseId">;
+
 type ContainerProps = {
   open: boolean;
   databaseId: string;
   onClose: () => void;
 };
 
+const Component = ({
+  open,
+  onClose,
+  error,
+  isFetchComplete,
+  onChangeSecretColumns,
+  secretColumnsOptions,
+  secretColumns,
+  isDisableSaveButton,
+  isSaving,
+  onSave,
+}: Props) => {
+  return (
+    <Dialog open={open} maxWidth="xl" onClose={onClose}>
+      <DialogWrapper>
+        <DialogCloseButton onClick={onClose} />
+        <DialogTitle>
+          <NoticeableLetters>Search target columns</NoticeableLetters>
+        </DialogTitle>
+        <DialogContainer padding="0 0 20px">
+          {error ? (
+            <ErrorMessage {...error} />
+          ) : isFetchComplete ? (
+            <DialogBody>
+              <DialogMain>
+                <OptionSharingSelects
+                  onChange={onChangeSecretColumns}
+                  options={secretColumnsOptions}
+                  values={secretColumns}
+                  creatable
+                  deletable
+                />
+              </DialogMain>
+              <DialogToolBar
+                right={
+                  <LoadingButton
+                    disabled={isDisableSaveButton}
+                    pending={isSaving}
+                    onClick={onSave}
+                  >
+                    Save
+                  </LoadingButton>
+                }
+              />
+            </DialogBody>
+          ) : (
+            <LoadingIndicator />
+          )}
+        </DialogContainer>
+      </DialogWrapper>
+    </Dialog>
+  );
+};
 const Container = ({
   open,
   onClose,
@@ -39,24 +103,16 @@ const Container = ({
 }: ContainerProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const [isSaving, setIsSaving] = useState(false);
-  const [config, setConfig] = useState<string[]>([]);
-  const [options, setOptions] = useState<
-    OptionSharingSelectsProps["options"] | null
-  >(null);
-  const [errorMessage, setErrorMessage] = useState<ErrorMessageProps | null>(
-    null
-  );
+  const [secretColumns, setSecretColumns] = useState<string[]>([]);
+  const [error, setError] = useState<ErrorMessageProps | undefined>(undefined);
 
-  const [getConfigRes, getConfigError, getConfigCacheKey] = (useGetConfig(
-    getAccessToken,
-    {
-      databaseId,
-    }
-  ) as unknown) as [
-    data: DatabaseConfigType | undefined,
-    error: any,
-    cacheKey: string
-  ];
+  const {
+    data: getConfigRes,
+    error: getConfigError,
+    mutate: getConfigMutate,
+  } = useGetConfig(getAccessToken, {
+    databaseId,
+  });
 
   const initializeState = () => {
     setIsSaving(false);
@@ -68,13 +124,38 @@ const Container = ({
     }
   }, [open, prevOpen]);
 
+  const fetchError = getConfigError;
+  useEffect(() => {
+    if (fetchError) {
+      setError({
+        reason: JSON.stringify(fetchError),
+        instruction: "Please reload this page",
+      });
+    }
+  }, [fetchError]);
+
+  useEffect(() => {
+    setSecretColumns(
+      getConfigRes?.columns
+        ?.filter((column) => column.is_secret)
+        ?.map((column) => column.name) || []
+    );
+
+    if (getConfigRes && getConfigRes.columns.length <= 0) {
+      setError({
+        reason: "No available column",
+        instruction: "Please add data or input field",
+      });
+    }
+  }, [getConfigRes]);
+
   const onSave = async () => {
     if (getConfigRes?.columns) {
       setIsSaving(true);
       const newConfig = produce(getConfigRes, (draft) => {
         draft.columns = draft.columns.map((column) => ({
           ...column,
-          is_secret: config.includes(column.name),
+          is_secret: secretColumns.includes(column.name),
         }));
       });
 
@@ -88,12 +169,12 @@ const Container = ({
       );
 
       if (error) {
-        setErrorMessage({
+        setError({
           reason: error?.body?.detail || JSON.stringify(error?.body || error),
           instruction: "Please reload this page",
         });
       } else {
-        mutate(getConfigCacheKey, data);
+        getConfigMutate(data);
       }
 
       setIsSaving(false);
@@ -101,75 +182,27 @@ const Container = ({
     onClose();
   };
 
-  useEffect(() => {
-    setConfig(
-      getConfigRes?.columns
-        ?.filter((column) => column.is_secret)
-        ?.map((column) => column.name) || []
-    );
-  }, [getConfigRes]);
-
-  useEffect(() => {
-    if (getConfigRes?.columns) {
-      const options = getConfigRes.columns.map((column) => ({
-        label: `${column.name} (display name: ${column.display_name})`,
-        value: column.name,
-      }));
-      setOptions(options.length > 0 ? options : null);
-    }
-  }, [getConfigRes]);
+  const secretColumnsOptions =
+    getConfigRes?.columns.map((column) => ({
+      label: `${column.name} (display name: ${column.display_name})`,
+      value: column.name,
+    })) || [];
+  const isFetchComplete = Boolean(!fetchError && getConfigRes);
+  const isDisableSaveButton = secretColumns.includes("");
 
   return (
-    <Dialog open={open} maxWidth="xl" onClose={onClose}>
-      <DialogWrapper>
-        <DialogCloseButton onClick={onClose} />
-        <DialogTitle>
-          <TextCenteringSpan>Secret columns</TextCenteringSpan>
-        </DialogTitle>
-        <DialogContainer padding="0 0 20px">
-          {getConfigError ? (
-            <ErrorMessage
-              reason={JSON.stringify(getConfigError)}
-              instruction="please reload this page"
-            />
-          ) : errorMessage ? (
-            <ErrorMessage {...errorMessage} />
-          ) : getConfigRes ? (
-            options == null ? (
-              <ErrorMessage
-                reason="No available column"
-                instruction="Please add data or configure input field"
-              />
-            ) : (
-              <DialogBody>
-                <DialogMain>
-                  <OptionSharingSelects
-                    options={options}
-                    onChange={(newConfig) => {
-                      setConfig(newConfig);
-                    }}
-                    values={config}
-                    creatable
-                    deletable
-                  />
-                </DialogMain>
-                <DialogToolBar
-                  right={
-                    <LoadingButton
-                      disabled={config.includes("")}
-                      pending={isSaving}
-                      onClick={onSave}
-                    >
-                      Save
-                    </LoadingButton>
-                  }
-                />
-              </DialogBody>
-            )
-          ) : null}
-        </DialogContainer>
-      </DialogWrapper>
-    </Dialog>
+    <Component
+      isDisableSaveButton={isDisableSaveButton}
+      isFetchComplete={isFetchComplete}
+      isSaving={isSaving}
+      onChangeSecretColumns={setSecretColumns}
+      onClose={onClose}
+      onSave={onSave}
+      open={open}
+      secretColumns={secretColumns}
+      secretColumnsOptions={secretColumnsOptions}
+      error={error}
+    />
   );
 };
 

@@ -15,8 +15,13 @@ const Template: Story<InputConfigListItemProps> = (args) => (
 
 export const Default = Template.bind({});
 Default.args = {
-  onChange: (action, value) =>
-    window.alert(`${action} "${JSON.stringify(value)}"`),
+  onUpdate: (newValue, oldValue) =>
+    window.alert(
+      `${JSON.stringify(oldValue)} -> "${JSON.stringify(newValue)}"`
+    ),
+  onDelete: (oldValue) => {
+    window.alert(`${JSON.stringify(oldValue)} is deleted`);
+  },
   value: {
     name: "name",
     display_name: "display_name",

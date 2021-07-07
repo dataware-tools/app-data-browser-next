@@ -1,7 +1,6 @@
 import { ReactNode } from "react";
-import { useRecoilValue } from "recoil";
-import { userActionsState } from "globalStates";
 import { UserActionType } from "utils";
+import { useIsActionPermitted } from "globalStates";
 
 type ContainerProps = {
   required: UserActionType;
@@ -12,13 +11,7 @@ const Container = ({
   required,
   children,
 }: ContainerProps): JSX.Element | null => {
-  const userActions = useRecoilValue(userActionsState);
-  if (userActions.length === 0) {
-    return null;
-  }
-
-  const isPermitted = userActions.some((action) => required.startsWith(action));
-
+  const isPermitted = useIsActionPermitted(required);
   return isPermitted ? <>{children}</> : null;
 };
 
