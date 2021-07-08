@@ -118,17 +118,24 @@ const Container = ({
     }
   }, [fetchError]);
 
-  useEffect(() => {
+  const initializeInputColumns = (
+    getConfigRes: ReturnType<typeof useGetConfig>["data"]
+  ) => {
     setInputColumns(
       getConfigRes?.columns.map((column) => ({
         name: column.name,
         display_name: column.display_name,
         necessity: column.necessity || "unnecessary",
+        order_of_input: column.order_of_input,
       })) || []
     );
+  };
+  useEffect(() => {
+    initializeInputColumns(getConfigRes);
   }, [getConfigRes]);
 
   const initializeState = () => {
+    initializeInputColumns(getConfigRes);
     setIsSaving(false);
   };
   const prevOpen = usePrevious(open);
@@ -163,6 +170,7 @@ const Container = ({
             name: column.name,
             display_name: column.display_name,
             necessity: column.necessity,
+            order_of_input: column.order_of_input,
             dtype: "string" as const,
             aggregation: "first" as const,
           }));
