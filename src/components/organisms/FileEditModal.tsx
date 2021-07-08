@@ -62,7 +62,7 @@ const Container = ({
           (column) =>
             isEditableColumnName(getConfigRes, column.name) &&
             column.aggregation !== "first" &&
-            editableColumnDtype.includes[column.dtype]
+            editableColumnDtype.includes(column.dtype)
         )
         .map((column) => ({
           name: column.name,
