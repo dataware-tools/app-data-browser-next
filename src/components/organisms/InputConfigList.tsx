@@ -67,19 +67,23 @@ const Component = ({
                 return (
                   <Draggable key={index} draggableId={`${index}`} index={index}>
                     {(provided) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                      >
-                        <span className={classes.draggable}>
-                          <DragIndicatorIcon />
-                          <InputConfigListItem
-                            value={config}
-                            onUpdate={onUpdate}
-                            onDelete={onDelete}
-                          />
-                        </span>
+                      <div ref={provided.innerRef} {...provided.draggableProps}>
+                        <InputConfigListItem
+                          label={
+                            <span
+                              className={classes.draggable}
+                              {...provided.dragHandleProps}
+                            >
+                              <DragIndicatorIcon />
+                              {config.name}
+                              <br />
+                              {`(display name: ${config.display_name})`}
+                            </span>
+                          }
+                          value={config}
+                          onUpdate={onUpdate}
+                          onDelete={onDelete}
+                        />
                         <Spacer direction="vertical" size="3vh" />
                       </div>
                     )}

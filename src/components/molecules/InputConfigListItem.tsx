@@ -5,7 +5,7 @@ import { Spacer } from "@dataware-tools/app-common";
 import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from "@material-ui/icons/Delete";
 import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
-import React from "react";
+import React, { ReactNode } from "react";
 import { DatabaseColumnsConfigType } from "utils";
 
 type ValueType = Required<
@@ -17,6 +17,7 @@ type ActionType = "change" | "delete";
 type Props = { classes: ReturnType<typeof useStyles> } & ContainerProps;
 type ContainerProps = {
   value: ValueType;
+  label: ReactNode;
   onUpdate: (newValue: ValueType, oldValue: ValueType) => void;
   onDelete: (deletedValue: ValueType) => void;
 };
@@ -44,16 +45,13 @@ const useStyles = makeStyles({
 const Component = ({
   classes,
   value,
+  label,
   onUpdate,
   onDelete,
 }: Props): JSX.Element => {
   return (
     <div className={classes.root}>
-      <ElemCenteringFlexDiv>
-        {value.name}
-        <br />
-        {`(display name: ${value.display_name})`}
-      </ElemCenteringFlexDiv>
+      {label}
       <div className={classes.right}>
         <Spacer direction="horizontal" size="10px" />
         <Select

@@ -1,6 +1,6 @@
 import { Spacer } from "@dataware-tools/app-common";
 import { makeStyles } from "@material-ui/core/styles";
-import { Fragment, useState } from "react";
+import { useState } from "react";
 import {
   ActionType,
   OptionSharingSelectsItem,
@@ -57,66 +57,46 @@ const Component = ({
 }: Props): JSX.Element => {
   return (
     <div className={classes.root}>
-      {draggable ? (
-        <DragDropContext onDragEnd={onDragEnd}>
-          <Droppable droppableId="droppable">
-            {(provided) => (
-              <div {...provided.droppableProps} ref={provided.innerRef}>
-                {values.map((value, index) => {
-                  return (
-                    <Draggable
-                      key={index}
-                      draggableId={`${index}`}
-                      index={index}
-                    >
-                      {(provided) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                        >
-                          <span className={classes.draggable}>
-                            <DragIndicatorIcon />
-                            <OptionSharingSelectsItem
-                              value={value}
-                              index={index}
-                              onChange={onChange}
-                              {...delegated}
-                            />
-                          </span>
-                          {index < values.length - 1 ? (
-                            <Spacer
-                              direction="vertical"
-                              size={space || "3vh"}
-                            />
+      <DragDropContext onDragEnd={onDragEnd}>
+        <Droppable droppableId="droppable" isDropDisabled={!draggable}>
+          {(provided) => (
+            <div {...provided.droppableProps} ref={provided.innerRef}>
+              {values.map((value, index) => {
+                return (
+                  <Draggable
+                    draggableId={`${index}`}
+                    index={index}
+                    isDragDisabled={!draggable}
+                    key={index}
+                  >
+                    {(provided) => (
+                      <div ref={provided.innerRef} {...provided.draggableProps}>
+                        <span className={classes.draggable}>
+                          {draggable ? (
+                            <span {...provided.dragHandleProps}>
+                              <DragIndicatorIcon />
+                            </span>
                           ) : null}
-                        </div>
-                      )}
-                    </Draggable>
-                  );
-                })}
-                {provided.placeholder}
-              </div>
-            )}
-          </Droppable>
-        </DragDropContext>
-      ) : (
-        <>
-          {values.map((value, index) => (
-            <Fragment key={index}>
-              <OptionSharingSelectsItem
-                value={value}
-                index={index}
-                onChange={onChange}
-                {...delegated}
-              />
-              {index < values.length - 1 ? (
-                <Spacer direction="vertical" size={space || "3vh"} />
-              ) : null}
-            </Fragment>
-          ))}
-        </>
-      )}
+                          <OptionSharingSelectsItem
+                            value={value}
+                            index={index}
+                            onChange={onChange}
+                            {...delegated}
+                          />
+                        </span>
+                        {index < values.length - 1 ? (
+                          <Spacer direction="vertical" size={space || "3vh"} />
+                        ) : null}
+                      </div>
+                    )}
+                  </Draggable>
+                );
+              })}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
       {creatable ? (
         <>
           <Spacer direction="vertical" size={space || "3vh"} />
