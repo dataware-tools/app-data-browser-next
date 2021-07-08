@@ -147,6 +147,8 @@ const Container = ({
         reason: "No available column",
         instruction: "Please add data or input field",
       });
+    } else {
+      setError(undefined);
     }
   }, [getConfigRes]);
 

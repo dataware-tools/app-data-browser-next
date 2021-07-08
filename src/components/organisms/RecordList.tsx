@@ -102,15 +102,30 @@ const Container = ({
     searchKey,
   });
 
+  const columns =
+    getConfigRes?.columns
+      .filter((column) => column.is_display_field)
+      .map((column) => ({
+        field: column.name,
+        label: column.display_name,
+      })) || [];
   const fetchError = listRecordsError || getConfigError;
+
   useEffect(() => {
     if (fetchError) {
       setError({
         reason: JSON.stringify(fetchError),
         instruction: "Please reload this page",
       });
+    } else if (columns.length <= 0) {
+      setError({
+        reason: "Display columns is not configured",
+        instruction: "Please report administrator this error",
+      });
+    } else {
+      setError(undefined);
     }
-  }, [fetchError]);
+  }, [fetchError, columns.length]);
 
   const onSelectRecord: Props["onSelectRecord"] = (record) => {
     if (listRecordsRes) {
@@ -156,13 +171,6 @@ const Container = ({
     listRecordsMutate();
   };
 
-  const columns =
-    getConfigRes?.columns
-      .filter((column) => column.is_display_field)
-      .map((column) => ({
-        field: column.name,
-        label: column.display_name,
-      })) || [];
   const records = listRecordsRes?.data || [];
 
   return (

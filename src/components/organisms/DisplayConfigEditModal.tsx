@@ -148,6 +148,8 @@ const Container = ({
         reason: JSON.stringify(fetchError),
         instruction: "Please reload this page",
       });
+    } else {
+      setError(undefined);
     }
   }, [fetchError]);
 
