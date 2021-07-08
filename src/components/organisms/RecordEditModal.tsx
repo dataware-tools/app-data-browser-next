@@ -1,8 +1,4 @@
-import {
-  ErrorMessageProps,
-  metaStore,
-  usePrevious,
-} from "@dataware-tools/app-common";
+import { ErrorMessageProps, metaStore } from "@dataware-tools/app-common";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
@@ -61,26 +57,6 @@ const Container = ({
     }
   );
 
-  const initializeState = () => {
-    setError(undefined);
-  };
-  const prevOpen = usePrevious(open);
-  useEffect(() => {
-    if (open && !prevOpen) {
-      initializeState();
-    }
-  }, [open, prevOpen]);
-
-  const fetchError = getRecordError || getConfigError;
-  useEffect(() => {
-    if (fetchError) {
-      setError({
-        reason: JSON.stringify(fetchError),
-        instruction: "Please reload this page",
-      });
-    }
-  }, [fetchError]);
-
   const fields: MetadataEditModalProps["fields"] = useMemo(
     () =>
       getConfigRes?.columns
@@ -98,15 +74,22 @@ const Container = ({
         .sort(compInputFields) || [],
     [getConfigRes, create]
   );
-
+  const fetchError = getRecordError || getConfigError;
   useEffect(() => {
-    if (create && fields.length <= 0) {
+    if (fetchError) {
+      setError({
+        reason: JSON.stringify(fetchError),
+        instruction: "Please reload this page",
+      });
+    } else if (create && fields.length <= 0) {
       setError({
         reason: "Input fields is not configured",
         instruction: "please report administrator this error",
       });
+    } else {
+      setError(undefined);
     }
-  }, [fields, create, open]);
+  }, [fetchError, fields, create]);
 
   const onSubmit: MetadataEditModalProps["onSubmit"] = async (
     newRecordInfo

@@ -126,6 +126,7 @@ const Component = ({
                       freeSolo
                       filterSelectedOptions
                       fullWidth
+                      autoSelect
                     />
                   );
                 }}
