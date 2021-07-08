@@ -8,6 +8,8 @@ type AwaitType<T> = T extends Promise<infer U>
 type DatabaseColumnsConfigDtypeType =
   | "string[]"
   | "string"
+  | "str"
+  | "text"
   | "int"
   | "float"
   | "double"

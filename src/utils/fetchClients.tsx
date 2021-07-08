@@ -237,6 +237,32 @@ const useListFiles: UseAPI<typeof metaStore.FileService.listFiles> = (
   return { ...swrRes, cacheKey };
 };
 
+const useGetFile: UseAPI<typeof metaStore.FileService.getFile> = (
+  token,
+  { databaseId, uuid },
+  shouldFetch = true
+) => {
+  const cacheKey = `${API_ROUTE.META.BASE}/databases/${databaseId}/files/${uuid}`;
+  const fetcher =
+    databaseId && uuid
+      ? async () => {
+          metaStore.OpenAPI.TOKEN = token;
+          metaStore.OpenAPI.BASE = API_ROUTE.META.BASE;
+          const res = await metaStore.FileService.getFile({
+            databaseId,
+            uuid,
+          });
+          return res;
+        }
+      : null;
+
+  const swrRes = useSWR(
+    shouldFetch && databaseId && uuid ? cacheKey : null,
+    fetcher
+  );
+  return { ...swrRes, cacheKey };
+};
+
 const useCreateJwtToDownloadFile: UseAPIWithoutCache<
   typeof fileProvider.DownloadService.createJwtToDownloadFile
 > = (token, { requestBody }, shouldFetch = true) => {
@@ -286,5 +312,6 @@ export {
   useGetRecord,
   useListRecords,
   useListFiles,
+  useGetFile,
   useCreateJwtToDownloadFile,
 };
