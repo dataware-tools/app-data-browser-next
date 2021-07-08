@@ -13,6 +13,7 @@ import {
   ErrorMessageProps,
   SearchFormProps,
   PerPageSelectProps,
+  deleteQueryString,
 } from "@dataware-tools/app-common";
 
 import { useAuth0 } from "@auth0/auth0-react";
@@ -39,6 +40,10 @@ import { userActionsState, recordPaginateState } from "globalStates";
 import { RenderToggleByAction } from "components/atoms/RenderToggleByAction";
 import { ControlledDatabaseMenuButton } from "components/organisms/ControlledDatabaseMenuButton";
 import {
+  DisplayConfigEditModal,
+  DisplayConfigEditModalProps,
+} from "components/organisms/DisplayConfigEditModal";
+import {
   RecordAddButton,
   RecordAddButtonProps,
 } from "components/organisms/RecordAddButton";
@@ -54,11 +59,13 @@ type Props = {
   page: number;
   perPage: PerPageSelectProps["perPage"];
   addedRecordId?: RecordDetailModalProps["recordId"];
+  isNewDatabase: boolean;
   onChangeSearchText: SearchFormProps["onSearch"];
   onChangePerPage: PerPageSelectProps["setPerPage"];
   onChangePage: (newPage: number) => void;
   onAddRecordSucceeded: RecordAddButtonProps["onAddRecordSucceeded"];
   onCloseRecordDetailModal: RecordDetailModalProps["onClose"];
+  onEndInitializeDatabase: DisplayConfigEditModalProps["onClose"];
 };
 
 const Component = ({
@@ -71,12 +78,14 @@ const Component = ({
   page,
   databaseId,
   addedRecordId,
+  isNewDatabase,
   onChangeSearchText,
   onChangePerPage,
   onChangePage,
   onAddRecordSucceeded,
   onCloseRecordDetailModal,
   searchColumns,
+  onEndInitializeDatabase,
 }: Props) => {
   return (
     <>
@@ -156,6 +165,13 @@ const Component = ({
           onClose={onCloseRecordDetailModal}
         />
       ) : null}
+      {isNewDatabase ? (
+        <DisplayConfigEditModal
+          open
+          databaseId={databaseId}
+          onClose={onEndInitializeDatabase}
+        />
+      ) : null}
     </>
   );
 };
@@ -174,6 +190,9 @@ const Page = (): JSX.Element => {
     undefined
   );
   const [error, setError] = useState<ErrorMessageProps | undefined>(undefined);
+  const [isNewDatabase, setIsNewDatabase] = useState(
+    Boolean(getQueryString("new"))
+  );
 
   const { data: getConfigRes, error: getConfigError } = useGetConfig(
     getAccessToken,
@@ -205,6 +224,8 @@ const Page = (): JSX.Element => {
         reason: JSON.stringify(fetchError),
         instruction: "Please reload this page",
       });
+    } else {
+      setError(undefined);
     }
   }, [fetchError]);
 
@@ -251,6 +272,10 @@ const Page = (): JSX.Element => {
   const onChangeSearchText: Props["onChangeSearchText"] = (searchText) => {
     setRecordPaginateState((prev) => ({ ...prev, search: searchText }));
   };
+  const onEndInitializeDatabase: Props["onEndInitializeDatabase"] = () => {
+    setIsNewDatabase(false);
+    deleteQueryString("new", "replace");
+  };
 
   const isFetchComplete = Boolean(
     !fetchError && listRecordsRes && getConfigRes && listPermittedActionRes
@@ -276,6 +301,8 @@ const Page = (): JSX.Element => {
       addedRecordId={addedRecordId}
       totalPage={totalPage}
       searchColumns={searchKey}
+      isNewDatabase={isNewDatabase}
+      onEndInitializeDatabase={onEndInitializeDatabase}
     />
   );
 };

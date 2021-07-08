@@ -22,7 +22,11 @@ import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
 import { useListDatabases } from "utils";
 import { useRecoilState } from "recoil";
 import { databasePaginateState } from "globalStates";
-import { DatabaseAddButton } from "components/organisms/DatabaseAddButton";
+import {
+  DatabaseAddButton,
+  DatabaseAddButtonProps,
+} from "components/organisms/DatabaseAddButton";
+import { useHistory } from "react-router-dom";
 
 type Props = {
   error?: ErrorMessageProps;
@@ -35,6 +39,7 @@ type Props = {
   onChangeSearchText: SearchFormProps["onSearch"];
   onChangePerPage: PerPageSelectProps["setPerPage"];
   onChangePage: (newPage: number) => void;
+  onAddDatabaseSucceeded: DatabaseAddButtonProps["onAddDatabaseSucceeded"];
 };
 
 const Component = ({
@@ -48,6 +53,7 @@ const Component = ({
   onChangeSearchText,
   onChangePerPage,
   onChangePage,
+  onAddDatabaseSucceeded,
 }: Props) => {
   return (
     <>
@@ -68,7 +74,9 @@ const Component = ({
                     values={perPageOptions}
                   />
                   <Spacer direction="horizontal" size="15px" />
-                  <DatabaseAddButton />
+                  <DatabaseAddButton
+                    onAddDatabaseSucceeded={onAddDatabaseSucceeded}
+                  />
                 </>
               ) : null
             }
@@ -102,6 +110,7 @@ const Component = ({
 
 const Container = (): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
+  const history = useHistory();
   const [{ page, perPage, search }, setDatabasePaginateState] = useRecoilState(
     databasePaginateState
   );
@@ -133,6 +142,12 @@ const Container = (): JSX.Element => {
     setDatabasePaginateState((prev) => ({ ...prev, search: searchText }));
   };
 
+  const onAddDatabaseSucceeded: Props["onAddDatabaseSucceeded"] = (
+    newDatabase
+  ) => {
+    history.push(`/databases/${newDatabase.database_id}/records?new=true`);
+  };
+
   const error: Props["error"] = listDatabasesError
     ? {
         reason: JSON.stringify(listDatabasesError),
@@ -154,6 +169,7 @@ const Container = (): JSX.Element => {
       searchText={search}
       perPageOptions={[10, 20, 50, 100]}
       totalPage={totalPage}
+      onAddDatabaseSucceeded={onAddDatabaseSucceeded}
     />
   );
 };
