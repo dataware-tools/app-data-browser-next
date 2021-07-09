@@ -18,6 +18,7 @@ import {
   metaStore,
 } from "@dataware-tools/app-common";
 import { useState } from "react";
+import { FileEditModal, FileEditModalProps } from "./FileEditModal";
 
 type Props = {
   error?: ErrorMessageProps;
@@ -29,7 +30,9 @@ type Props = {
   onDownload: FileListItemProps["onDownload"];
   previewingFile?: FilePreviewModalProps["file"];
   onCloseFilePreviewModal: FilePreviewModalProps["onClose"];
-};
+  onCloseFileEditModal: FileEditModalProps["onClose"];
+  editingFile?: metaStore.FileModel;
+} & ContainerProps;
 
 type ContainerProps = {
   databaseId: string;
@@ -42,6 +45,10 @@ const Component = ({
   error,
   previewingFile,
   onCloseFilePreviewModal,
+  databaseId,
+  recordId,
+  editingFile,
+  onCloseFileEditModal,
   ...delegated
 }: Props): JSX.Element => {
   return (
@@ -67,6 +74,15 @@ const Component = ({
               height="auto"
             />
           ) : null}
+          {editingFile ? (
+            <FileEditModal
+              open={Boolean(editingFile)}
+              databaseId={databaseId}
+              recordId={recordId}
+              onClose={onCloseFileEditModal}
+              uuid={editingFile.uuid}
+            />
+          ) : null}
         </>
       ) : (
         <LoadingIndicator />
@@ -78,6 +94,9 @@ const Component = ({
 const Container = ({ databaseId, recordId }: ContainerProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const [previewingFile, setPreviewingFile] = useState<
+    metaStore.FileModel | undefined
+  >(undefined);
+  const [editingFile, setEditingFile] = useState<
     metaStore.FileModel | undefined
   >(undefined);
 
@@ -94,10 +113,9 @@ const Container = ({ databaseId, recordId }: ContainerProps): JSX.Element => {
     setPreviewingFile(file);
   };
 
-  // ! this is dummy func
-  // TODO: implement method
-  const onEdit = (file: metaStore.FileModel) =>
-    window.alert(`edit: ${JSON.stringify(file)}`);
+  const onEdit = (file: metaStore.FileModel) => {
+    setEditingFile(file);
+  };
 
   const onDelete = async (file: metaStore.FileModel) => {
     if (!window.confirm("Are you sure you want to delete file?")) return;
@@ -160,6 +178,7 @@ const Container = ({ databaseId, recordId }: ContainerProps): JSX.Element => {
   };
 
   const onCloseFilePreviewModal = () => setPreviewingFile(undefined);
+  const onCloseFileEditModal = () => setEditingFile(undefined);
   const files = listFilesRes?.data || [];
   const error: Props["error"] = listFilesError
     ? {
@@ -171,6 +190,8 @@ const Container = ({ databaseId, recordId }: ContainerProps): JSX.Element => {
 
   return (
     <Component
+      databaseId={databaseId}
+      recordId={recordId}
       error={error}
       isFetchComplete={isFetchComplete}
       files={files}
@@ -180,6 +201,8 @@ const Container = ({ databaseId, recordId }: ContainerProps): JSX.Element => {
       onDownload={onDownload}
       previewingFile={previewingFile}
       onCloseFilePreviewModal={onCloseFilePreviewModal}
+      editingFile={editingFile}
+      onCloseFileEditModal={onCloseFileEditModal}
     />
   );
 };

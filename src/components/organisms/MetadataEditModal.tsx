@@ -32,6 +32,7 @@ type ContainerProps = {
   currentMetadata: MetadataInputFieldListProps["currentMetadata"];
   fields: MetadataInputFieldListProps["fields"];
   error?: ErrorMessageProps;
+  title: string;
   onClose: () => void;
   onSubmit: (newMetadata: Record<string, unknown>) => Promise<boolean>;
 };
@@ -45,6 +46,7 @@ const Component = ({
   nonFilledRequiredFieldNames,
   prefixInputElementId,
   isSaving,
+  title,
   onClose,
   onSave,
 }: Props) => {
@@ -52,7 +54,7 @@ const Component = ({
     <Dialog open={open} maxWidth="xl" onClose={onClose}>
       <DialogWrapper>
         <DialogCloseButton onClick={onClose} />
-        <DialogTitle>{create ? "Add" : "Edit"} Record</DialogTitle>
+        <DialogTitle>{title}</DialogTitle>
         <DialogContainer padding="0 0 20px" height="65vh">
           {error ? (
             <ErrorMessage {...error} />
@@ -113,7 +115,7 @@ const Container = ({
   const onSave = async () => {
     if (fields) {
       setIsSaving(true);
-      const newRecordInfo = {};
+      const newMetadata = {};
 
       const nonFilledRequired: string[] = [];
       const nonFilledRecommends: string[] = [];
@@ -156,10 +158,10 @@ const Container = ({
         const inputEl = document.getElementById(
           `${prefixInputElementId}_${config.name.replace(/\s+/g, "")}`
         ) as HTMLInputElement;
-        newRecordInfo[config.name] = inputEl.value;
+        newMetadata[config.name] = inputEl.value;
       });
 
-      const isSubmitSucceed = await onSubmit(newRecordInfo);
+      const isSubmitSucceed = await onSubmit(newMetadata);
 
       setIsSaving(false);
       if (!isSubmitSucceed) {

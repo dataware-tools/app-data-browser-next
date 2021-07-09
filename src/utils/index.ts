@@ -1,5 +1,5 @@
 import { AUTH_CONFIG } from "@dataware-tools/app-common";
-import { DatabaseColumnsConfigType } from "utils";
+import { DatabaseConfigType, DatabaseColumnsConfigType } from "utils/utilTypes";
 
 const APP_ROUTE = {
   HOME: "/",
@@ -20,7 +20,13 @@ const authConfig = {
 const redirectUri =
   typeof window === "undefined" ? null : window.location.origin;
 
-const pydtkSystemColumns = ["database_id", "record_id", "path", "contents"];
+const pydtkSystemColumns = [
+  "database_id",
+  "record_id",
+  "path",
+  "contents",
+  "uuid",
+];
 
 const inputFieldsNecessityOrder = [
   "required",
@@ -39,6 +45,26 @@ const compStr = (a: string, b: string): number => {
     return 1;
   }
 };
+
+const isEditableColumnName = (
+  getConfigRes: DatabaseConfigType,
+  name: string
+): boolean => {
+  return (
+    !pydtkSystemColumns.includes(name) &&
+    !getConfigRes?.index_columns.includes(name) &&
+    !name.startsWith("_")
+  );
+};
+
+const editableColumnDtype: DatabaseColumnsConfigType[number]["dtype"][] = [
+  "string",
+  "str",
+  "text",
+  "double",
+  "float",
+  "int",
+];
 
 const compInputFields = (
   a: Pick<
@@ -74,6 +100,8 @@ export {
   pydtkSystemColumns,
   compStr,
   compInputFields,
+  editableColumnDtype,
+  isEditableColumnName,
 };
 export * from "./fetchClients";
 export * from "./utilTypes";
