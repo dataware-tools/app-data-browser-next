@@ -2,6 +2,7 @@ import { ErrorMessageProps, metaStore } from "@dataware-tools/app-common";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useEffect, useMemo, useState } from "react";
 import {
+  extractReasonFromFetchError,
   compInputFields,
   fetchMetaStore,
   useGetConfig,
@@ -9,7 +10,8 @@ import {
   useGetFile,
   editableColumnDtype,
   isEditableColumnName,
-} from "utils/index";
+} from "utils";
+
 import {
   MetadataEditModal,
   MetadataEditModalProps,
@@ -76,7 +78,7 @@ const Container = ({
   useEffect(() => {
     if (fetchError) {
       setError({
-        reason: JSON.stringify(fetchError),
+        reason: extractReasonFromFetchError(fetchError),
         instruction: "Please reload this page",
       });
     } else {
@@ -97,7 +99,7 @@ const Container = ({
 
     if (saveFileError) {
       setError({
-        reason: JSON.stringify(saveFileError),
+        reason: extractReasonFromFetchError(saveFileError),
         instruction: "Please reload this page",
       });
       return false;

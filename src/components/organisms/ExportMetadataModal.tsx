@@ -1,7 +1,7 @@
 import Dialog from "@material-ui/core/Dialog";
 import { useState, useEffect } from "react";
 import LoadingButton from "@material-ui/lab/LoadingButton";
-import { useListRecords } from "utils/index";
+import { extractReasonFromFetchError, useListRecords } from "utils/index";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import { FormControl, InputLabel } from "@material-ui/core";
@@ -138,7 +138,7 @@ const Container = ({
   useEffect(() => {
     if (fetchError) {
       setError({
-        reason: JSON.stringify(fetchError),
+        reason: extractReasonFromFetchError(fetchError),
         instruction: "Please reload this page",
       });
     } else {

@@ -21,7 +21,13 @@ import LoadingButton, {
   LoadingButtonProps,
 } from "@material-ui/lab/LoadingButton";
 import { SoloSelect, SoloSelectProps } from "components/molecules/SoloSelect";
-import { useGetConfig, fetchMetaStore, compStr } from "utils/index";
+import {
+  useGetConfig,
+  fetchMetaStore,
+  compStr,
+  extractReasonFromFetchError,
+} from "utils";
+
 import {
   OptionSharingSelects,
   OptionSharingSelectsProps,
@@ -146,7 +152,7 @@ const Container = ({
   useEffect(() => {
     if (fetchError) {
       setError({
-        reason: JSON.stringify(fetchError),
+        reason: extractReasonFromFetchError(fetchError),
         instruction: "Please reload this page",
       });
     } else {
@@ -211,7 +217,7 @@ const Container = ({
 
       if (updateConfigError) {
         setError({
-          reason: JSON.stringify(fetchError),
+          reason: extractReasonFromFetchError(fetchError),
           instruction: "Please reload this page",
         });
       } else {

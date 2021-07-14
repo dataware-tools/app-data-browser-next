@@ -5,7 +5,8 @@ import {
   useGetConfig,
   fetchMetaStore,
   isEditableColumnName,
-} from "utils/index";
+  extractReasonFromFetchError,
+} from "utils";
 import {
   InputConfigList,
   InputConfigListProps,
@@ -114,7 +115,7 @@ const Container = ({
   useEffect(() => {
     if (fetchError) {
       setError({
-        reason: JSON.stringify(fetchError),
+        reason: extractReasonFromFetchError(fetchError),
         instruction: "Please reload this page",
       });
     } else {
@@ -192,7 +193,7 @@ const Container = ({
 
       if (updateConfigError) {
         setError({
-          reason: JSON.stringify(updateConfigError),
+          reason: extractReasonFromFetchError(updateConfigError),
           instruction: "Please reload this page",
         });
       } else {
