@@ -7,8 +7,9 @@ import {
   fetchMetaStore,
   useGetRecord,
   useGetConfig,
-  pydtkSystemColumns,
   useListRecords,
+  editableColumnDtype,
+  isEditableColumnName,
 } from "utils/index";
 import {
   MetadataEditModal,
@@ -60,11 +61,12 @@ const Container = ({
   const fields: MetadataEditModalProps["fields"] = useMemo(
     () =>
       getConfigRes?.columns
-        .filter(
-          (column) =>
-            !pydtkSystemColumns.includes(column.name) &&
-            !column.name.startsWith("_") &&
-            (create ? column.necessity !== "unnecessary" : true)
+        .filter((column) =>
+          Boolean(
+            isEditableColumnName(getConfigRes, column.name) &&
+              editableColumnDtype.includes(column.dtype) &&
+              (create ? column.necessity !== "unnecessary" : true)
+          )
         )
         .map((column) => ({
           name: column.name,
@@ -95,7 +97,7 @@ const Container = ({
   const onSubmit: MetadataEditModalProps["onSubmit"] = async (
     newRecordInfo
   ) => {
-    const [saveRecordRes] = create
+    const [saveRecordRes, saveRecordError] = create
       ? await fetchMetaStore(
           getAccessToken,
           metaStore.RecordService.createRecord,
@@ -114,9 +116,9 @@ const Container = ({
           }
         );
 
-    if (getRecordError) {
+    if (saveRecordError) {
       setError({
-        reason: JSON.stringify(getRecordError),
+        reason: JSON.stringify(saveRecordError),
         instruction: "Please reload thi page",
       });
       return false;
@@ -145,9 +147,11 @@ const Container = ({
     return true;
   };
 
+  const title = create ? "Add record" : "Edit record";
   return (
     <MetadataEditModal
       open={open}
+      title={title}
       currentMetadata={getRecordRes}
       fields={fields}
       error={error}

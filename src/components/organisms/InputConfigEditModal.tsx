@@ -1,7 +1,11 @@
 import Dialog from "@material-ui/core/Dialog";
 import { useState, useEffect } from "react";
 import LoadingButton from "@material-ui/lab/LoadingButton";
-import { useGetConfig, fetchMetaStore, pydtkSystemColumns } from "utils/index";
+import {
+  useGetConfig,
+  fetchMetaStore,
+  isEditableColumnName,
+} from "utils/index";
 import {
   InputConfigList,
   InputConfigListProps,
@@ -204,8 +208,7 @@ const Container = ({
   const nonInputColumns = (getConfigRes?.columns
     .filter(
       (column) =>
-        !column.name.startsWith("_") &&
-        !pydtkSystemColumns.includes(column.name) &&
+        isEditableColumnName(getConfigRes, column.name) &&
         (column.necessity == null || column.necessity === "unnecessary")
     )
     ?.map((column) => ({
