@@ -27,7 +27,7 @@ import {
 import LoadingButton from "@material-ui/lab/LoadingButton";
 import { useRecoilValue } from "recoil";
 import { databasePaginateState } from "globalStates";
-import { useListDatabases } from "utils";
+import { extractReasonFromFetchError, useListDatabases } from "utils";
 
 type Props = {
   onSubmit: () => Promise<void>;
@@ -185,7 +185,7 @@ const Container = ({
     );
     if (createDatabaseError) {
       setError({
-        reason: JSON.stringify(createDatabaseError),
+        reason: extractReasonFromFetchError(createDatabaseError),
         instruction: "Please reload this page",
       });
       return;

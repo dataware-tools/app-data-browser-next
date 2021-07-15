@@ -34,11 +34,13 @@ import {
   useGetConfig,
   useListPermittedActions,
   UserActionType,
+  extractReasonFromFetchError,
 } from "utils";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { userActionsState, recordPaginateState } from "globalStates";
 import { RenderToggleByAction } from "components/atoms/RenderToggleByAction";
 import { ControlledDatabaseMenuButton } from "components/organisms/ControlledDatabaseMenuButton";
+
 import {
   DisplayConfigEditModal,
   DisplayConfigEditModalProps,
@@ -221,7 +223,7 @@ const Page = (): JSX.Element => {
   useEffect(() => {
     if (fetchError) {
       setError({
-        reason: JSON.stringify(fetchError),
+        reason: extractReasonFromFetchError(fetchError),
         instruction: "Please reload this page",
       });
     } else {

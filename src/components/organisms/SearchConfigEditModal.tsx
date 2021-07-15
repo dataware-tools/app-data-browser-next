@@ -1,7 +1,11 @@
 import Dialog from "@material-ui/core/Dialog";
 import { useState, useEffect } from "react";
 import LoadingButton from "@material-ui/lab/LoadingButton";
-import { useGetConfig, fetchMetaStore } from "utils/index";
+import {
+  useGetConfig,
+  fetchMetaStore,
+  extractReasonFromFetchError,
+} from "utils";
 import { useAuth0 } from "@auth0/auth0-react";
 import {
   ErrorMessage,
@@ -19,6 +23,7 @@ import {
   ErrorMessageProps,
 } from "@dataware-tools/app-common";
 import { produce } from "immer";
+
 import {
   OptionSharingSelects,
   OptionSharingSelectsProps,
@@ -129,7 +134,7 @@ const Container = ({
   useEffect(() => {
     if (fetchError) {
       setError({
-        reason: JSON.stringify(fetchError),
+        reason: extractReasonFromFetchError(fetchError),
         instruction: "Please reload this page",
       });
     }
@@ -173,7 +178,7 @@ const Container = ({
 
       if (updateConfigError) {
         setError({
-          reason: JSON.stringify(updateConfigError),
+          reason: extractReasonFromFetchError(updateConfigError),
           instruction: "Please reload this page",
         });
         return;

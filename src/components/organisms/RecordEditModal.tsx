@@ -10,7 +10,8 @@ import {
   useListRecords,
   editableColumnDtype,
   isEditableColumnName,
-} from "utils/index";
+  extractReasonFromFetchError,
+} from "utils";
 import {
   MetadataEditModal,
   MetadataEditModalProps,
@@ -81,7 +82,7 @@ const Container = ({
   useEffect(() => {
     if (fetchError) {
       setError({
-        reason: JSON.stringify(fetchError),
+        reason: extractReasonFromFetchError(fetchError),
         instruction: "Please reload this page",
       });
     } else if (create && fields.length <= 0) {
