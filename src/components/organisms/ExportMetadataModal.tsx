@@ -18,6 +18,7 @@ import {
   usePrevious,
   ErrorMessageProps,
   ErrorMessage,
+  alert,
 } from "@dataware-tools/app-common";
 import { useAuth0 } from "@auth0/auth0-react";
 
@@ -200,7 +201,7 @@ const Container = ({
         exportAsCSV();
         break;
       default:
-        window.alert("Unsupported format");
+        await alert({ title: "Unsupported format" });
     }
   };
 
