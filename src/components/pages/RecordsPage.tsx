@@ -26,8 +26,6 @@ import {
   RecordDetailModalProps,
 } from "components/organisms/RecordDetailModal";
 
-import { Link } from "react-router-dom";
-import HomeIcon from "@material-ui/icons/Home";
 import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
 import {
   useListRecords,
@@ -49,6 +47,7 @@ import {
   RecordAddButton,
   RecordAddButtonProps,
 } from "components/organisms/RecordAddButton";
+import { Breadcrumbs } from "components/molecules/Breadcrumbs";
 
 type Props = {
   error?: ErrorMessageProps;
@@ -95,12 +94,12 @@ const Component = ({
         <PageBody>
           <PageToolBar
             left={
-              <Link to="/">
-                <ElemCenteringFlexDiv>
-                  <HomeIcon />
-                  Home
-                </ElemCenteringFlexDiv>
-              </Link>
+              <Breadcrumbs
+                items={[
+                  { link: "/", text: "Databases", iconName: "Storage" },
+                  { text: databaseId },
+                ]}
+              />
             }
             right={
               isFetchComplete ? (
