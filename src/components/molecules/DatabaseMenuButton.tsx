@@ -1,5 +1,5 @@
 import { MouseEvent, useState } from "react";
-import MenuIcon from "@material-ui/icons/Menu";
+import { MoreHoriz as MoreIcon } from "@material-ui/icons";
 import {
   DatabaseMenu,
   DatabaseMenuProps,
@@ -25,7 +25,7 @@ const Component = ({
 }: Props): JSX.Element | null => {
   return (
     <div>
-      <SquareIconButton icon={<MenuIcon />} onClick={onOpen} />
+      <SquareIconButton icon={<MoreIcon />} onClick={onOpen} />
       <DatabaseMenu
         {...delegated}
         onClick={onMenuSelect as (value: string) => void}
