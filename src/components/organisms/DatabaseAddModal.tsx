@@ -13,6 +13,7 @@ import {
   usePrevious,
 } from "@dataware-tools/app-common";
 import { useAuth0 } from "@auth0/auth0-react";
+import Box from "@material-ui/core/Box";
 import Dialog, { DialogProps } from "@material-ui/core/Dialog";
 import TextField from "@material-ui/core/TextField";
 import { useEffect, useState } from "react";
@@ -69,61 +70,67 @@ const Component = ({
                 <ErrorMessage {...error} />
               ) : (
                 <>
-                  <label htmlFor="DatabaseAddModal_database_id">
-                    Database ID
-                  </label>
-                  <Controller
-                    name="database_id"
-                    control={control}
-                    defaultValue=""
-                    rules={{ required: true }}
-                    render={({ field }) => (
-                      <TextField
-                        {...field}
-                        error={formErrors.database_id?.type === "required"}
-                        helperText={
-                          formErrors.database_id?.type === "required" &&
-                          "Database ID is required"
-                        }
-                        fullWidth
-                        id="DatabaseAddModal_database_id"
-                      />
-                    )}
-                  />
-                  <label htmlFor="DatabaseAddModal_name">Name</label>
-                  <Controller
-                    name="name"
-                    control={control}
-                    defaultValue=""
-                    rules={{ required: true }}
-                    render={({ field }) => (
-                      <TextField
-                        {...field}
-                        fullWidth
-                        id="DatabaseAddModal_name"
-                        error={formErrors.name?.type === "required"}
-                        helperText={
-                          formErrors.name?.type === "required" &&
-                          "Name is required"
-                        }
-                      />
-                    )}
-                  />
-                  <label htmlFor="DatabaseAddModal_description">
-                    Description
-                  </label>
-                  <Controller
-                    name="description"
-                    control={control}
-                    defaultValue=""
-                    render={({ field }) => (
-                      <TextField
-                        {...field}
-                        fullWidth
-                        id="DatabaseAddModal_description"
-                      />
-                    )}
-                  />
+                  <Box mt={1}>
+                    <label htmlFor="DatabaseAddModal_database_id">
+                      Database ID
+                    </label>
+                    <Controller
+                      name="database_id"
+                      control={control}
+                      defaultValue=""
+                      rules={{ required: true }}
+                      render={({ field }) => (
+                        <TextField
+                          {...field}
+                          error={formErrors.database_id?.type === "required"}
+                          helperText={
+                            formErrors.database_id?.type === "required" &&
+                            "Database ID is required"
+                          }
+                          fullWidth
+                          id="DatabaseAddModal_database_id"
+                        />
+                      )}
+                    />
+                  </Box>
+                  <Box mt={3}>
+                    <label htmlFor="DatabaseAddModal_name">Name</label>
+                    <Controller
+                      name="name"
+                      control={control}
+                      defaultValue=""
+                      rules={{ required: true }}
+                      render={({ field }) => (
+                        <TextField
+                          {...field}
+                          fullWidth
+                          id="DatabaseAddModal_name"
+                          error={formErrors.name?.type === "required"}
+                          helperText={
+                            formErrors.name?.type === "required" &&
+                            "Name is required"
+                          }
+                        />
+                      )}
+                    />
+                  </Box>
+                  <Box mt={3}>
+                    <label htmlFor="DatabaseAddModal_description">
+                      Description
+                    </label>
+                    <Controller
+                      name="description"
+                      control={control}
+                      defaultValue=""
+                      render={({ field }) => (
+                        <TextField
+                          {...field}
+                          fullWidth
+                          id="DatabaseAddModal_description"
+                        />
+                      )}
+                    />
+                  </Box>
                 </>
               )}
             </DialogMain>
