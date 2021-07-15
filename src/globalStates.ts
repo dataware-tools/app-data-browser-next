@@ -38,6 +38,6 @@ type DatabasePaginateState = {
 };
 
 export const databasePaginateState = atom<DatabasePaginateState>({
-  key: "recordPaginateState",
+  key: "databasePaginateState",
   default: { page: 1, perPage: 20, search: "", searchKey: [] },
 });
