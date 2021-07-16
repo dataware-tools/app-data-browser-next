@@ -3,7 +3,6 @@ import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
 import Breadcrumbs from "@material-ui/core/Breadcrumbs";
 import Link from "@material-ui/core/Link";
-import * as MuiIcons from "@material-ui/icons";
 import { useHistory } from "react-router-dom";
 
 const useStyles = makeStyles((theme: Theme) =>
@@ -21,7 +20,7 @@ const useStyles = makeStyles((theme: Theme) =>
 
 type ItemType = {
   link?: string;
-  iconName?: string;
+  icon?: JSX.Element;
   text: string;
 };
 
@@ -45,20 +44,12 @@ const BreadcrumbsItem = ({ item }: BreadcrumbsItemProps): JSX.Element => {
       className={classes.link}
       onClick={handleClick}
     >
-      {item.iconName && (
-        <span className={classes.icon}>
-          {React.createElement(MuiIcons[item.iconName])}
-        </span>
-      )}
+      {item.icon && <span className={classes.icon}>{item.icon}</span>}
       {item.text}
     </Link>
   ) : (
     <Typography color="textPrimary" className={classes.link}>
-      {item.iconName && (
-        <span className={classes.icon}>
-          {React.createElement(MuiIcons[item.iconName])}
-        </span>
-      )}
+      {item.icon && <span className={classes.icon}>{item.icon}</span>}
       {item.text}
     </Typography>
   );

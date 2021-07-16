@@ -47,7 +47,9 @@ import {
   RecordAddButton,
   RecordAddButtonProps,
 } from "components/organisms/RecordAddButton";
+
 import { Breadcrumbs } from "components/molecules/Breadcrumbs";
+import StorageIcon from "@material-ui/icons/Storage";
 
 type Props = {
   error?: ErrorMessageProps;
@@ -96,7 +98,7 @@ const Component = ({
             left={
               <Breadcrumbs
                 items={[
-                  { link: "/", text: "Databases", iconName: "Storage" },
+                  { link: "/", text: "Databases", icon: <StorageIcon /> },
                   { text: databaseId },
                 ]}
               />
