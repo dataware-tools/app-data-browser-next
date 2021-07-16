@@ -19,6 +19,8 @@ import { DatabaseList } from "components/organisms/DatabaseList";
 import { useEffect } from "react";
 import Pagination from "@material-ui/core/Pagination";
 import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
+import { Breadcrumbs } from "components/molecules/Breadcrumbs";
+import StorageIcon from "@material-ui/icons/Storage";
 import { useListDatabases } from "utils";
 import { useRecoilState } from "recoil";
 import { databasePaginateState } from "globalStates";
@@ -60,6 +62,11 @@ const Component = ({
       <PageContainer>
         <PageBody>
           <PageToolBar
+            left={
+              <Breadcrumbs
+                items={[{ text: "Databases", icon: <StorageIcon /> }]}
+              />
+            }
             right={
               isFetchComplete ? (
                 <>
