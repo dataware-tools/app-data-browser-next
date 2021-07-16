@@ -1,4 +1,4 @@
-import { Breadcrumbs } from "./Breadcrumbs";
+import { Breadcrumbs } from ".";
 import HomeIcon from "@material-ui/icons/Home";
 import WhatshotIcon from "@material-ui/icons/Whatshot";
 
