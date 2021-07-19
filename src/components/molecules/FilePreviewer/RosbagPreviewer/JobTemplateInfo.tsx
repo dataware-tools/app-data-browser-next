@@ -1,6 +1,9 @@
 import React from "react";
 import { jobStore } from "@dataware-tools/app-common";
-import { Table } from "semantic-ui-react";
+import Table from "@material-ui/core/Table";
+import TableBody from "@material-ui/core/TableBody";
+import TableRow from "@material-ui/core/TableRow";
+import TableCell from "@material-ui/core/TableCell";
 
 type JobInfoViewProps = {
   jobTemplate: jobStore.JobTemplateModel;
@@ -11,22 +14,20 @@ export const JobTemplateInfo = (props: JobInfoViewProps): JSX.Element => {
   return (
     <div>
       <Table>
-        <Table.Body>
-          <Table.Row>
-            <Table.Cell>Description: </Table.Cell>
-            <Table.Cell>
-              {props.jobTemplate.job_template.description}
-            </Table.Cell>
-          </Table.Row>
-          <Table.Row>
-            <Table.Cell>Args: </Table.Cell>
-            <Table.Cell>
+        <TableBody>
+          <TableRow>
+            <TableCell>Description: </TableCell>
+            <TableCell>{props.jobTemplate.job_template.description}</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell>Args: </TableCell>
+            <TableCell>
               {props.jobType.job_type.args.map((arg: any) => {
                 return arg.name;
               })}
-            </Table.Cell>
-          </Table.Row>
-        </Table.Body>
+            </TableCell>
+          </TableRow>
+        </TableBody>
       </Table>
     </div>
   );

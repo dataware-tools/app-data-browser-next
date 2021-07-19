@@ -1,55 +1,125 @@
-import React from "react";
-import { jobStore } from "@dataware-tools/app-common";
-import { Button, Message, Popup } from "semantic-ui-react";
+import {
+  ErrorMessage,
+  jobStore,
+  ErrorMessageProps,
+} from "@dataware-tools/app-common";
+import Button from "@material-ui/core/Button";
+import Alert from "@material-ui/core/Alert";
+import AlertTitle from "@material-ui/core/AlertTitle";
+import Popover from "@material-ui/core/Popover";
+import { MouseEvent, useState } from "react";
 
-type JobViewProps = {
+type JobViewerDOMProps = {
+  error?: ErrorMessageProps;
+  anchorEl?: HTMLElement;
+  onOpenPopover: (event: MouseEvent<HTMLElement>, script: string) => void;
+  onClosePopover: () => void;
+  onClickExecuteButton: (script: string) => void;
+  scripts: string[];
+  currentShownScript?: string;
+};
+
+type JobViewerProps = {
   jobType: jobStore.JobTypeModel;
   job: jobStore.JobPostedModel;
 };
-export const JobViewer = ({ job, jobType }: JobViewProps): JSX.Element => {
+
+const JobViewerDOM = ({
+  error,
+  anchorEl,
+  onOpenPopover,
+  onClosePopover,
+  onClickExecuteButton,
+  scripts,
+  currentShownScript,
+}: JobViewerDOMProps): JSX.Element => {
   return (
-    <div>
-      {(job?.output?.code === 200 && (
-        <Message positive>
-          <Message.Header>Successfully submitted the job</Message.Header>
-          {Object.entries(jobType.job_type.scheme.output).map(
-            ([key, value]) => {
-              // @ts-expect-error typescript cant resolve this
-              if (value.isExecutable) {
-                const script = job.output[key];
-                return (
-                  <Popup
-                    content={script}
-                    trigger={
-                      <Button
-                        onClick={() => {
-                          // eslint-disable-next-line no-eval
-                          eval(script);
-                        }}
-                      >
-                        Execute
-                      </Button>
-                    }
-                  />
-                );
-              } else {
-                return null;
-              }
-            }
-          )}
-        </Message>
-      )) || (
-        <Message negative>
-          <Message.Header>Failed to submit the job</Message.Header>
-          {
-            // @ts-expect-error API type is incorrect
-            job?.output?.reason && (
-              // @ts-expect-error API type is incorrect
-              <p>{job.output.reason}</p>
-            )
-          }
-        </Message>
+    <>
+      {error ? (
+        <ErrorMessage {...error} />
+      ) : (
+        <Alert severity="success">
+          <AlertTitle>Successfully submitted the job</AlertTitle>
+          {scripts.map((script, index) => {
+            return (
+              <Button
+                key={index}
+                onClick={() => onClickExecuteButton(script)}
+                onMouseEnter={(event) => onOpenPopover(event, script)}
+                onMouseLeave={() => onClosePopover()}
+              >
+                Execute
+              </Button>
+            );
+          })}
+          <Popover
+            // See https://github.com/mui-org/material-ui/issues/7212
+            style={{ pointerEvents: "none" }}
+            open={Boolean(anchorEl)}
+            anchorEl={anchorEl}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "right",
+            }}
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "left",
+            }}
+            onClose={onClosePopover}
+          >
+            <div>{currentShownScript}</div>
+          </Popover>
+        </Alert>
       )}
-    </div>
+    </>
+  );
+};
+
+export const JobViewer = ({ job, jobType }: JobViewerProps): JSX.Element => {
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | undefined>(undefined);
+  const [currentShownScript, setCurrentShownScript] = useState<
+    string | undefined
+  >(undefined);
+
+  const onOpenPopover: JobViewerDOMProps["onOpenPopover"] = (event, script) => {
+    setAnchorEl(event.currentTarget);
+    setCurrentShownScript(script);
+  };
+
+  const onClosePopover = () => {
+    setAnchorEl(undefined);
+    setCurrentShownScript(undefined);
+  };
+
+  const onClickExecuteButton: JobViewerDOMProps["onClickExecuteButton"] = (
+    script
+  ) => {
+    // eslint-disable-next-line no-eval
+    eval(script);
+  };
+
+  const scripts = Object.entries(jobType.job_type.scheme.output)
+    // @ts-expect-error I don't know how to resolve this error
+    .filter(([, value]) => value.isExecutable)
+    .map(([key]) => job.output[key]);
+  const error =
+    job.output.code !== 200
+      ? // @ts-expect-error Fix API
+        job.output.reason
+        ? // @ts-expect-error Fix API
+          { reason: job.output.reason }
+        : { reason: "unknown Error" }
+      : undefined;
+
+  return (
+    <JobViewerDOM
+      anchorEl={anchorEl}
+      scripts={scripts}
+      error={error}
+      currentShownScript={currentShownScript}
+      onOpenPopover={onOpenPopover}
+      onClosePopover={onClosePopover}
+      onClickExecuteButton={onClickExecuteButton}
+    />
   );
 };

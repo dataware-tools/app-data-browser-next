@@ -28,7 +28,7 @@ type Props = {
 };
 
 type RosbagPreviewerProps = { filePath: string };
-const Component = ({
+const RosbagPreviewerDOM = ({
   error,
   onChangeJobTemplate,
   onSubmitJob,
@@ -125,7 +125,7 @@ export const RosbagPreviewer = ({
   };
 
   return (
-    <Component
+    <RosbagPreviewerDOM
       error={error}
       jobTemplateId={jobTemplateId}
       onChangeJobTemplate={setJobTemplateId}

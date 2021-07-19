@@ -25,6 +25,7 @@ export const JobSubmitter = ({
   return (
     <div>
       <SoloSelect
+        label="Select job template"
         value={jobTemplateId}
         onChange={onChangeJobTemplate}
         options={jobTemplateList.map((jt) => {
@@ -34,12 +35,11 @@ export const JobSubmitter = ({
       {jobType && jobTemplate ? (
         <JobTemplateInfo jobTemplate={jobTemplate} jobType={jobType} />
       ) : null}
-      <Button
-        onClick={() => onSubmitJob()}
-        disabled={Boolean(!jobTemplate || job)}
-      >
-        Submit
-      </Button>
+      {jobTemplate && !job ? (
+        <Button onClick={() => onSubmitJob()} disabled={Boolean()}>
+          Submit
+        </Button>
+      ) : null}
     </div>
   );
 };
