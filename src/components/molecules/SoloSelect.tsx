@@ -6,7 +6,7 @@ type OptionsType = { label: string; value: string }[];
 type Props = ContainerProps;
 
 type ContainerProps = {
-  value: string;
+  value?: string;
   onChange: (newValue: string) => void;
   options: OptionsType;
   selectProps?: Omit<SelectProps, "value" | "onChange">;
