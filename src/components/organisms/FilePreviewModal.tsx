@@ -6,7 +6,6 @@ import {
   DialogWrapper,
 } from "@dataware-tools/app-common";
 import { FileType } from "components/organisms/FileListItem";
-import { FileDownloadURLInjector } from "components/organisms/FileDownloadUrlInjector";
 import { FilePreviewer } from "components/molecules/FilePreviewer";
 
 type ContainerWithDialogProps = DialogProps & {
@@ -25,12 +24,7 @@ const Component = ({
         <DialogContainer height={height}>
           <DialogBody>
             <DialogMain>
-              <FileDownloadURLInjector
-                file={file}
-                render={(file, url) => {
-                  return <FilePreviewer file={file} url={url} />;
-                }}
-              />
+              <FilePreviewer file={file} />
             </DialogMain>
           </DialogBody>
         </DialogContainer>

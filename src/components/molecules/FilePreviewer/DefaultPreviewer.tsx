@@ -1,6 +1,4 @@
-import { FilePreviewerContent } from "./types";
-
-const Container: FilePreviewerContent = (): JSX.Element => {
+const Container = (): JSX.Element => {
   return <div>Not supported</div>;
 };
 
