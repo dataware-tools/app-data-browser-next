@@ -33,6 +33,7 @@ import {
   useListPermittedActions,
   UserActionType,
   extractReasonFromFetchError,
+  useGetDatabase,
 } from "utils";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { userActionsState, recordPaginateState } from "globalStates";
@@ -57,6 +58,7 @@ type Props = {
   perPageOptions: PerPageSelectProps["values"];
   isFetchComplete: boolean;
   databaseId: string;
+  databaseName?: string;
   searchColumns: RecordListProps["searchKey"];
   totalPage: number;
   page: number;
@@ -80,6 +82,7 @@ const Component = ({
   totalPage,
   page,
   databaseId,
+  databaseName,
   addedRecordId,
   isNewDatabase,
   onChangeSearchText,
@@ -99,7 +102,7 @@ const Component = ({
               <Breadcrumbs
                 items={[
                   { link: "/", text: "Databases", icon: <StorageIcon /> },
-                  { text: databaseId },
+                  { text: databaseName || databaseId },
                 ]}
               />
             }
@@ -197,6 +200,9 @@ const Page = (): JSX.Element => {
     Boolean(getQueryString("new"))
   );
 
+  const { data: getDatabaseRes } = useGetDatabase(getAccessToken, {
+    databaseId,
+  });
   const { data: getConfigRes, error: getConfigError } = useGetConfig(
     getAccessToken,
     {
@@ -286,11 +292,13 @@ const Page = (): JSX.Element => {
   const totalPage = listRecordsRes
     ? Math.ceil(listRecordsRes.total / listRecordsRes.per_page)
     : 0;
+  const databaseName = getDatabaseRes?.name;
 
   return (
     <Component
       error={error}
       databaseId={databaseId}
+      databaseName={databaseName}
       isFetchComplete={isFetchComplete}
       onAddRecordSucceeded={onAddRecordSucceeded}
       onChangePage={onChangePage}
