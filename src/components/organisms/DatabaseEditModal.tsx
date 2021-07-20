@@ -28,7 +28,11 @@ import {
 import LoadingButton from "@material-ui/lab/LoadingButton";
 import { useRecoilValue } from "recoil";
 import { databasePaginateState } from "globalStates";
-import { extractReasonFromFetchError, useListDatabases } from "utils";
+import {
+  extractReasonFromFetchError,
+  useGetDatabase,
+  useListDatabases,
+} from "utils";
 
 type Props<T extends boolean> = {
   onSubmit: () => Promise<void>;
@@ -36,12 +40,13 @@ type Props<T extends boolean> = {
   error?: ErrorMessageProps;
   formErrors: DeepMap<FormInput, FieldError>;
   control: Control<FormInput>;
-} & Omit<ContainerProps<T>, "onSubmitSucceeded" | "add">;
+} & Omit<ContainerProps<T>, "onSubmitSucceeded" | "databaseId" | "currentData">;
 
 type ContainerProps<T extends boolean> = {
   onClose: () => void;
   onSubmitSucceeded?: (newDatabase: metaStore.DatabaseModel) => void;
   databaseId?: T extends true ? never : string;
+  currentData?: T extends true ? never : metaStore.DatabaseModel;
   add?: T;
 } & Omit<DialogProps, "onClose" | "onSubmit">;
 
@@ -58,14 +63,14 @@ const Component = <T extends boolean>({
   isSubmitting,
   formErrors,
   control,
-  databaseId,
+  add,
   ...delegated
 }: Props<T>) => {
   return (
     <Dialog {...delegated}>
       <DialogWrapper>
         <DialogCloseButton onClick={onClose} />
-        <DialogTitle>Add database</DialogTitle>
+        <DialogTitle>{`${add ? "Add" : "Update"} database`}</DialogTitle>
         <DialogContainer padding="0 0 20px">
           <DialogBody>
             <DialogMain>
@@ -73,7 +78,7 @@ const Component = <T extends boolean>({
                 <ErrorMessage {...error} />
               ) : (
                 <>
-                  {databaseId ? (
+                  {add ? (
                     <Box mt={1}>
                       <label htmlFor="DatabaseAddModal_database_id">
                         Database ID
@@ -159,6 +164,7 @@ const Container = <T extends boolean>({
   onClose,
   databaseId,
   add,
+  currentData,
   ...delegated
 }: ContainerProps<T>): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
@@ -166,7 +172,7 @@ const Container = <T extends boolean>({
     control,
     formState: { errors: formErrors },
     handleSubmit,
-  } = useForm<FormInput>();
+  } = useForm<FormInput>({ defaultValues: currentData });
   const { page, perPage, search } = useRecoilValue(databasePaginateState);
   const [error, setError] = useState<ErrorMessageProps | undefined>(undefined);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -175,6 +181,9 @@ const Container = <T extends boolean>({
     data: listDatabasesRes,
     mutate: listDatabasesMutate,
   } = useListDatabases(getAccessToken, { page, perPage, search });
+  const { mutate: getDatabaseMutate } = useGetDatabase(getAccessToken, {
+    databaseId,
+  });
 
   const initializeState = () => {
     setError(undefined);
@@ -212,6 +221,7 @@ const Container = <T extends boolean>({
       });
       return;
     } else if (saveDatabaseRes) {
+      getDatabaseMutate(saveDatabaseRes);
       if (listDatabasesRes) {
         listDatabasesMutate({
           ...listDatabasesRes,
@@ -229,7 +239,7 @@ const Container = <T extends boolean>({
 
   return (
     <Component
-      databaseId={databaseId}
+      add={add}
       open={open}
       onClose={onClose}
       onSubmit={handleSubmit(onSubmit)}
