@@ -10,6 +10,8 @@ import {
   DialogMain,
   usePrevious,
   ErrorMessageProps,
+  confirm,
+  alert,
 } from "@dataware-tools/app-common";
 import Dialog from "@material-ui/core/Dialog";
 import { useState, useEffect } from "react";
@@ -133,7 +135,9 @@ const Container = ({
       });
 
       if (nonFilledRequired.length > 0) {
-        window.alert(`${JSON.stringify(nonFilledRequired)} is required`);
+        await alert({
+          title: `${JSON.stringify(nonFilledRequired)} is required`,
+        });
         setNonFilledRequiredFieldNames(nonFilledRequired);
         setIsSaving(false);
         return;
@@ -143,11 +147,11 @@ const Container = ({
 
       if (nonFilledRecommends.length > 0) {
         if (
-          !window.confirm(
-            `${JSON.stringify(
+          !(await confirm({
+            title: `${JSON.stringify(
               nonFilledRecommends
-            )} is recommended. Are you sure to save?`
-          )
+            )} is recommended. Are you sure to save?`,
+          }))
         ) {
           setIsSaving(false);
           return;
@@ -165,7 +169,7 @@ const Container = ({
 
       setIsSaving(false);
       if (!isSubmitSucceed) {
-        window.alert("save failed. please retry saving");
+        await alert({ title: "save failed. please retry saving" });
         return;
       }
     }

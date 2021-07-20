@@ -1,7 +1,7 @@
 import Dialog from "@material-ui/core/Dialog";
 import { useState, useEffect } from "react";
 import LoadingButton from "@material-ui/lab/LoadingButton";
-import { useListRecords } from "utils/index";
+import { extractReasonFromFetchError, useListRecords } from "utils/index";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
 import { FormControl, InputLabel } from "@material-ui/core";
@@ -18,6 +18,7 @@ import {
   usePrevious,
   ErrorMessageProps,
   ErrorMessage,
+  alert,
 } from "@dataware-tools/app-common";
 import { useAuth0 } from "@auth0/auth0-react";
 
@@ -138,7 +139,7 @@ const Container = ({
   useEffect(() => {
     if (fetchError) {
       setError({
-        reason: JSON.stringify(fetchError),
+        reason: extractReasonFromFetchError(fetchError),
         instruction: "Please reload this page",
       });
     } else {
@@ -200,7 +201,7 @@ const Container = ({
         exportAsCSV();
         break;
       default:
-        window.alert("Unsupported format");
+        await alert({ title: "Unsupported format" });
     }
   };
 

@@ -1,8 +1,4 @@
-import {
-  DatabaseListItem,
-  DatabaseListItemProps,
-} from "components/organisms/DatabaseListItem";
-import List from "@material-ui/core/List";
+import { DatabaseListItemProps } from "components/organisms/DatabaseListItem";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useHistory } from "react-router-dom";
 import { ParamTypeListDatabases, useListDatabases } from "utils";
@@ -10,20 +6,23 @@ import {
   ErrorMessage,
   ErrorMessageProps,
   LoadingIndicator,
-  metaStore,
+  Table,
+  TableProps,
 } from "@dataware-tools/app-common";
 
 type Props = {
   error?: ErrorMessageProps;
+  columns: TableProps["columns"];
   isFetchComplete: boolean;
   databases: DatabaseListItemProps["database"][];
-  onSelectDatabase: DatabaseListItemProps["onClick"];
+  onSelectDatabase: (databaseId: string) => void;
 };
 
 type ContainerProps = ParamTypeListDatabases;
 
 const Component = ({
   error,
+  columns,
   isFetchComplete,
   databases,
   onSelectDatabase,
@@ -33,17 +32,15 @@ const Component = ({
       {error ? (
         <ErrorMessage {...error} />
       ) : isFetchComplete ? (
-        <List>
-          {databases.map((database) => {
-            return (
-              <DatabaseListItem
-                key={database.database_id}
-                database={database}
-                onClick={onSelectDatabase}
-              />
-            );
-          })}
-        </List>
+        <Table
+          columns={columns}
+          rows={databases}
+          disableHoverCell
+          stickyHeader
+          onClickRow={(targetDetail) =>
+            onSelectDatabase(targetDetail.row.database_id as string)
+          }
+        />
       ) : (
         <LoadingIndicator />
       )}
@@ -60,9 +57,23 @@ const Container = ({ page, perPage, search }: ContainerProps): JSX.Element => {
     error: listDatabasesError,
   } = useListDatabases(getAccessToken, { page, perPage, search });
 
-  const onSelectDatabase = (database: metaStore.DatabaseModel) =>
-    history.push(`/databases/${database.database_id}/records`);
+  const onSelectDatabase = (databaseId: string) =>
+    history.push(`/databases/${databaseId}/records`);
 
+  const columns = [
+    {
+      field: "name",
+      ifEmpty: "No name...",
+      label: "Name",
+      type: "string" as const,
+    },
+    {
+      field: "description",
+      ifEmpty: "No description...",
+      label: "Description",
+      type: "string" as const,
+    },
+  ];
   const error: Props["error"] = listDatabasesError
     ? {
         reason: JSON.stringify(listDatabasesError),
@@ -73,6 +84,7 @@ const Container = ({ page, perPage, search }: ContainerProps): JSX.Element => {
   const databases = listDatabasesRes?.data || [];
   return (
     <Component
+      columns={columns}
       databases={databases}
       onSelectDatabase={onSelectDatabase}
       isFetchComplete={isFetchComplete}

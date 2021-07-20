@@ -14,6 +14,8 @@ import {
   usePrevious,
   DialogTabBarProps,
   ErrorMessageProps,
+  confirm,
+  alert,
 } from "@dataware-tools/app-common";
 import Dialog from "@material-ui/core/Dialog";
 import { useState, useEffect } from "react";
@@ -179,9 +181,9 @@ const Container = ({
       return;
     }
     if (
-      !window.confirm(
-        `Are you sure you want to upload file: ${files[0].name} ?`
-      )
+      !(await confirm({
+        title: `Are you sure you want to upload file: ${files[0].name} ?`,
+      }))
     ) {
       return;
     }
@@ -201,7 +203,9 @@ const Container = ({
     );
 
     if (createFileError) {
-      window.alert(`Fail to upload: ${JSON.stringify(createFileError)}`);
+      await alert({
+        title: `Fail to upload: ${JSON.stringify(createFileError)}`,
+      });
       setIsAddingFile(false);
       return;
     }

@@ -26,19 +26,19 @@ import {
   RecordDetailModalProps,
 } from "components/organisms/RecordDetailModal";
 
-import { Link } from "react-router-dom";
-import HomeIcon from "@material-ui/icons/Home";
 import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
 import {
   useListRecords,
   useGetConfig,
   useListPermittedActions,
   UserActionType,
+  extractReasonFromFetchError,
 } from "utils";
 import { useRecoilState, useSetRecoilState } from "recoil";
 import { userActionsState, recordPaginateState } from "globalStates";
 import { RenderToggleByAction } from "components/atoms/RenderToggleByAction";
 import { ControlledDatabaseMenuButton } from "components/organisms/ControlledDatabaseMenuButton";
+
 import {
   DisplayConfigEditModal,
   DisplayConfigEditModalProps,
@@ -47,6 +47,9 @@ import {
   RecordAddButton,
   RecordAddButtonProps,
 } from "components/organisms/RecordAddButton";
+
+import { Breadcrumbs } from "components/molecules/Breadcrumbs";
+import StorageIcon from "@material-ui/icons/Storage";
 
 type Props = {
   error?: ErrorMessageProps;
@@ -93,12 +96,12 @@ const Component = ({
         <PageBody>
           <PageToolBar
             left={
-              <Link to="/">
-                <ElemCenteringFlexDiv>
-                  <HomeIcon />
-                  Home
-                </ElemCenteringFlexDiv>
-              </Link>
+              <Breadcrumbs
+                items={[
+                  { link: "/", text: "Databases", icon: <StorageIcon /> },
+                  { text: databaseId },
+                ]}
+              />
             }
             right={
               isFetchComplete ? (
@@ -221,7 +224,7 @@ const Page = (): JSX.Element => {
   useEffect(() => {
     if (fetchError) {
       setError({
-        reason: JSON.stringify(fetchError),
+        reason: extractReasonFromFetchError(fetchError),
         instruction: "Please reload this page",
       });
     } else {

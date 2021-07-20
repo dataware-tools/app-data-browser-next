@@ -1,6 +1,7 @@
 import {
   API_ROUTE,
   fileProvider,
+  jobStore,
   metaStore,
   objToQueryString,
   permissionManager,
@@ -43,6 +44,16 @@ const fetchFileProvider = async <T, U>(
 ): Promise<[data: Data<U>, error: any]> => {
   fileProvider.OpenAPI.BASE = API_ROUTE.FILE.BASE;
   fileProvider.OpenAPI.TOKEN = token;
+  return await fetchAPI(fetcher, param);
+};
+
+const fetchJobStore = async <T, U>(
+  token: string | (() => Promise<string>),
+  fetcher: (args: T) => Promise<U>,
+  param: T
+): Promise<[data: Data<U>, error: any]> => {
+  jobStore.OpenAPI.BASE = API_ROUTE.JOB.BASE;
+  jobStore.OpenAPI.TOKEN = token;
   return await fetchAPI(fetcher, param);
 };
 
@@ -263,6 +274,61 @@ const useGetFile: UseAPI<typeof metaStore.FileService.getFile> = (
   return { ...swrRes, cacheKey };
 };
 
+const useListJobTemplate: UseAPI<
+  typeof jobStore.JobTemplateService.listJobTemplates
+> = (token, _nonParam, shouldFetch = true) => {
+  const cacheKey = `${API_ROUTE.JOB.BASE}/job-templates`;
+  const fetcher = async () => {
+    jobStore.OpenAPI.TOKEN = token;
+    jobStore.OpenAPI.BASE = API_ROUTE.JOB.BASE;
+    const res = await jobStore.JobTemplateService.listJobTemplates();
+    return res;
+  };
+  const swrRes = useSWR(shouldFetch ? cacheKey : null, fetcher);
+  return { ...swrRes, cacheKey };
+};
+
+const useGetJobTemplate: UseAPI<
+  typeof jobStore.JobTemplateService.getJobTemplate
+> = (token, { jobTemplateId }, shouldFetch = true) => {
+  const cacheKey = `${API_ROUTE.JOB.BASE}/job-templates/${jobTemplateId}`;
+  const fetcher = jobTemplateId
+    ? async () => {
+        jobStore.OpenAPI.TOKEN = token;
+        jobStore.OpenAPI.BASE = API_ROUTE.JOB.BASE;
+        const res = await jobStore.JobTemplateService.getJobTemplate({
+          jobTemplateId,
+        });
+        return res;
+      }
+    : null;
+  const swrRes = useSWR(
+    shouldFetch && jobTemplateId ? cacheKey : null,
+    fetcher
+  );
+  return { ...swrRes, cacheKey };
+};
+
+const useGetJobTypes: UseAPI<typeof jobStore.JobTypeService.getJobTypes> = (
+  token,
+  { jobTypeUid },
+  shouldFetch = true
+) => {
+  const cacheKey = `${API_ROUTE.JOB.BASE}/job-templates/${jobTypeUid}`;
+  const fetcher = jobTypeUid
+    ? async () => {
+        jobStore.OpenAPI.TOKEN = token;
+        jobStore.OpenAPI.BASE = API_ROUTE.JOB.BASE;
+        const res = await jobStore.JobTypeService.getJobTypes({
+          jobTypeUid,
+        });
+        return res;
+      }
+    : null;
+  const swrRes = useSWR(shouldFetch && jobTypeUid ? cacheKey : null, fetcher);
+  return { ...swrRes, cacheKey };
+};
+
 const useCreateJwtToDownloadFile: UseAPIWithoutCache<
   typeof fileProvider.DownloadService.createJwtToDownloadFile
 > = (token, { requestBody }, shouldFetch = true) => {
@@ -308,10 +374,14 @@ export {
   fetchAPI,
   fetchMetaStore,
   fetchFileProvider,
+  fetchJobStore,
   uploadFileToFileProvider,
   useGetRecord,
   useListRecords,
   useListFiles,
   useGetFile,
+  useListJobTemplate,
+  useGetJobTemplate,
+  useGetJobTypes,
   useCreateJwtToDownloadFile,
 };

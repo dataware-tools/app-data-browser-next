@@ -13,6 +13,7 @@ import {
   usePrevious,
 } from "@dataware-tools/app-common";
 import { useAuth0 } from "@auth0/auth0-react";
+import Box from "@material-ui/core/Box";
 import Dialog, { DialogProps } from "@material-ui/core/Dialog";
 import TextField from "@material-ui/core/TextField";
 import { useEffect, useState } from "react";
@@ -27,7 +28,7 @@ import {
 import LoadingButton from "@material-ui/lab/LoadingButton";
 import { useRecoilValue } from "recoil";
 import { databasePaginateState } from "globalStates";
-import { useListDatabases } from "utils";
+import { extractReasonFromFetchError, useListDatabases } from "utils";
 
 type Props<T extends boolean> = {
   onSubmit: () => Promise<void>;
@@ -72,8 +73,8 @@ const Component = <T extends boolean>({
                 <ErrorMessage {...error} />
               ) : (
                 <>
-                  {!databaseId ? (
-                    <>
+                  {databaseId ? (
+                    <Box mt={1}>
                       <label htmlFor="DatabaseAddModal_database_id">
                         Database ID
                       </label>
@@ -95,42 +96,46 @@ const Component = <T extends boolean>({
                           />
                         )}
                       />
-                    </>
+                    </Box>
                   ) : null}
-                  <label htmlFor="DatabaseAddModal_name">Name</label>
-                  <Controller
-                    name="name"
-                    control={control}
-                    defaultValue=""
-                    rules={{ required: true }}
-                    render={({ field }) => (
-                      <TextField
-                        {...field}
-                        fullWidth
-                        id="DatabaseAddModal_name"
-                        error={formErrors.name?.type === "required"}
-                        helperText={
-                          formErrors.name?.type === "required" &&
-                          "Name is required"
-                        }
-                      />
-                    )}
-                  />
-                  <label htmlFor="DatabaseAddModal_description">
-                    Description
-                  </label>
-                  <Controller
-                    name="description"
-                    control={control}
-                    defaultValue=""
-                    render={({ field }) => (
-                      <TextField
-                        {...field}
-                        fullWidth
-                        id="DatabaseAddModal_description"
-                      />
-                    )}
-                  />
+                  <Box mt={3}>
+                    <label htmlFor="DatabaseAddModal_name">Name</label>
+                    <Controller
+                      name="name"
+                      control={control}
+                      defaultValue=""
+                      rules={{ required: true }}
+                      render={({ field }) => (
+                        <TextField
+                          {...field}
+                          fullWidth
+                          id="DatabaseAddModal_name"
+                          error={formErrors.name?.type === "required"}
+                          helperText={
+                            formErrors.name?.type === "required" &&
+                            "Name is required"
+                          }
+                        />
+                      )}
+                    />
+                  </Box>
+                  <Box mt={3}>
+                    <label htmlFor="DatabaseAddModal_description">
+                      Description
+                    </label>
+                    <Controller
+                      name="description"
+                      control={control}
+                      defaultValue=""
+                      render={({ field }) => (
+                        <TextField
+                          {...field}
+                          fullWidth
+                          id="DatabaseAddModal_description"
+                        />
+                      )}
+                    />
+                  </Box>
                 </>
               )}
             </DialogMain>
@@ -202,7 +207,7 @@ const Container = <T extends boolean>({
 
     if (saveDatabaseError) {
       setError({
-        reason: JSON.stringify(saveDatabaseError),
+        reason: extractReasonFromFetchError(saveDatabaseError),
         instruction: "Please reload this page",
       });
       return;

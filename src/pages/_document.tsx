@@ -20,14 +20,11 @@ export const MetaHeader = (): JSX.Element => {
         rel="stylesheet"
       />
     */}
-      <link rel="icon" href={`/${homepage}/favicon.ico`} />
+      <link rel="icon" href={`${homepage}/favicon.ico`} />
       {/* PWA primary color */}
       <meta name="theme-color" content={theme.palette.primary.main} />
       <meta charSet="utf-8" />
-      <meta
-        name="description"
-        content="Human Dataware Lab application template"
-      />
+      <meta name="description" content="Human Dataware Lab data browser" />
     </>
   );
 };

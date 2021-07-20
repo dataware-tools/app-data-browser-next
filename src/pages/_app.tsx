@@ -35,7 +35,7 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
           name="viewport"
           content="minimum-scale=1, initial-scale=1, width=device-width"
         />
-        <title>App template Next - Dataware-tools</title>
+        <title>Data Browser - Dataware-tools</title>
       </Head>
       <React.StrictMode>
         <SWRConfig value={SwrOptions}>

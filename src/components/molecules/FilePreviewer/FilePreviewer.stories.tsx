@@ -12,7 +12,6 @@ const Template: Story<FilePreviewerProps> = (args) => (
 
 export const Default = Template.bind({});
 Default.args = {
-  url: "",
   file: {
     path: "",
   },
@@ -20,19 +19,8 @@ Default.args = {
 
 export const Text = Template.bind({});
 Text.args = {
-  url:
-    "https://raw.githubusercontent.com/dataware-tools/pydtk/master/README.md",
-  file: {
-    path: "file.txt",
-  },
-};
-
-export const Video = Template.bind({});
-Video.args = {
-  url:
-    "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/360/Big_Buck_Bunny_360_10s_1MB.mp4",
   file: {
     path:
-      "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/360/Big_Buck_Bunny_360_10s_1MB.mp4",
+      "/opt/uploaded_data/database_default/record_20210719-023706-793/test.txt",
   },
 };

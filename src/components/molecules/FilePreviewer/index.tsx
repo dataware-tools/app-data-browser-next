@@ -2,27 +2,48 @@ import { DefaultPreviewer } from "./DefaultPreviewer";
 import { TextPreviewer } from "./TextPreviewer";
 import { VideoPreviewer } from "./VideoPreviewer";
 import { metaStore } from "@dataware-tools/app-common";
+import { FileDownloadURLInjector } from "components/organisms/FileDownloadUrlInjector";
+import { RosbagPreviewer } from "./RosbagPreviewer";
 
 type FilePreviewerContentWithSpec = {
   spec: {
     extensions: string[];
     contentTypes: string[];
   };
-  render: (url: string) => JSX.Element;
+  render: (file: FileType) => JSX.Element;
 };
 
 const filePreviewerCandidates: Record<string, FilePreviewerContentWithSpec> = {
   default: {
     spec: { extensions: [".*"], contentTypes: [".*"] },
-    render: (url: string) => <DefaultPreviewer url={url} />,
+    render: (file) => (
+      <FileDownloadURLInjector
+        file={file}
+        render={() => <DefaultPreviewer />}
+      />
+    ),
   },
   text: {
     spec: { extensions: [".txt", ".md"], contentTypes: ["text/.*"] },
-    render: (url: string) => <TextPreviewer url={url} />,
+    render: (file) => (
+      <FileDownloadURLInjector
+        file={file}
+        render={(_, url) => <TextPreviewer url={url} />}
+      />
+    ),
   },
   video: {
     spec: { extensions: [".mp4"], contentTypes: ["video/.*"] },
-    render: (url: string) => <VideoPreviewer url={url} />,
+    render: (file) => (
+      <FileDownloadURLInjector
+        file={file}
+        render={(_, url) => <VideoPreviewer url={url} />}
+      />
+    ),
+  },
+  rosbag: {
+    spec: { extensions: ["bag"], contentTypes: ["application/rosbag"] },
+    render: (file) => <RosbagPreviewer filePath={file.path} />,
   },
 };
 
@@ -51,9 +72,9 @@ const isContentTypeSupported = (
     : false;
 };
 
-type ContainerProps = { file: FileType; url: string };
+type ContainerProps = { file: FileType };
 
-const Container = ({ file, url }: ContainerProps): JSX.Element => {
+const Container = ({ file }: ContainerProps): JSX.Element => {
   const [, previewer] = Object.entries(filePreviewerCandidates).find(
     ([, candidate]) => {
       return (
@@ -64,8 +85,8 @@ const Container = ({ file, url }: ContainerProps): JSX.Element => {
   ) || [undefined, undefined];
 
   return previewer
-    ? previewer.render(url)
-    : filePreviewerCandidates.default.render(url);
+    ? previewer.render(file)
+    : filePreviewerCandidates.default.render(file);
 };
 
 export { Container as FilePreviewer };

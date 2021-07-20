@@ -13,7 +13,8 @@ import {
   fetchMetaStore,
   useListRecords,
   ParamTypeListRecords,
-} from "utils/index";
+  extractReasonFromFetchError,
+} from "utils";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useEffect, useState } from "react";
 import { produce } from "immer";
@@ -114,7 +115,7 @@ const Container = ({
   useEffect(() => {
     if (fetchError) {
       setError({
-        reason: JSON.stringify(fetchError),
+        reason: extractReasonFromFetchError(fetchError),
         instruction: "Please reload this page",
       });
     } else if (columns.length <= 0) {
@@ -157,7 +158,7 @@ const Container = ({
 
       if (deleteRecordError) {
         setError({
-          reason: JSON.stringify(deleteRecordError),
+          reason: extractReasonFromFetchError(deleteRecordError),
           instruction: "Please reload this page",
         });
       } else if (deleteRecordRes) {

@@ -10,7 +10,9 @@ import {
 import { useListFiles, fetchFileProvider, fetchMetaStore } from "utils";
 import { useAuth0 } from "@auth0/auth0-react";
 import {
+  alert,
   API_ROUTE,
+  confirm,
   ErrorMessage,
   ErrorMessageProps,
   fileProvider,
@@ -118,7 +120,12 @@ const Container = ({ databaseId, recordId }: ContainerProps): JSX.Element => {
   };
 
   const onDelete = async (file: metaStore.FileModel) => {
-    if (!window.confirm("Are you sure you want to delete file?")) return;
+    if (
+      !(await confirm({
+        title: "Are you sure you want to delete file?",
+      }))
+    )
+      return;
 
     const [, deleteFileEntityError] = await fetchFileProvider(
       getAccessToken,
@@ -129,7 +136,9 @@ const Container = ({ databaseId, recordId }: ContainerProps): JSX.Element => {
     );
 
     if (deleteFileEntityError) {
-      window.alert(`Error occur! : ${JSON.stringify(deleteFileEntityError)}`);
+      await alert({
+        title: `Error occur! : ${JSON.stringify(deleteFileEntityError)}`,
+      });
       return;
     }
 
@@ -143,7 +152,9 @@ const Container = ({ databaseId, recordId }: ContainerProps): JSX.Element => {
     );
 
     if (deleteFileMetaError) {
-      window.alert(`Error occur! : ${JSON.stringify(deleteFileMetaError)}`);
+      await alert({
+        title: `Error occur! : ${JSON.stringify(deleteFileMetaError)}`,
+      });
       return;
     }
 
@@ -172,7 +183,7 @@ const Container = ({ databaseId, recordId }: ContainerProps): JSX.Element => {
           window.open(API_ROUTE.FILE.BASE + "/download/" + res.token, "_blank");
         })
         .catch((e) => {
-          alert("Failed to download the file: " + e);
+          alert({ title: "Failed to download the file: " + e });
         });
     });
   };
