@@ -104,6 +104,23 @@ const extractReasonFromFetchError = (fetchError: {
   }
 };
 
+const createSystemMetadata = (
+  type: "add" | "update",
+  user: { name: string }
+): Record<string, string> => {
+  return type === "add"
+    ? {
+        created_by: user.name,
+        creation_time: new Date().getTime().toString(),
+      }
+    : type === "update"
+    ? {
+        updated_by: user.name,
+        update_time: new Date().getTime().toString(),
+      }
+    : {};
+};
+
 export {
   APP_ROUTE,
   SwrOptions,
@@ -115,6 +132,7 @@ export {
   editableColumnDtype,
   isEditableColumnName,
   extractReasonFromFetchError,
+  createSystemMetadata,
 };
 export * from "./fetchClients";
 export * from "./utilTypes";
