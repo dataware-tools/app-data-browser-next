@@ -76,11 +76,11 @@ const Component = ({
 }: Props) => {
   const currentTabName = tabNames[selectedTabIndex];
   return (
-    <Dialog open={open} maxWidth="xl" onClose={onClose}>
+    <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
       <DialogWrapper>
         <DialogCloseButton onClick={onClose} />
         {title && <DialogTitle>{title}</DialogTitle>}
-        <DialogContainer maxHeight="60vh">
+        <DialogContainer height="60vh">
           <DialogTabBar
             onChange={onChangeTab}
             tabNames={tabNames}
@@ -90,8 +90,14 @@ const Component = ({
             <ErrorMessage {...error} />
           ) : (
             <>
-              <DialogBody>
-                <DialogMain maxWidth="60vw">
+              <DialogBody
+                sx={{
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <DialogMain width="60vw">
                   {currentTabName === "Info" ? (
                     <RecordInfo databaseId={databaseId} recordId={recordId} />
                   ) : currentTabName === "Files" ? (
