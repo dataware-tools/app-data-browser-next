@@ -3,9 +3,9 @@ import Button from "@material-ui/core/Button";
 import AddCircle from "@material-ui/icons/AddCircle";
 import { useState } from "react";
 import {
-  DatabaseAddModal,
-  DatabaseAddModalProps,
-} from "components/organisms/DatabaseAddModal";
+  DatabaseEditModal,
+  DatabaseEditModalProps,
+} from "components/organisms/DatabaseEditModal";
 
 type Props = {
   isOpenDatabaseAddModal: boolean;
@@ -14,7 +14,7 @@ type Props = {
 } & ContainerProps;
 
 type ContainerProps = {
-  onAddDatabaseSucceeded?: DatabaseAddModalProps["onSubmitSucceeded"];
+  onAddDatabaseSucceeded?: DatabaseEditModalProps<true>["onSubmitSucceeded"];
 };
 
 const Component = ({
@@ -28,7 +28,8 @@ const Component = ({
       <Button onClick={onOpenDatabaseAddModal} startIcon={<AddCircle />}>
         <TextCenteringSpan>Database</TextCenteringSpan>
       </Button>
-      <DatabaseAddModal
+      <DatabaseEditModal
+        add
         open={isOpenDatabaseAddModal}
         onClose={onCloseDatabaseAddModal}
         onSubmitSucceeded={onAddDatabaseSucceeded}

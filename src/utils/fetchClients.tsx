@@ -146,6 +146,24 @@ const useListDatabases: UseAPI<
   return { ...swrRes, cacheKey };
 };
 
+const useGetDatabase: UseAPI<typeof metaStore.DatabaseService.getDatabase> = (
+  token,
+  { databaseId },
+  shouldFetch = true
+) => {
+  const cacheKey = `${API_ROUTE.META.BASE}/databases/${databaseId}`;
+  const fetcher = databaseId
+    ? async () => {
+        metaStore.OpenAPI.TOKEN = token;
+        metaStore.OpenAPI.BASE = API_ROUTE.META.BASE;
+        const res = await metaStore.DatabaseService.getDatabase({ databaseId });
+
+        return res;
+      }
+    : null;
+  const swrRes = useSWR(shouldFetch && databaseId ? cacheKey : null, fetcher);
+  return { ...swrRes, cacheKey };
+};
 interface UseGetConfig<T extends (...args: any) => Promise<any>> {
   (...args: Parameters<UseAPI<T>>): {
     data: DatabaseConfigType | undefined;
@@ -370,6 +388,7 @@ const useCreateJwtToDownloadFile: UseAPIWithoutCache<
 export {
   useListPermittedActions,
   useListDatabases,
+  useGetDatabase,
   useGetConfig,
   fetchAPI,
   fetchMetaStore,

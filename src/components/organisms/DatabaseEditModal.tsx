@@ -31,20 +31,24 @@ import { databasePaginateState } from "globalStates";
 import {
   extractReasonFromFetchError,
   initializeDatabaseConfig,
+  useGetDatabase,
   useListDatabases,
 } from "utils";
 
-type Props = {
+type Props<T extends boolean> = {
   onSubmit: () => Promise<void>;
   isSubmitting: boolean;
   error?: ErrorMessageProps;
   formErrors: DeepMap<FormInput, FieldError>;
   control: Control<FormInput>;
-} & Omit<ContainerProps, "onSubmitSucceeded">;
+} & Omit<ContainerProps<T>, "onSubmitSucceeded" | "databaseId" | "currentData">;
 
-type ContainerProps = {
+type ContainerProps<T extends boolean> = {
   onClose: () => void;
   onSubmitSucceeded?: (newDatabase: metaStore.DatabaseModel) => void;
+  databaseId?: T extends true ? never : string;
+  currentData?: T extends true ? never : metaStore.DatabaseModel;
+  add?: T;
 } & Omit<DialogProps, "onClose" | "onSubmit">;
 
 type FormInput = {
@@ -53,20 +57,21 @@ type FormInput = {
   description?: string;
 };
 
-const Component = ({
+const Component = <T extends boolean>({
   onClose,
   error,
   onSubmit,
   isSubmitting,
   formErrors,
   control,
+  add,
   ...delegated
-}: Props) => {
+}: Props<T>) => {
   return (
-    <Dialog {...delegated}>
+    <Dialog {...delegated} onClose={onClose}>
       <DialogWrapper>
         <DialogCloseButton onClick={onClose} />
-        <DialogTitle>Add database</DialogTitle>
+        <DialogTitle>{`${add ? "Add" : "Update"} database`}</DialogTitle>
         <DialogContainer padding="0 0 20px">
           <DialogBody>
             <DialogMain>
@@ -74,29 +79,31 @@ const Component = ({
                 <ErrorMessage {...error} />
               ) : (
                 <>
-                  <Box mt={1}>
-                    <label htmlFor="DatabaseAddModal_database_id">
-                      Database ID
-                    </label>
-                    <Controller
-                      name="database_id"
-                      control={control}
-                      defaultValue=""
-                      rules={{ required: true }}
-                      render={({ field }) => (
-                        <TextField
-                          {...field}
-                          error={formErrors.database_id?.type === "required"}
-                          helperText={
-                            formErrors.database_id?.type === "required" &&
-                            "Database ID is required"
-                          }
-                          fullWidth
-                          id="DatabaseAddModal_database_id"
-                        />
-                      )}
-                    />
-                  </Box>
+                  {add ? (
+                    <Box mt={1}>
+                      <label htmlFor="DatabaseAddModal_database_id">
+                        Database ID
+                      </label>
+                      <Controller
+                        name="database_id"
+                        control={control}
+                        defaultValue=""
+                        rules={{ required: true }}
+                        render={({ field }) => (
+                          <TextField
+                            {...field}
+                            error={formErrors.database_id?.type === "required"}
+                            helperText={
+                              formErrors.database_id?.type === "required" &&
+                              "Database ID is required"
+                            }
+                            fullWidth
+                            id="DatabaseAddModal_database_id"
+                          />
+                        )}
+                      />
+                    </Box>
+                  ) : null}
                   <Box mt={3}>
                     <label htmlFor="DatabaseAddModal_name">Name</label>
                     <Controller
@@ -152,18 +159,21 @@ const Component = ({
   );
 };
 
-const Container = ({
+const Container = <T extends boolean>({
   onSubmitSucceeded,
   open,
   onClose,
+  databaseId,
+  add,
+  currentData,
   ...delegated
-}: ContainerProps): JSX.Element => {
+}: ContainerProps<T>): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const {
     control,
     formState: { errors: formErrors },
     handleSubmit,
-  } = useForm<FormInput>();
+  } = useForm<FormInput>({ defaultValues: currentData });
   const { page, perPage, search } = useRecoilValue(databasePaginateState);
   const [error, setError] = useState<ErrorMessageProps | undefined>(undefined);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -172,6 +182,9 @@ const Container = ({
     data: listDatabasesRes,
     mutate: listDatabasesMutate,
   } = useListDatabases(getAccessToken, { page, perPage, search });
+  const { mutate: getDatabaseMutate } = useGetDatabase(getAccessToken, {
+    databaseId,
+  });
 
   const initializeState = () => {
     setError(undefined);
@@ -187,7 +200,7 @@ const Container = ({
   const onSubmit: SubmitHandler<FormInput> = async (requestBody) => {
     setIsSubmitting(true);
 
-    const procAfterFail = async (error: any) => {
+    const procAfterFailAdd = async (error: any) => {
       await fetchMetaStore(
         getAccessToken,
         metaStore.DatabaseService.deleteDatabase,
@@ -201,58 +214,78 @@ const Container = ({
       });
     };
 
-    const [createDatabaseRes, createDatabaseError] = await fetchMetaStore(
-      getAccessToken,
-      metaStore.DatabaseService.createDatabase,
-      {
-        requestBody,
+    const [saveDatabaseRes, saveDatabaseError] =
+      !add && databaseId
+        ? await fetchMetaStore(
+            getAccessToken,
+            metaStore.DatabaseService.updateDatabase,
+            { databaseId, requestBody }
+          )
+        : await fetchMetaStore(
+            getAccessToken,
+            metaStore.DatabaseService.createDatabase,
+            {
+              requestBody,
+            }
+          );
+
+    if (saveDatabaseError) {
+      add
+        ? procAfterFailAdd(saveDatabaseError)
+        : setError({
+            reason: extractReasonFromFetchError(saveDatabaseError),
+            instruction: "Please reload this page",
+          });
+      return;
+    }
+
+    if (add) {
+      const createdDatabaseId =
+        saveDatabaseRes?.database_id || requestBody.database_id;
+      const [
+        getConfigRes,
+        getConfigError,
+      ] = await fetchMetaStore(
+        getAccessToken,
+        metaStore.ConfigService.getConfig,
+        { databaseId: createdDatabaseId }
+      );
+      if (getConfigError) {
+        await procAfterFailAdd(getConfigError);
+        return;
       }
-    );
-    if (createDatabaseError) {
-      await procAfterFail(createDatabaseError);
-      return;
+
+      const { error: initializeDatabaseError } = await initializeDatabaseConfig(
+        getAccessToken,
+        createdDatabaseId,
+        getConfigRes || {}
+      );
+      if (initializeDatabaseError) {
+        await procAfterFailAdd(initializeDatabaseError);
+        return;
+      }
     }
 
-    const createdDatabaseId =
-      createDatabaseRes?.database_id || requestBody.database_id;
-    const [getConfigRes, getConfigError] = await fetchMetaStore(
-      getAccessToken,
-      metaStore.ConfigService.getConfig,
-      { databaseId: createdDatabaseId }
-    );
-    if (getConfigError) {
-      await procAfterFail(getConfigError);
-      return;
-    }
-
-    const { error: initializeDatabaseError } = await initializeDatabaseConfig(
-      getAccessToken,
-      createdDatabaseId,
-      getConfigRes || {}
-    );
-    if (initializeDatabaseError) {
-      await procAfterFail(initializeDatabaseError);
-      return;
-    }
-
-    if (createDatabaseRes) {
+    if (saveDatabaseRes) {
       if (listDatabasesRes) {
         listDatabasesMutate({
           ...listDatabasesRes,
-          data: [createDatabaseRes, ...listDatabasesRes.data],
+          data: [saveDatabaseRes, ...listDatabasesRes.data],
         });
-        onSubmitSucceeded && onSubmitSucceeded(createDatabaseRes);
+        onSubmitSucceeded && onSubmitSucceeded(saveDatabaseRes);
       } else {
         listDatabasesMutate();
       }
     }
 
+    getDatabaseMutate(saveDatabaseRes);
     setIsSubmitting(false);
     onClose();
   };
 
   return (
     <Component
+      add={add}
       open={open}
       onClose={onClose}
       onSubmit={handleSubmit(onSubmit)}
@@ -265,5 +298,5 @@ const Container = ({
   );
 };
 
-export { Container as DatabaseAddModal };
-export type { ContainerProps as DatabaseAddModalProps };
+export { Container as DatabaseEditModal };
+export type { ContainerProps as DatabaseEditModalProps };

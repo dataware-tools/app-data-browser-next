@@ -9,6 +9,10 @@ import { SearchConfigEditModal } from "components/organisms/SearchConfigEditModa
 import { SecretConfigEditModal } from "components/organisms/SecretConfigEditModal";
 import { useState } from "react";
 import { useIsActionPermitted } from "globalStates";
+import { DatabaseEditModal } from "./DatabaseEditModal";
+import { metaStore } from "@dataware-tools/app-common";
+import { useGetDatabase } from "utils";
+import { useAuth0 } from "@auth0/auth0-react";
 
 type Props = {
   menu: DatabaseMenuButtonProps["menu"];
@@ -16,13 +20,16 @@ type Props = {
   isOpenInputConfigEditModal: boolean;
   isOpenSearchConfigEditModal: boolean;
   isOpenSecretConfigEditModal: boolean;
+  isOpenDatabaseEditModal: boolean;
   isOpenExportMetadataModal: boolean;
   onSelectMenu: DatabaseMenuButtonProps["onMenuSelect"];
   onCloseDisplayConfigModal: () => void;
   onCloseInputConfigEditModal: () => void;
   onCloseSearchConfigEditModal: () => void;
   onCloseSecretConfigEditModal: () => void;
+  onCloseDatabaseEditModal: () => void;
   onCloseExportMetadataModal: () => void;
+  databaseInfo?: metaStore.DatabaseModel;
 } & ContainerProps;
 
 type ContainerProps = {
@@ -43,6 +50,9 @@ const Component = ({
   onCloseSecretConfigEditModal,
   isOpenExportMetadataModal,
   onCloseExportMetadataModal,
+  isOpenDatabaseEditModal,
+  onCloseDatabaseEditModal,
+  databaseInfo,
 }: Props): JSX.Element => {
   return (
     <>
@@ -67,6 +77,12 @@ const Component = ({
         open={isOpenSecretConfigEditModal}
         onClose={onCloseSecretConfigEditModal}
       />
+      <DatabaseEditModal
+        databaseId={databaseId}
+        open={isOpenDatabaseEditModal}
+        onClose={onCloseDatabaseEditModal}
+        currentData={databaseInfo}
+      />
       <ExportMetadataModal
         databaseId={databaseId}
         open={isOpenExportMetadataModal}
@@ -76,7 +92,11 @@ const Component = ({
   );
 };
 
-const Container = ({ ...delegated }: ContainerProps): JSX.Element => {
+const Container = ({
+  databaseId,
+  ...delegated
+}: ContainerProps): JSX.Element => {
+  const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const isPermittedConfigureDatabase = useIsActionPermitted(
     "databases:write:update"
   );
@@ -86,9 +106,13 @@ const Container = ({ ...delegated }: ContainerProps): JSX.Element => {
   const [isOpenInputConfigModal, setIsOpenInputConfigModal] = useState(false);
   const [isOpenSearchConfigModal, setIsOpenSearchConfigModal] = useState(false);
   const [isOpenSecretConfigModal, setIsOpenSecretConfigModal] = useState(false);
+  const [isOpenDatabaseEditModal, setIsOpenDatabaseEditModal] = useState(false);
   const [isOpenExportMetadataModal, setIsOpenExportMetadataModal] = useState(
     false
   );
+  const { data: getDatabaseRes } = useGetDatabase(getAccessToken, {
+    databaseId,
+  });
 
   const menu: Props["menu"] = [
     isPermittedConfigureDatabase
@@ -102,6 +126,9 @@ const Container = ({ ...delegated }: ContainerProps): JSX.Element => {
       : undefined,
     isPermittedConfigureDatabase
       ? { value: "Configure secret columns" }
+      : undefined,
+    isPermittedConfigureDatabase
+      ? { value: "Update database info" }
       : undefined,
     { value: "Export metadata" },
   ];
@@ -121,6 +148,9 @@ const Container = ({ ...delegated }: ContainerProps): JSX.Element => {
         setIsOpenSecretConfigModal(true);
         break;
       case menu[4]?.value:
+        setIsOpenDatabaseEditModal(true);
+        break;
+      case menu[5]?.value:
         setIsOpenExportMetadataModal(true);
         break;
     }
@@ -129,17 +159,21 @@ const Container = ({ ...delegated }: ContainerProps): JSX.Element => {
   return (
     <Component
       {...delegated}
+      databaseInfo={getDatabaseRes}
+      databaseId={databaseId}
       isOpenDisplayConfigModal={isOpenDisplayConfigModal}
       isOpenInputConfigEditModal={isOpenInputConfigModal}
       isOpenSearchConfigEditModal={isOpenSearchConfigModal}
       isOpenSecretConfigEditModal={isOpenSecretConfigModal}
       isOpenExportMetadataModal={isOpenExportMetadataModal}
+      isOpenDatabaseEditModal={isOpenDatabaseEditModal}
       menu={menu}
       onSelectMenu={onSelectMenu}
       onCloseDisplayConfigModal={() => setIsOpenDisplayConfigModal(false)}
       onCloseInputConfigEditModal={() => setIsOpenInputConfigModal(false)}
       onCloseSearchConfigEditModal={() => setIsOpenSearchConfigModal(false)}
       onCloseSecretConfigEditModal={() => setIsOpenSecretConfigModal(false)}
+      onCloseDatabaseEditModal={() => setIsOpenDatabaseEditModal(false)}
       onCloseExportMetadataModal={() => setIsOpenExportMetadataModal(false)}
     />
   );
