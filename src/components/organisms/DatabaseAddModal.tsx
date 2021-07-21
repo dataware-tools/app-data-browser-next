@@ -28,7 +28,11 @@ import {
 import LoadingButton from "@material-ui/lab/LoadingButton";
 import { useRecoilValue } from "recoil";
 import { databasePaginateState } from "globalStates";
-import { extractReasonFromFetchError, useListDatabases } from "utils";
+import {
+  extractReasonFromFetchError,
+  initializeDatabaseConfig,
+  useListDatabases,
+} from "utils";
 
 type Props = {
   onSubmit: () => Promise<void>;
@@ -183,6 +187,20 @@ const Container = ({
   const onSubmit: SubmitHandler<FormInput> = async (requestBody) => {
     setIsSubmitting(true);
 
+    const procAfterFail = async (error: any) => {
+      await fetchMetaStore(
+        getAccessToken,
+        metaStore.DatabaseService.deleteDatabase,
+        {
+          databaseId: requestBody.database_id,
+        }
+      );
+      setError({
+        reason: extractReasonFromFetchError(error),
+        instruction: "Please reload this page",
+      });
+    };
+
     const [createDatabaseRes, createDatabaseError] = await fetchMetaStore(
       getAccessToken,
       metaStore.DatabaseService.createDatabase,
@@ -191,21 +209,42 @@ const Container = ({
       }
     );
     if (createDatabaseError) {
-      setError({
-        reason: extractReasonFromFetchError(createDatabaseError),
-        instruction: "Please reload this page",
-      });
+      await procAfterFail(createDatabaseError);
       return;
-    } else if (createDatabaseRes) {
+    }
+
+    const createdDatabaseId =
+      createDatabaseRes?.database_id || requestBody.database_id;
+    const [getConfigRes, getConfigError] = await fetchMetaStore(
+      getAccessToken,
+      metaStore.ConfigService.getConfig,
+      { databaseId: createdDatabaseId }
+    );
+    if (getConfigError) {
+      await procAfterFail(getConfigError);
+      return;
+    }
+
+    const { error: initializeDatabaseError } = await initializeDatabaseConfig(
+      getAccessToken,
+      createdDatabaseId,
+      getConfigRes || {}
+    );
+    if (initializeDatabaseError) {
+      await procAfterFail(initializeDatabaseError);
+      return;
+    }
+
+    if (createDatabaseRes) {
       if (listDatabasesRes) {
         listDatabasesMutate({
           ...listDatabasesRes,
           data: [createDatabaseRes, ...listDatabasesRes.data],
         });
+        onSubmitSucceeded && onSubmitSucceeded(createDatabaseRes);
       } else {
         listDatabasesMutate();
       }
-      onSubmitSucceeded && onSubmitSucceeded(createDatabaseRes);
     }
 
     setIsSubmitting(false);

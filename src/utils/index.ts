@@ -1,5 +1,6 @@
-import { AUTH_CONFIG } from "@dataware-tools/app-common";
+import { AUTH_CONFIG, metaStore } from "@dataware-tools/app-common";
 import { DatabaseConfigType, DatabaseColumnsConfigType } from "utils/utilTypes";
+import { fetchMetaStore } from "utils";
 
 const APP_ROUTE = {
   HOME: "/",
@@ -26,6 +27,10 @@ const pydtkSystemColumns = [
   "path",
   "contents",
   "uuid",
+  "created_by",
+  "creation_time",
+  "updated_by",
+  "update_time",
 ];
 
 const inputFieldsNecessityOrder = [
@@ -106,19 +111,68 @@ const extractReasonFromFetchError = (fetchError: {
 
 const createSystemMetadata = (
   type: "add" | "update",
-  user: { name: string }
+  user: { sub: string }
 ): Record<string, string> => {
   return type === "add"
     ? {
-        created_by: user.name,
+        created_by: user.sub,
         creation_time: new Date().getTime().toString(),
       }
     : type === "update"
     ? {
-        updated_by: user.name,
+        updated_by: user.sub,
         update_time: new Date().getTime().toString(),
       }
     : {};
+};
+
+const initializeDatabaseConfig = async (
+  getAccessToken: Parameters<typeof fetchMetaStore>[0],
+  databaseId: string,
+  currentConfig: Record<string, any>
+): Promise<{ error?: any }> => {
+  if (currentConfig.is_initialized_by_data_browser_v0) {
+    return {};
+  }
+  const [, updateConfigError] = await fetchMetaStore(
+    getAccessToken,
+    metaStore.ConfigService.updateConfig,
+    {
+      databaseId: databaseId,
+      requestBody: {
+        ...currentConfig,
+        columns: [
+          {
+            name: "created_by",
+            display_name: "Created by",
+            dtype: "string",
+            aggregation: "addToSet",
+          },
+          {
+            name: "creation_time",
+            display_name: "Creation time",
+            dtype: "float",
+            aggregation: "min",
+          },
+          {
+            name: "updated_by",
+            display_name: "Updated by",
+            dtype: "string",
+            aggregation: "addToSet",
+          },
+          {
+            name: "update_time",
+            display_name: "Update time",
+            dtype: "float",
+            aggregation: "last",
+          },
+          ...currentConfig.columns,
+        ],
+        is_initialized_by_data_browser_v0: true,
+      },
+    }
+  );
+  return { error: updateConfigError };
 };
 
 export {
@@ -133,6 +187,7 @@ export {
   isEditableColumnName,
   extractReasonFromFetchError,
   createSystemMetadata,
+  initializeDatabaseConfig,
 };
 export * from "./fetchClients";
 export * from "./utilTypes";
