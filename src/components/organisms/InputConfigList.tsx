@@ -15,7 +15,11 @@ import {
   DragDropContextProps,
 } from "react-beautiful-dnd";
 import DragIndicatorIcon from "@material-ui/icons/DragIndicator";
-import { DatabaseColumnsConfigType, compInputFields } from "utils";
+import {
+  DatabaseColumnsConfigType,
+  compInputFields,
+  pydtkSystemColumns,
+} from "utils";
 import {
   InputConfigAddModal,
   InputConfigAddModalProps,
@@ -240,7 +244,9 @@ const Container = ({
   ];
 
   const alreadyUsedColumnNames = [
-    ...new Set(inputConfig.map((column) => column.name)),
+    ...new Set(
+      inputConfig.map((column) => column.name).concat(pydtkSystemColumns)
+    ),
   ];
 
   return (
