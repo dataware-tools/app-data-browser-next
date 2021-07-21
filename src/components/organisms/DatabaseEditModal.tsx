@@ -67,7 +67,7 @@ const Component = <T extends boolean>({
   ...delegated
 }: Props<T>) => {
   return (
-    <Dialog {...delegated}>
+    <Dialog {...delegated} onClose={onClose}>
       <DialogWrapper>
         <DialogCloseButton onClick={onClose} />
         <DialogTitle>{`${add ? "Add" : "Update"} database`}</DialogTitle>
