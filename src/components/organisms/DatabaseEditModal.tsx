@@ -30,6 +30,7 @@ import { useRecoilValue } from "recoil";
 import { databasePaginateState } from "globalStates";
 import {
   extractReasonFromFetchError,
+  initializeDatabaseConfig,
   useGetDatabase,
   useListDatabases,
 } from "utils";
@@ -198,6 +199,19 @@ const Container = <T extends boolean>({
 
   const onSubmit: SubmitHandler<FormInput> = async (requestBody) => {
     setIsSubmitting(true);
+    const procAfterFail = async (error: any) => {
+      await fetchMetaStore(
+        getAccessToken,
+        metaStore.DatabaseService.deleteDatabase,
+        {
+          databaseId: requestBody.database_id,
+        }
+      );
+      setError({
+        reason: extractReasonFromFetchError(error),
+        instruction: "Please reload this page",
+      });
+    };
 
     const [saveDatabaseRes, saveDatabaseError] =
       !add && databaseId
@@ -220,17 +234,46 @@ const Container = <T extends boolean>({
         instruction: "Please reload this page",
       });
       return;
-    } else if (saveDatabaseRes) {
-      getDatabaseMutate(saveDatabaseRes);
+    }
+    getDatabaseMutate(saveDatabaseRes);
+
+    if (add) {
+      const createdDatabaseId =
+        saveDatabaseRes?.database_id || requestBody.database_id;
+      const [
+        getConfigRes,
+        getConfigError,
+      ] = await fetchMetaStore(
+        getAccessToken,
+        metaStore.ConfigService.getConfig,
+        { databaseId: createdDatabaseId }
+      );
+      if (getConfigError) {
+        await procAfterFail(getConfigError);
+        return;
+      }
+
+      const { error: initializeDatabaseError } = await initializeDatabaseConfig(
+        getAccessToken,
+        createdDatabaseId,
+        getConfigRes || {}
+      );
+      if (initializeDatabaseError) {
+        await procAfterFail(initializeDatabaseError);
+        return;
+      }
+    }
+
+    if (saveDatabaseRes) {
       if (listDatabasesRes) {
         listDatabasesMutate({
           ...listDatabasesRes,
           data: [saveDatabaseRes, ...listDatabasesRes.data],
         });
+        onSubmitSucceeded && onSubmitSucceeded(saveDatabaseRes);
       } else {
         listDatabasesMutate();
       }
-      onSubmitSucceeded && onSubmitSucceeded(saveDatabaseRes);
     }
 
     setIsSubmitting(false);
