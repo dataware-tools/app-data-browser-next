@@ -1,9 +1,14 @@
+import dynamic from "next/dynamic";
 import { DefaultPreviewer } from "./DefaultPreviewer";
 import { TextPreviewer } from "./TextPreviewer";
 import { VideoPreviewer } from "./VideoPreviewer";
 import { metaStore } from "@dataware-tools/app-common";
 import { FileDownloadURLInjector } from "components/organisms/FileDownloadUrlInjector";
 import { RosbagPreviewer } from "./RosbagPreviewer";
+const AudioPreviewer = dynamic<any>(
+  () => import("./AudioPreviewer").then((module) => module.AudioPreviewer),
+  { ssr: false }
+);
 
 type FilePreviewerContentWithSpec = {
   spec: {
@@ -44,6 +49,15 @@ const filePreviewerCandidates: Record<string, FilePreviewerContentWithSpec> = {
   rosbag: {
     spec: { extensions: ["bag"], contentTypes: ["application/rosbag"] },
     render: (file) => <RosbagPreviewer filePath={file.path} />,
+  },
+  audio: {
+    spec: { extensions: [".wav", ".mp3"], contentTypes: ["audio/.*"] },
+    render: (file) => (
+      <FileDownloadURLInjector
+        file={file}
+        render={(_, url) => <AudioPreviewer url={url} />}
+      />
+    ),
   },
 };
 
