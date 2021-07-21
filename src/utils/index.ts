@@ -175,6 +175,27 @@ const initializeDatabaseConfig = async (
   return { error: updateConfigError };
 };
 
+const leftFillNum = (num: number, targetLength: number): string => {
+  return num.toString().padStart(targetLength, "0");
+};
+
+const floatToTimecodeString = (time: number | undefined): string => {
+  if (time === undefined) {
+    return "??:??:??";
+  }
+
+  const hour = Math.floor(time / 3600);
+  const minute = Math.floor(time / 60);
+  const second = Math.floor(time % 60);
+  return (
+    leftFillNum(hour, 2) +
+    ":" +
+    leftFillNum(minute, 2) +
+    ":" +
+    leftFillNum(second, 2)
+  );
+};
+
 export {
   APP_ROUTE,
   SwrOptions,
@@ -188,6 +209,8 @@ export {
   extractReasonFromFetchError,
   createSystemMetadata,
   initializeDatabaseConfig,
+  leftFillNum,
+  floatToTimecodeString,
 };
 export * from "./fetchClients";
 export * from "./utilTypes";
