@@ -121,6 +121,7 @@ const useStyles = makeStyles({
     maxHeight: "40vh",
     minHeight: "0",
     overflow: "auto",
+    padding: "10px 0",
   },
   draggable: {
     alignItems: "center",
