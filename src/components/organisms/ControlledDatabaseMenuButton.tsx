@@ -10,6 +10,9 @@ import { SecretConfigEditModal } from "components/organisms/SecretConfigEditModa
 import { useState } from "react";
 import { useIsActionPermitted } from "globalStates";
 import { DatabaseEditModal } from "./DatabaseEditModal";
+import { metaStore } from "@dataware-tools/app-common";
+import { useGetDatabase } from "utils";
+import { useAuth0 } from "@auth0/auth0-react";
 
 type Props = {
   menu: DatabaseMenuButtonProps["menu"];
@@ -26,6 +29,7 @@ type Props = {
   onCloseSecretConfigEditModal: () => void;
   onCloseDatabaseEditModal: () => void;
   onCloseExportMetadataModal: () => void;
+  databaseInfo?: metaStore.DatabaseModel;
 } & ContainerProps;
 
 type ContainerProps = {
@@ -48,6 +52,7 @@ const Component = ({
   onCloseExportMetadataModal,
   isOpenDatabaseEditModal,
   onCloseDatabaseEditModal,
+  databaseInfo,
 }: Props): JSX.Element => {
   return (
     <>
@@ -76,6 +81,7 @@ const Component = ({
         databaseId={databaseId}
         open={isOpenDatabaseEditModal}
         onClose={onCloseDatabaseEditModal}
+        currentData={databaseInfo}
       />
       <ExportMetadataModal
         databaseId={databaseId}
@@ -86,7 +92,11 @@ const Component = ({
   );
 };
 
-const Container = ({ ...delegated }: ContainerProps): JSX.Element => {
+const Container = ({
+  databaseId,
+  ...delegated
+}: ContainerProps): JSX.Element => {
+  const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const isPermittedConfigureDatabase = useIsActionPermitted(
     "databases:write:update"
   );
@@ -100,6 +110,9 @@ const Container = ({ ...delegated }: ContainerProps): JSX.Element => {
   const [isOpenExportMetadataModal, setIsOpenExportMetadataModal] = useState(
     false
   );
+  const { data: getDatabaseRes } = useGetDatabase(getAccessToken, {
+    databaseId,
+  });
 
   const menu: Props["menu"] = [
     isPermittedConfigureDatabase
@@ -146,6 +159,8 @@ const Container = ({ ...delegated }: ContainerProps): JSX.Element => {
   return (
     <Component
       {...delegated}
+      databaseInfo={getDatabaseRes}
+      databaseId={databaseId}
       isOpenDisplayConfigModal={isOpenDisplayConfigModal}
       isOpenInputConfigEditModal={isOpenInputConfigModal}
       isOpenSearchConfigEditModal={isOpenSearchConfigModal}
