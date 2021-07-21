@@ -199,7 +199,8 @@ const Container = <T extends boolean>({
 
   const onSubmit: SubmitHandler<FormInput> = async (requestBody) => {
     setIsSubmitting(true);
-    const procAfterFail = async (error: any) => {
+
+    const procAfterFailAdd = async (error: any) => {
       await fetchMetaStore(
         getAccessToken,
         metaStore.DatabaseService.deleteDatabase,
@@ -229,13 +230,14 @@ const Container = <T extends boolean>({
           );
 
     if (saveDatabaseError) {
-      setError({
-        reason: extractReasonFromFetchError(saveDatabaseError),
-        instruction: "Please reload this page",
-      });
+      add
+        ? procAfterFailAdd(saveDatabaseError)
+        : setError({
+            reason: extractReasonFromFetchError(saveDatabaseError),
+            instruction: "Please reload this page",
+          });
       return;
     }
-    getDatabaseMutate(saveDatabaseRes);
 
     if (add) {
       const createdDatabaseId =
@@ -249,7 +251,7 @@ const Container = <T extends boolean>({
         { databaseId: createdDatabaseId }
       );
       if (getConfigError) {
-        await procAfterFail(getConfigError);
+        await procAfterFailAdd(getConfigError);
         return;
       }
 
@@ -259,7 +261,7 @@ const Container = <T extends boolean>({
         getConfigRes || {}
       );
       if (initializeDatabaseError) {
-        await procAfterFail(initializeDatabaseError);
+        await procAfterFailAdd(initializeDatabaseError);
         return;
       }
     }
@@ -276,6 +278,7 @@ const Container = <T extends boolean>({
       }
     }
 
+    getDatabaseMutate(saveDatabaseRes);
     setIsSubmitting(false);
     onClose();
   };
