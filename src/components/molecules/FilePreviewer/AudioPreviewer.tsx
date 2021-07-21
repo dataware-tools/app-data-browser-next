@@ -3,16 +3,16 @@ import { Button } from "@material-ui/core";
 import { floatToTimecodeString } from "utils";
 import { ToolBar } from "@dataware-tools/app-common";
 import WaveSurfer from "wavesurfer.js";
-
-// TODO: Import the following packages when their type definition is released
-// import CursorPlugin from "wavesurfer.js/dist/plugin/wavesurfer.cursor.js";  // Cannot import as type def. is missing
-// import TimelinePlugin from "wavesurfer.js/dist/plugin/wavesurfer.timeline.js"; // Missing type def.
+// @ts-expect-error Type-definitions are missing
+import CursorPlugin from "wavesurfer.js/dist/plugin/wavesurfer.cursor.js";
+// @ts-expect-error Type-definitions are missing
+import TimelinePlugin from "wavesurfer.js/dist/plugin/wavesurfer.timeline.js";
 
 type AudioPreviewerProps = { url: string };
 export const AudioPreviewer = ({ url }: AudioPreviewerProps): JSX.Element => {
   const wavesurfer = useRef<WaveSurfer | null>(null);
-  const waveformRef = useRef(null);
-  const waveformTimeline = useRef(null);
+  const waveformRef = useRef<HTMLDivElement | null>(null);
+  const waveformTimeline = useRef<HTMLDivElement | null>(null);
   const [isReady, setIsReady] = useState<boolean>(false);
   const [currentTime, setCurrentTime] = useState<number>(0);
   const [duration, setDuration] = useState<number | undefined>(undefined);
@@ -24,22 +24,21 @@ export const AudioPreviewer = ({ url }: AudioPreviewerProps): JSX.Element => {
         container: waveformRef.current!,
         responsive: true,
         splitChannels: true,
-        // TODO: Enable the following plugins when their type definition is released
-        // plugins: [
-        //   CursorPlugin.create({
-        //     showTime: true,
-        //     opacity: 1,
-        //     customShowTimeStyle: {
-        //       "background-color": "#000",
-        //       color: "#fff",
-        //       padding: "2px",
-        //     },
-        //   }),
-        //   TimelinePlugin.create({
-        //     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        //     container: waveformTimeline.current!
-        //   })
-        // ],
+        plugins: [
+          CursorPlugin.create({
+            showTime: true,
+            opacity: 1,
+            customShowTimeStyle: {
+              "background-color": "#000",
+              color: "#fff",
+              padding: "2px",
+            },
+          }),
+          TimelinePlugin.create({
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+            container: waveformTimeline.current!,
+          }),
+        ],
       });
 
       wavesurfer.current.load(url);
@@ -62,14 +61,13 @@ export const AudioPreviewer = ({ url }: AudioPreviewerProps): JSX.Element => {
         wavesurfer.current?.destroy();
       };
     } else {
-      // eslint-disable-next-line @typescript-eslint/no-empty-function
-      return () => {};
+      return undefined;
     }
   }, [url, waveformRef, waveformTimeline]);
 
   return (
     <div>
-      <div id="waveform" ref={waveformRef} />
+      <div id="waveform" ref={waveformRef} style={{ position: "relative" }} />
       <div id="waveform-timeline" ref={waveformTimeline} />
       <ToolBar
         left={
