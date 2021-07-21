@@ -27,6 +27,7 @@ import {
   useListFiles,
   uploadFileToFileProvider,
   useGetConfig,
+  createSystemMetadata,
 } from "utils";
 import {
   RecordEditModal,
@@ -146,7 +147,7 @@ const Container = ({
   databaseId,
   recordId,
 }: ContainerProps): JSX.Element => {
-  const { getAccessTokenSilently: getAccessToken } = useAuth0();
+  const { getAccessTokenSilently: getAccessToken, user } = useAuth0();
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
   const [isOpenRecordEditModal, setIsOpenRecordEditModal] = useState(false);
   const [isAddingFile, setIsAddingFile] = useState(false);
@@ -198,6 +199,12 @@ const Container = ({
 
     const requestBody = new FormData();
     requestBody.append("file", files[0]);
+    requestBody.append(
+      "metadata",
+      new Blob([JSON.stringify(createSystemMetadata("add", user))], {
+        type: "application/json",
+      })
+    );
 
     const [createFileRes, createFileError] = await uploadFileToFileProvider(
       getAccessToken,
