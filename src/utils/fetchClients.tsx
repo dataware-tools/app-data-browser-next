@@ -1,12 +1,13 @@
 import {
   API_ROUTE,
   fileProvider,
+  jobStore,
   metaStore,
   objToQueryString,
   permissionManager,
 } from "@dataware-tools/app-common";
-import useSWR from "swr";
-import { AwaitType } from "./utilTypes";
+import useSWR, { SWRResponse } from "swr";
+import { AwaitType, DatabaseConfigType } from "utils/utilTypes";
 import { useState, useEffect } from "react";
 
 type Data<T> = T extends void | undefined | null
@@ -43,6 +44,16 @@ const fetchFileProvider = async <T, U>(
 ): Promise<[data: Data<U>, error: any]> => {
   fileProvider.OpenAPI.BASE = API_ROUTE.FILE.BASE;
   fileProvider.OpenAPI.TOKEN = token;
+  return await fetchAPI(fetcher, param);
+};
+
+const fetchJobStore = async <T, U>(
+  token: string | (() => Promise<string>),
+  fetcher: (args: T) => Promise<U>,
+  param: T
+): Promise<[data: Data<U>, error: any]> => {
+  jobStore.OpenAPI.BASE = API_ROUTE.JOB.BASE;
+  jobStore.OpenAPI.TOKEN = token;
   return await fetchAPI(fetcher, param);
 };
 
@@ -91,14 +102,14 @@ interface UseAPI<T extends (...args: any) => Promise<any>> {
     token: string | (() => Promise<string>),
     param: Partial<Parameters<T>[number]>,
     shouldFetch?: boolean
-  ): [data: AwaitType<ReturnType<T>> | undefined, error: any, cacheKey: string];
+  ): SWRResponse<AwaitType<ReturnType<T>>, any> & { cacheKey: string };
 }
 
 interface UseAPIWithoutCache<T extends (...args: any) => Promise<any>> {
-  (...args: Parameters<UseAPI<T>>): [
-    ReturnType<UseAPI<T>>[0],
-    ReturnType<UseAPI<T>>[1]
-  ];
+  (...args: Parameters<UseAPI<T>>): {
+    data: AwaitType<ReturnType<T>> | undefined;
+    error: any;
+  };
 }
 
 const useListPermittedActions: UseAPI<
@@ -116,12 +127,8 @@ const useListPermittedActions: UseAPI<
         return res;
       }
     : null;
-  // See: https://swr.vercel.app/docs/conditional-fetching
-  const { data, error } = useSWR(
-    shouldFetch && databaseId ? cacheKey : null,
-    fetcher
-  );
-  return [data, error, cacheKey];
+  const resSWR = useSWR(shouldFetch && databaseId ? cacheKey : null, fetcher);
+  return { ...resSWR, cacheKey };
 };
 
 const useListDatabases: UseAPI<
@@ -135,12 +142,34 @@ const useListDatabases: UseAPI<
     const res = await metaStore.DatabaseService.listDatabases(query);
     return res;
   };
-  // See: https://swr.vercel.app/docs/conditional-fetching
-  const { data, error } = useSWR(shouldFetch ? cacheKey : null, fetcher);
-  return [data, error, cacheKey];
+  const swrRes = useSWR(shouldFetch ? cacheKey : null, fetcher);
+  return { ...swrRes, cacheKey };
 };
 
-const useGetConfig: UseAPI<typeof metaStore.ConfigService.getConfig> = (
+const useGetDatabase: UseAPI<typeof metaStore.DatabaseService.getDatabase> = (
+  token,
+  { databaseId },
+  shouldFetch = true
+) => {
+  const cacheKey = `${API_ROUTE.META.BASE}/databases/${databaseId}`;
+  const fetcher = databaseId
+    ? async () => {
+        metaStore.OpenAPI.TOKEN = token;
+        metaStore.OpenAPI.BASE = API_ROUTE.META.BASE;
+        const res = await metaStore.DatabaseService.getDatabase({ databaseId });
+
+        return res;
+      }
+    : null;
+  const swrRes = useSWR(shouldFetch && databaseId ? cacheKey : null, fetcher);
+  return { ...swrRes, cacheKey };
+};
+interface UseGetConfig<T extends (...args: any) => Promise<any>> {
+  (...args: Parameters<UseAPI<T>>): {
+    data: DatabaseConfigType | undefined;
+  } & Omit<ReturnType<UseAPI<T>>, "data">;
+}
+const useGetConfig: UseGetConfig<typeof metaStore.ConfigService.getConfig> = (
   token,
   { databaseId },
   shouldFetch = true
@@ -157,11 +186,11 @@ const useGetConfig: UseAPI<typeof metaStore.ConfigService.getConfig> = (
       }
     : null;
 
-  const { data, error } = useSWR(
+  const { data, ...rest } = useSWR(
     shouldFetch && databaseId ? cacheKey : null,
     fetcher
   );
-  return [data, error, cacheKey];
+  return { data: data as DatabaseConfigType | undefined, ...rest, cacheKey };
 };
 
 const useGetRecord: UseAPI<typeof metaStore.RecordService.getRecord> = (
@@ -183,11 +212,11 @@ const useGetRecord: UseAPI<typeof metaStore.RecordService.getRecord> = (
         }
       : null;
 
-  const { data, error } = useSWR(
+  const swrRes = useSWR(
     shouldFetch && databaseId && recordId ? cacheKey : null,
     fetcher
   );
-  return [data, error, cacheKey];
+  return { ...swrRes, cacheKey };
 };
 
 const useListRecords: UseAPI<typeof metaStore.RecordService.listRecords> = (
@@ -208,11 +237,11 @@ const useListRecords: UseAPI<typeof metaStore.RecordService.listRecords> = (
         return listRecordsRes;
       }
     : null;
-  const { data, error } = useSWR(
+  const swrRes = useSWR(
     shouldFetch && databaseId ? cacheKey : null,
     listRecords
   );
-  return [data, error, cacheKey];
+  return { ...swrRes, cacheKey };
 };
 
 const useListFiles: UseAPI<typeof metaStore.FileService.listFiles> = (
@@ -233,11 +262,89 @@ const useListFiles: UseAPI<typeof metaStore.FileService.listFiles> = (
         return res;
       }
     : null;
-  const { data, error } = useSWR(
-    shouldFetch && databaseId ? cacheKey : null,
+  const swrRes = useSWR(shouldFetch && databaseId ? cacheKey : null, fetcher);
+  return { ...swrRes, cacheKey };
+};
+
+const useGetFile: UseAPI<typeof metaStore.FileService.getFile> = (
+  token,
+  { databaseId, uuid },
+  shouldFetch = true
+) => {
+  const cacheKey = `${API_ROUTE.META.BASE}/databases/${databaseId}/files/${uuid}`;
+  const fetcher =
+    databaseId && uuid
+      ? async () => {
+          metaStore.OpenAPI.TOKEN = token;
+          metaStore.OpenAPI.BASE = API_ROUTE.META.BASE;
+          const res = await metaStore.FileService.getFile({
+            databaseId,
+            uuid,
+          });
+          return res;
+        }
+      : null;
+
+  const swrRes = useSWR(
+    shouldFetch && databaseId && uuid ? cacheKey : null,
     fetcher
   );
-  return [data, error, cacheKey];
+  return { ...swrRes, cacheKey };
+};
+
+const useListJobTemplate: UseAPI<
+  typeof jobStore.JobTemplateService.listJobTemplates
+> = (token, _nonParam, shouldFetch = true) => {
+  const cacheKey = `${API_ROUTE.JOB.BASE}/job-templates`;
+  const fetcher = async () => {
+    jobStore.OpenAPI.TOKEN = token;
+    jobStore.OpenAPI.BASE = API_ROUTE.JOB.BASE;
+    const res = await jobStore.JobTemplateService.listJobTemplates();
+    return res;
+  };
+  const swrRes = useSWR(shouldFetch ? cacheKey : null, fetcher);
+  return { ...swrRes, cacheKey };
+};
+
+const useGetJobTemplate: UseAPI<
+  typeof jobStore.JobTemplateService.getJobTemplate
+> = (token, { jobTemplateId }, shouldFetch = true) => {
+  const cacheKey = `${API_ROUTE.JOB.BASE}/job-templates/${jobTemplateId}`;
+  const fetcher = jobTemplateId
+    ? async () => {
+        jobStore.OpenAPI.TOKEN = token;
+        jobStore.OpenAPI.BASE = API_ROUTE.JOB.BASE;
+        const res = await jobStore.JobTemplateService.getJobTemplate({
+          jobTemplateId,
+        });
+        return res;
+      }
+    : null;
+  const swrRes = useSWR(
+    shouldFetch && jobTemplateId ? cacheKey : null,
+    fetcher
+  );
+  return { ...swrRes, cacheKey };
+};
+
+const useGetJobTypes: UseAPI<typeof jobStore.JobTypeService.getJobTypes> = (
+  token,
+  { jobTypeUid },
+  shouldFetch = true
+) => {
+  const cacheKey = `${API_ROUTE.JOB.BASE}/job-templates/${jobTypeUid}`;
+  const fetcher = jobTypeUid
+    ? async () => {
+        jobStore.OpenAPI.TOKEN = token;
+        jobStore.OpenAPI.BASE = API_ROUTE.JOB.BASE;
+        const res = await jobStore.JobTypeService.getJobTypes({
+          jobTypeUid,
+        });
+        return res;
+      }
+    : null;
+  const swrRes = useSWR(shouldFetch && jobTypeUid ? cacheKey : null, fetcher);
+  return { ...swrRes, cacheKey };
 };
 
 const useCreateJwtToDownloadFile: UseAPIWithoutCache<
@@ -275,19 +382,25 @@ const useCreateJwtToDownloadFile: UseAPIWithoutCache<
     }
   }, [token, shouldFetch]);
 
-  return [res.data, res.error];
+  return res;
 };
 
 export {
   useListPermittedActions,
   useListDatabases,
+  useGetDatabase,
   useGetConfig,
   fetchAPI,
   fetchMetaStore,
   fetchFileProvider,
+  fetchJobStore,
   uploadFileToFileProvider,
   useGetRecord,
   useListRecords,
   useListFiles,
+  useGetFile,
+  useListJobTemplate,
+  useGetJobTemplate,
+  useGetJobTypes,
   useCreateJwtToDownloadFile,
 };

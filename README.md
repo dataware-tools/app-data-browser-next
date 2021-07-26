@@ -1,13 +1,7 @@
-## First thing to do
+# app-data-browser-next
 
-The things you have to do after creating a repository based on this template are as follows:
+Web-application for browsing data in Dataware-tools.
 
-- Change `name` in `package.json` to the name of your application
-- Change `repository` in `package.json` to the newly created repository
-- Change `homepage` in `package.json` to your application name
-  - This should be the same as `urlPrefix` in
-    [App Catalog](https://github.com/dataware-tools/protocols/blob/master/catalogs/app.json)
-    if you want to register your application to dataware-tools
 
 ## How to build docker-image
 
@@ -29,6 +23,13 @@ After success of building image
 ```bash
 $ dc up
 ```
+
+If you want to change Auth0's configurations (i.e., client-id, domain, etc.),
+you need to set the following environment variables:
+
+- `NEXT_PUBLIC_DATAWARE_TOOLS_AUTH_CONFIG_DOMAIN`: Domain (default: `dataware-tools.us.auth0.com`)
+- `NEXT_PUBLIC_DATAWARE_TOOLS_AUTH_CONFIG_CLIENT_ID`: Client ID (default: the one for the demo page)
+- `NEXT_PUBLIC_DATAWARE_TOOLS_AUTH_CONFIG_API_URL`: API URL (default: `https://demo.dataware-tools.com/`)
 
 ## Getting started
 

@@ -2,7 +2,7 @@ import { Story } from "@storybook/react";
 import {
   InputConfigAddModal,
   InputConfigAddModalProps,
-  NewConfigType,
+  NewColumnType,
 } from "./InputConfigAddModal";
 
 export default {
@@ -17,7 +17,7 @@ const Template: Story<InputConfigAddModalProps> = (args) => (
 export const Default = Template.bind({});
 Default.args = {
   open: true,
-  onSave: (newConfig: NewConfigType) =>
+  onSave: (newConfig: NewColumnType) =>
     window.alert(`save! ${JSON.stringify(newConfig)}`),
   options: [
     { name: "test1", display_name: "Test1" },

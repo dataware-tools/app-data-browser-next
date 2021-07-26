@@ -5,7 +5,7 @@ import { Spacer } from "@dataware-tools/app-common";
 import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from "@material-ui/icons/Delete";
 import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
-import React from "react";
+import React, { ReactNode } from "react";
 import { DatabaseColumnsConfigType } from "utils";
 
 type ValueType = Required<
@@ -17,11 +17,9 @@ type ActionType = "change" | "delete";
 type Props = { classes: ReturnType<typeof useStyles> } & ContainerProps;
 type ContainerProps = {
   value: ValueType;
-  onChange: (
-    action: ActionType,
-    newValue: ValueType | undefined,
-    oldValue: ValueType
-  ) => void;
+  label: ReactNode;
+  onUpdate: (newValue: ValueType, oldValue: ValueType) => void;
+  onDelete: (deletedValue: ValueType) => void;
 };
 
 const useStyles = makeStyles({
@@ -44,21 +42,22 @@ const useStyles = makeStyles({
   },
 });
 
-const Component = ({ classes, value, onChange }: Props): JSX.Element => {
+const Component = ({
+  classes,
+  value,
+  label,
+  onUpdate,
+  onDelete,
+}: Props): JSX.Element => {
   return (
     <div className={classes.root}>
-      <ElemCenteringFlexDiv>
-        {value.name}
-        <br />
-        {`(display name: ${value.display_name})`}
-      </ElemCenteringFlexDiv>
+      {label}
       <div className={classes.right}>
         <Spacer direction="horizontal" size="10px" />
         <Select
           value={value.necessity}
           onChange={(event) =>
-            onChange(
-              "change",
+            onUpdate(
               {
                 ...value,
                 necessity: event.target.value,
@@ -75,9 +74,7 @@ const Component = ({ classes, value, onChange }: Props): JSX.Element => {
         </Select>
         <Spacer direction="horizontal" size="10px" />
         <ElemCenteringFlexDiv>
-          <IconButton
-            onClick={() => onChange("delete", undefined, { ...value })}
-          >
+          <IconButton onClick={() => onDelete(value)}>
             <DeleteIcon />
           </IconButton>
         </ElemCenteringFlexDiv>

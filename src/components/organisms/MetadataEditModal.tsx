@@ -9,139 +9,57 @@ import {
   DialogWrapper,
   DialogMain,
   usePrevious,
+  ErrorMessageProps,
+  confirm,
+  alert,
 } from "@dataware-tools/app-common";
 import Dialog from "@material-ui/core/Dialog";
 import { useState, useEffect } from "react";
 import LoadingButton from "@material-ui/lab/LoadingButton";
-import { compInputFields } from "utils/index";
 import {
   MetadataInputFieldList,
   MetadataInputFieldListProps,
 } from "components/organisms/MetadataInputFieldList";
 
+type Props = {
+  nonFilledRequiredFieldNames: MetadataInputFieldListProps["nonFilledRequiredFieldNames"];
+  prefixInputElementId: MetadataInputFieldListProps["prefixInputElementId"];
+  isSaving: boolean;
+  onSave: () => void;
+} & Omit<ContainerProps, "onSubmit">;
+
 type ContainerProps = {
   open: boolean;
-  onClose: () => void;
   create?: boolean;
-  currentMetadata?: MetadataInputFieldListProps["currentMetadata"];
+  currentMetadata: MetadataInputFieldListProps["currentMetadata"];
   fields: MetadataInputFieldListProps["fields"];
-  error: any;
+  error?: ErrorMessageProps;
+  title: string;
+  onClose: () => void;
   onSubmit: (newMetadata: Record<string, unknown>) => Promise<boolean>;
 };
 
-const Container = ({
+const Component = ({
   open,
-  onClose,
+  error,
   create,
   currentMetadata,
-  fields: propFields,
-  error,
-  onSubmit,
-}: ContainerProps): JSX.Element => {
-  const fields = create
-    ? propFields
-        .filter(
-          (config) => config.necessity && config.necessity !== "unnecessary"
-        )
-        .sort(compInputFields)
-    : propFields.sort(compInputFields);
-
-  const [isSaving, setIsSaving] = useState(false);
-  const [
-    nonFilledRequiredFieldNames,
-    setNonFilledRequiredFieldNames,
-  ] = useState<string[]>([]);
-
-  const initializeState = () => {
-    setIsSaving(false);
-    setNonFilledRequiredFieldNames([]);
-  };
-  // See: https://stackoverflow.com/questions/58209791/set-initial-state-for-material-ui-dialog
-  const prevOpen = usePrevious(open);
-  useEffect(() => {
-    if (open && !prevOpen) {
-      initializeState();
-    }
-  }, [open, prevOpen]);
-
-  const onSave = async () => {
-    if (fields) {
-      setIsSaving(true);
-      const newRecordInfo = {};
-
-      const nonFilledRequired: string[] = [];
-      const nonFilledRecommends: string[] = [];
-
-      fields.forEach((config) => {
-        const inputEl = document.getElementById(
-          `RecordEditModalInputFields_${config.name.replace(/\s+/g, "")}`
-        ) as HTMLInputElement;
-        if (config.necessity === "required" && !inputEl.value) {
-          nonFilledRequired.push(config.name);
-        }
-        if (config.necessity === "recommended" && !inputEl.value) {
-          nonFilledRecommends.push(config.name);
-        }
-      });
-
-      if (nonFilledRequired.length > 0) {
-        window.alert(`${JSON.stringify(nonFilledRequired)} is required`);
-        setNonFilledRequiredFieldNames(nonFilledRequired);
-        setIsSaving(false);
-        return;
-      } else {
-        setNonFilledRequiredFieldNames([]);
-      }
-
-      if (nonFilledRecommends.length > 0) {
-        if (
-          !window.confirm(
-            `${JSON.stringify(
-              nonFilledRecommends
-            )} is recommended. Are you sure to save?`
-          )
-        ) {
-          setIsSaving(false);
-          return;
-        }
-      }
-
-      fields.forEach((config) => {
-        const inputEl = document.getElementById(
-          `RecordEditModalInputFields_${config.name.replace(/\s+/g, "")}`
-        ) as HTMLInputElement;
-        newRecordInfo[config.name] = inputEl.value;
-      });
-
-      const isSubmitSucceed = await onSubmit(newRecordInfo);
-
-      if (!isSubmitSucceed) {
-        setIsSaving(false);
-        window.alert("save failed. please retry saving");
-        return;
-      }
-
-      setIsSaving(false);
-    }
-    onClose();
-  };
-
+  fields,
+  nonFilledRequiredFieldNames,
+  prefixInputElementId,
+  isSaving,
+  title,
+  onClose,
+  onSave,
+}: Props) => {
   return (
     <Dialog open={open} maxWidth="xl" onClose={onClose}>
       <DialogWrapper>
         <DialogCloseButton onClick={onClose} />
-        <DialogTitle>{create ? "Add" : "Edit"} Record</DialogTitle>
+        <DialogTitle>{title}</DialogTitle>
         <DialogContainer padding="0 0 20px" height="65vh">
           {error ? (
-            <ErrorMessage
-              reason={JSON.stringify(error)}
-              instruction="please reload this page"
-            />
-          ) : !fields || fields.length <= 0 ? (
-            <ErrorMessage
-              reason="Input fields is not configured"
-              instruction="please report administrator this error"
-            />
+            <ErrorMessage {...error} />
           ) : currentMetadata || create ? (
             <>
               <DialogBody>
@@ -150,6 +68,7 @@ const Container = ({
                     currentMetadata={currentMetadata}
                     fields={fields}
                     nonFilledRequiredFieldNames={nonFilledRequiredFieldNames}
+                    prefixInputElementId={prefixInputElementId}
                   />
                 </DialogMain>
                 <DialogToolBar
@@ -167,6 +86,108 @@ const Container = ({
         </DialogContainer>
       </DialogWrapper>
     </Dialog>
+  );
+};
+const Container = ({
+  open,
+  onClose,
+  create,
+  fields,
+  onSubmit,
+  ...delegated
+}: ContainerProps): JSX.Element => {
+  const [isSaving, setIsSaving] = useState(false);
+  const [
+    nonFilledRequiredFieldNames,
+    setNonFilledRequiredFieldNames,
+  ] = useState<string[]>([]);
+
+  const initializeState = () => {
+    setIsSaving(false);
+    setNonFilledRequiredFieldNames([]);
+  };
+  const prevOpen = usePrevious(open);
+  useEffect(() => {
+    if (open && !prevOpen) {
+      initializeState();
+    }
+  }, [open, prevOpen]);
+
+  const prefixInputElementId = "MetadataEditModal";
+  const onSave = async () => {
+    if (fields) {
+      setIsSaving(true);
+      const newMetadata = {};
+
+      const nonFilledRequired: string[] = [];
+      const nonFilledRecommends: string[] = [];
+
+      fields.forEach((config) => {
+        const inputEl = document.getElementById(
+          `${prefixInputElementId}_${config.name.replace(/\s+/g, "")}`
+        ) as HTMLInputElement;
+        if (config.necessity === "required" && !inputEl.value) {
+          nonFilledRequired.push(config.name);
+        }
+        if (config.necessity === "recommended" && !inputEl.value) {
+          nonFilledRecommends.push(config.name);
+        }
+      });
+
+      if (nonFilledRequired.length > 0) {
+        await alert({
+          title: `${JSON.stringify(nonFilledRequired)} is required`,
+        });
+        setNonFilledRequiredFieldNames(nonFilledRequired);
+        setIsSaving(false);
+        return;
+      } else {
+        setNonFilledRequiredFieldNames([]);
+      }
+
+      if (nonFilledRecommends.length > 0) {
+        if (
+          !(await confirm({
+            title: `${JSON.stringify(
+              nonFilledRecommends
+            )} is recommended. Are you sure to save?`,
+          }))
+        ) {
+          setIsSaving(false);
+          return;
+        }
+      }
+
+      fields.forEach((config) => {
+        const inputEl = document.getElementById(
+          `${prefixInputElementId}_${config.name.replace(/\s+/g, "")}`
+        ) as HTMLInputElement;
+        newMetadata[config.name] = inputEl.value;
+      });
+
+      const isSubmitSucceed = await onSubmit(newMetadata);
+
+      setIsSaving(false);
+      if (!isSubmitSucceed) {
+        await alert({ title: "save failed. please retry saving" });
+        return;
+      }
+    }
+    onClose();
+  };
+
+  return (
+    <Component
+      {...delegated}
+      fields={fields}
+      isSaving={isSaving}
+      nonFilledRequiredFieldNames={nonFilledRequiredFieldNames}
+      onClose={onClose}
+      onSave={onSave}
+      open={open}
+      prefixInputElementId={prefixInputElementId}
+      create={create}
+    />
   );
 };
 

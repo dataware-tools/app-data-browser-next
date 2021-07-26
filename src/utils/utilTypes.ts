@@ -1,3 +1,4 @@
+import { metaStore } from "@dataware-tools/app-common";
 type AwaitType<T> = T extends Promise<infer U>
   ? U
   : T extends (...args: Array<any>) => Promise<infer V>
@@ -7,6 +8,8 @@ type AwaitType<T> = T extends Promise<infer U>
 type DatabaseColumnsConfigDtypeType =
   | "string[]"
   | "string"
+  | "str"
+  | "text"
   | "int"
   | "float"
   | "double"
@@ -37,6 +40,7 @@ type DatabaseColumnsConfigType = {
   dtype: DatabaseColumnsConfigDtypeType;
   aggregation: DatabaseColumnsConfigAggregationType;
   necessity?: DatabaseColumnsConfigNecessityType;
+  order_of_input?: number;
   is_secret?: boolean;
   is_display_field?: boolean;
   is_search_target?: boolean;
@@ -62,7 +66,17 @@ type UserActionType =
   | "metadata:write:update"
   | "metadata:write:delete";
 
+type ParamTypeListRecords = Parameters<
+  typeof metaStore.RecordService.listRecords
+>["0"];
+
+type ParamTypeListDatabases = Parameters<
+  typeof metaStore.DatabaseService.listDatabases
+>["0"];
+
 export type {
+  ParamTypeListRecords,
+  ParamTypeListDatabases,
   AwaitType,
   DatabaseConfigType,
   DatabaseColumnsConfigType,

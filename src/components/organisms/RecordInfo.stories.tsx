@@ -9,4 +9,4 @@ export default {
 const Template: Story<RecordInfoProps> = (args) => <RecordInfo {...args} />;
 
 export const Default = Template.bind({});
-Default.args = { record: { test1: "test1" } };
+Default.args = { databaseId: "default", recordId: "20210701-123756-142" };

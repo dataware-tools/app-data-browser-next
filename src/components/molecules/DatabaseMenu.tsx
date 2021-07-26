@@ -1,22 +1,16 @@
 import Menu from "@material-ui/core/Menu";
 import { MenuItem } from "@material-ui/core";
-import { RenderToggleByAction } from "components/atoms/RenderToggleByAction";
 
 type ComponentProps = {
-  onClick: (
-    targetValue:
-      | "Configure input columns"
-      | "Configure display columns"
-      | "Configure search target columns"
-      | "Configure secret columns"
-      | "Export metadata"
-  ) => void;
+  menu: ({ label?: string; value: string } | undefined)[];
+  onClick: (targetValue: string) => void;
   onClose: () => void;
   open: boolean;
   anchorEl: HTMLElement | null;
 };
 
 const Component = ({
+  menu,
   onClick,
   onClose,
   open,
@@ -36,48 +30,19 @@ const Component = ({
         horizontal: "right",
       }}
     >
-      <RenderToggleByAction required="databases:write:update">
-        <MenuItem
-          onClick={() => {
-            onClick("Configure input columns");
-            onClose();
-          }}
-        >
-          Configure input columns
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            onClick("Configure display columns");
-            onClose();
-          }}
-        >
-          Configure display columns
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            onClick("Configure search target columns");
-            onClose();
-          }}
-        >
-          Configure search target columns
-        </MenuItem>
-        <MenuItem
-          onClick={() => {
-            onClick("Configure secret columns");
-            onClose();
-          }}
-        >
-          Configure secret columns
-        </MenuItem>
-      </RenderToggleByAction>
-      <MenuItem
-        onClick={() => {
-          onClick("Export metadata");
-          onClose();
-        }}
-      >
-        Export metadata
-      </MenuItem>
+      {menu.map((item, i) =>
+        item ? (
+          <MenuItem
+            key={i}
+            onClick={() => {
+              onClick(item.value);
+              onClose();
+            }}
+          >
+            {item.label || item.value}
+          </MenuItem>
+        ) : null
+      )}
     </Menu>
   );
 };

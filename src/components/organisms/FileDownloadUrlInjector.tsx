@@ -16,7 +16,10 @@ type ContainerProps = {
 const Container = ({ file, render }: ContainerProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
 
-  const [createJwtRes, createJwtError] = useCreateJwtToDownloadFile(
+  const {
+    data: createJwtRes,
+    error: createJwtError,
+  } = useCreateJwtToDownloadFile(
     getAccessToken,
     { requestBody: { path: file.path, content_type: file["content-type"] } },
     Boolean(file.path)

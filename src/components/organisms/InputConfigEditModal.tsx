@@ -2,17 +2,15 @@ import Dialog from "@material-ui/core/Dialog";
 import { useState, useEffect } from "react";
 import LoadingButton from "@material-ui/lab/LoadingButton";
 import {
-  DatabaseConfigType,
   useGetConfig,
   fetchMetaStore,
-  pydtkSystemColumns,
-  compInputFields,
-} from "utils/index";
+  isEditableColumnName,
+  extractReasonFromFetchError,
+} from "utils";
 import {
   InputConfigList,
   InputConfigListProps,
 } from "components/organisms/InputConfigList";
-import AddCircleIcon from "@material-ui/icons/AddCircle";
 import { useAuth0 } from "@auth0/auth0-react";
 import {
   ErrorMessage,
@@ -22,28 +20,77 @@ import {
   DialogBody,
   DialogTitle,
   DialogContainer,
-  SquareIconButton,
-  TextCenteringSpan,
   DialogWrapper,
   DialogMain,
   usePrevious,
-  // NoticeableLetters,
+  NoticeableLetters,
+  LoadingIndicator,
+  ErrorMessageProps,
 } from "@dataware-tools/app-common";
-import {
-  InputConfigAddModal,
-  InputConfigAddModalProps,
-} from "components/organisms/InputConfigAddModal";
 import { produce } from "immer";
-import { mutate } from "swr";
 
 type ConfigNameType = "record_add_editable_columns";
-
+type Props = {
+  error?: ErrorMessageProps;
+  isFetchComplete: boolean;
+  inputColumns: InputConfigListProps["value"];
+  nonInputColumns: InputConfigListProps["restColumns"];
+  onChangeInputColumns: InputConfigListProps["onChange"];
+  isSaving: boolean;
+  onSave: () => void;
+} & Omit<ContainerProps, "databaseId">;
 type ContainerProps = {
   open: boolean;
   onClose: () => void;
   databaseId: string;
 };
 
+const Component = ({
+  open,
+  onClose,
+  error,
+  isFetchComplete,
+  inputColumns,
+  nonInputColumns,
+  onChangeInputColumns,
+  isSaving,
+  onSave,
+}: Props) => {
+  return (
+    <Dialog open={open} maxWidth="xl" onClose={onClose}>
+      <DialogWrapper>
+        <DialogCloseButton onClick={onClose} />
+        <DialogTitle>
+          <NoticeableLetters>Input columns</NoticeableLetters>
+        </DialogTitle>
+        <DialogContainer padding="0 0 20px">
+          {error ? (
+            <ErrorMessage {...error} />
+          ) : isFetchComplete ? (
+            <DialogBody>
+              <DialogMain>
+                <InputConfigList
+                  value={inputColumns}
+                  onChange={onChangeInputColumns}
+                  restColumns={nonInputColumns}
+                />
+              </DialogMain>
+              <DialogToolBar
+                right={
+                  <LoadingButton pending={isSaving} onClick={onSave}>
+                    Save
+                  </LoadingButton>
+                }
+              />
+            </DialogBody>
+          ) : (
+            <LoadingIndicator />
+          )}
+        </DialogContainer>
+      </DialogWrapper>
+    </Dialog>
+  );
+};
 const Container = ({
   open,
   onClose,
@@ -51,56 +98,51 @@ const Container = ({
 }: ContainerProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const [isSaving, setIsSaving] = useState(false);
-  const [openAddModal, setOpenAddModal] = useState(false);
-  const [databaseColumns, setDatabaseColumns] = useState<
+  const [error, setError] = useState<ErrorMessageProps | undefined>(undefined);
+  const [inputColumns, setInputColumns] = useState<
     InputConfigListProps["value"]
   >([]);
-  const [databaseColumnOptions, setDatabaseColumnOptions] = useState<
-    { name: string; display_name: string }[]
-  >([]);
 
-  const [getConfigRes, getConfigError, getConfigCacheKey] = (useGetConfig(
-    getAccessToken,
-    {
-      databaseId,
-    }
-  ) as unknown) as [
-    data: DatabaseConfigType | undefined,
-    error: any,
-    cacheKey: string
-  ];
+  const {
+    data: getConfigRes,
+    error: getConfigError,
+    mutate: getConfigMutate,
+  } = useGetConfig(getAccessToken, {
+    databaseId,
+  });
 
+  const fetchError = getConfigError;
   useEffect(() => {
-    setDatabaseColumns(
+    if (fetchError) {
+      setError({
+        reason: extractReasonFromFetchError(fetchError),
+        instruction: "Please reload this page",
+      });
+    } else {
+      setError(undefined);
+    }
+  }, [fetchError]);
+
+  const initializeInputColumns = (
+    getConfigRes: ReturnType<typeof useGetConfig>["data"]
+  ) => {
+    setInputColumns(
       getConfigRes?.columns.map((column) => ({
         name: column.name,
         display_name: column.display_name,
         necessity: column.necessity || "unnecessary",
+        order_of_input: column.order_of_input,
       })) || []
     );
-
-    setDatabaseColumnOptions(
-      (getConfigRes?.columns
-        .filter(
-          (column) =>
-            !column.name.startsWith("_") &&
-            !pydtkSystemColumns.includes(column.name) &&
-            (column.necessity == null || column.necessity === "unnecessary")
-        )
-        ?.map((column) => ({
-          display_name: column.display_name,
-          name: column.name,
-        })) || []) as {
-        name: string;
-        display_name: string;
-      }[]
-    );
+  };
+  useEffect(() => {
+    initializeInputColumns(getConfigRes);
   }, [getConfigRes]);
 
   const initializeState = () => {
+    initializeInputColumns(getConfigRes);
     setIsSaving(false);
   };
-  // See: https://stackoverflow.com/questions/58209791/set-initial-state-for-material-ui-dialog
   const prevOpen = usePrevious(open);
   useEffect(() => {
     if (open && !prevOpen) {
@@ -109,20 +151,20 @@ const Container = ({
   }, [open, prevOpen]);
 
   const onSave = async () => {
-    if (getConfigRes && databaseColumns) {
+    if (getConfigRes && inputColumns) {
       setIsSaving(true);
 
       const newDatabaseConfig = produce(getConfigRes, (draft) => {
         // update existing columns
         draft.columns = getConfigRes.columns.map((oldColumn) => {
-          const newColumn = databaseColumns.find(
+          const newColumn = inputColumns.find(
             (column) => column.name === oldColumn.name
           );
           return { ...oldColumn, ...newColumn };
         });
 
         // add new columns
-        const addedColumns = databaseColumns
+        const addedColumns = inputColumns
           .filter((column) => {
             const existingNames = getConfigRes.columns.map(
               (column) => column.name
@@ -133,13 +175,14 @@ const Container = ({
             name: column.name,
             display_name: column.display_name,
             necessity: column.necessity,
+            order_of_input: column.order_of_input,
             dtype: "string" as const,
             aggregation: "first" as const,
           }));
         draft.columns = draft.columns.concat(addedColumns);
       });
 
-      const [data, error] = await fetchMetaStore(
+      const [updateConfigRes, updateConfigError] = await fetchMetaStore(
         getAccessToken,
         metaStore.ConfigService.updateConfig,
         {
@@ -148,10 +191,13 @@ const Container = ({
         }
       );
 
-      if (error) {
-        // TODO: show error
+      if (updateConfigError) {
+        setError({
+          reason: extractReasonFromFetchError(updateConfigError),
+          instruction: "Please reload this page",
+        });
       } else {
-        mutate(getConfigCacheKey, data);
+        getConfigMutate(updateConfigRes);
       }
 
       setIsSaving(false);
@@ -159,134 +205,33 @@ const Container = ({
     onClose();
   };
 
-  const onAdd: InputConfigAddModalProps["onSave"] = (newColumn) => {
-    setDatabaseColumns((prev) => {
-      if (prev.some((prevColumn) => prevColumn.name === newColumn.name)) {
-        return prev.map((prevColumn) =>
-          prevColumn.name === newColumn.name
-            ? { ...prevColumn, ...newColumn }
-            : prevColumn
-        );
-      } else {
-        return [...prev, newColumn];
-      }
-    });
-    setDatabaseColumnOptions((prev) => {
-      if (prev) {
-        const newOptions = produce(prev, (prev) => {
-          prev.splice(
-            prev.findIndex((elem) => elem.name === newColumn.name),
-            1
-          );
-        });
-        return newOptions;
-      } else {
-        return prev;
-      }
-    });
-  };
-
-  const onChange: InputConfigListProps["onChange"] = (
-    _,
-    action,
-    newValue,
-    oldValue
-  ) => {
-    if (getConfigRes && databaseColumns) {
-      if (action === "delete") {
-        setDatabaseColumns((prev) =>
-          prev.map((column) =>
-            column.name === oldValue.name
-              ? { ...column, necessity: "unnecessary" }
-              : column
-          )
-        );
-        setDatabaseColumnOptions((prev) => {
-          if (prev) {
-            const newOptions = produce(prev, (prev) => {
-              prev.push({
-                name: oldValue.name,
-                display_name: oldValue.display_name,
-              });
-            });
-            return newOptions;
-          } else {
-            return [
-              { name: oldValue.name, display_name: oldValue.display_name },
-            ];
-          }
-        });
-      } else if (action === "change") {
-        setDatabaseColumns((prev) =>
-          prev.map((column) =>
-            column.name === oldValue.name ? { ...column, ...newValue } : column
-          )
-        );
-      }
-    }
-  };
-
-  const inputConfig = databaseColumns
-    ?.filter((column) => column.necessity && column.necessity !== "unnecessary")
-    .sort(compInputFields);
-
-  const alreadyUsedDisplayNames = [
-    ...new Set(inputConfig.map((column) => column.display_name)),
-  ];
-
-  const alreadyUsedNames = [
-    ...new Set(inputConfig.map((column) => column.name)),
-  ];
+  const isFetchComplete = Boolean(!fetchError && getConfigRes);
+  const nonInputColumns = (getConfigRes?.columns
+    .filter(
+      (column) =>
+        isEditableColumnName(getConfigRes, column.name) &&
+        (column.necessity == null || column.necessity === "unnecessary")
+    )
+    ?.map((column) => ({
+      display_name: column.display_name,
+      name: column.name,
+    })) || []) as {
+    name: string;
+    display_name: string;
+  }[];
 
   return (
-    <Dialog open={open} maxWidth="xl" onClose={onClose}>
-      <DialogWrapper>
-        <DialogCloseButton onClick={onClose} />
-        <DialogTitle>
-          {/* // TODO:Fix typeError */}
-          {/* <NoticeableLetters> */}
-          <TextCenteringSpan>Input columns</TextCenteringSpan>
-          {/* </NoticeableLetters> */}
-          {getConfigRes ? (
-            <SquareIconButton
-              onClick={() => setOpenAddModal(true)}
-              icon={<AddCircleIcon />}
-            />
-          ) : null}
-        </DialogTitle>
-        <DialogContainer padding="0 0 20px">
-          {getConfigError ? (
-            <ErrorMessage
-              reason={JSON.stringify(getConfigError)}
-              instruction="please reload this page"
-            />
-          ) : inputConfig ? (
-            <DialogBody>
-              <DialogMain>
-                <InputConfigList value={inputConfig} onChange={onChange} />
-              </DialogMain>
-              <DialogToolBar
-                right={
-                  <LoadingButton pending={isSaving} onClick={onSave}>
-                    Save
-                  </LoadingButton>
-                }
-              />
-            </DialogBody>
-          ) : null}
-          {databaseColumnOptions ? (
-            <InputConfigAddModal
-              options={databaseColumnOptions}
-              open={openAddModal}
-              onClose={() => setOpenAddModal(false)}
-              onSave={(newColumn) => onAdd(newColumn)}
-              alreadyUsedNames={alreadyUsedNames}
-              alreadyUsedDisplayNames={alreadyUsedDisplayNames}
-            />
-          ) : null}
-        </DialogContainer>
-      </DialogWrapper>
-    </Dialog>
+    <Component
+      error={error}
+      inputColumns={inputColumns}
+      isFetchComplete={isFetchComplete}
+      isSaving={isSaving}
+      nonInputColumns={nonInputColumns}
+      onChangeInputColumns={setInputColumns}
+      onClose={onClose}
+      onSave={onSave}
+      open={open}
+    />
   );
 };
 

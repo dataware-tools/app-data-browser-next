@@ -6,7 +6,9 @@ import Menu from "@material-ui/core/Menu";
 import { FileMenuItem, FileMenuItemProps } from "components/atoms/FileMenuItem";
 import { RenderToggleByAction } from "components/atoms/RenderToggleByAction";
 
-type ComponentProps = {
+type Props = ContainerProps;
+
+type ContainerProps = {
   onPreview?: FileMenuItemProps["onClick"];
   onEdit?: FileMenuItemProps["onClick"];
   onDelete?: FileMenuItemProps["onClick"];
@@ -24,22 +26,7 @@ const Component = ({
   onClose,
   open,
   anchorEl,
-}: ComponentProps): JSX.Element => {
-  const wrapClickHandler = (func: undefined | (() => void)) => {
-    if (!func) {
-      return undefined;
-    }
-    return async () => {
-      await func();
-      onClose();
-    };
-  };
-
-  const _onPreview = wrapClickHandler(onPreview);
-  const _onEdit = wrapClickHandler(onEdit);
-  const _onDelete = wrapClickHandler(onDelete);
-  const _onDownload = wrapClickHandler(onDownload);
-
+}: Props): JSX.Element => {
   return (
     <Menu
       open={open}
@@ -54,33 +41,33 @@ const Component = ({
         horizontal: "center",
       }}
     >
-      {_onPreview ? (
+      {onPreview ? (
         <FileMenuItem
-          onClick={_onPreview}
+          onClick={onPreview}
           icon={<PageviewIcon />}
           text="Preview"
         />
       ) : null}
 
-      {_onEdit ? (
+      {onEdit ? (
         <RenderToggleByAction required="metadata:write:update">
-          <FileMenuItem onClick={_onEdit} icon={<EditIcon />} text="Edit" />
+          <FileMenuItem onClick={onEdit} icon={<EditIcon />} text="Edit" />
         </RenderToggleByAction>
       ) : null}
 
-      {_onDelete ? (
+      {onDelete ? (
         <RenderToggleByAction required="metadata:write:delete">
           <FileMenuItem
-            onClick={_onDelete}
+            onClick={onDelete}
             icon={<DeleteIcon />}
             text="Delete"
           />
         </RenderToggleByAction>
       ) : null}
 
-      {_onDownload ? (
+      {onDownload ? (
         <FileMenuItem
-          onClick={_onDownload}
+          onClick={onDownload}
           icon={<FileDownloadIcon />}
           text="Download"
         />
@@ -88,5 +75,39 @@ const Component = ({
     </Menu>
   );
 };
-export { Component as FileMenu };
-export type { ComponentProps as FileMenuProps };
+
+const Container = ({
+  onPreview,
+  onEdit,
+  onDelete,
+  onDownload,
+  onClose,
+  ...delegate
+}: ContainerProps): JSX.Element => {
+  const wrapClickHandler = (func: undefined | (() => void)) => {
+    if (!func) {
+      return undefined;
+    }
+    return async () => {
+      await func();
+      onClose();
+    };
+  };
+
+  const _onPreview = wrapClickHandler(onPreview);
+  const _onEdit = wrapClickHandler(onEdit);
+  const _onDelete = wrapClickHandler(onDelete);
+  const _onDownload = wrapClickHandler(onDownload);
+  return (
+    <Component
+      {...delegate}
+      onClose={onClose}
+      onPreview={_onPreview}
+      onEdit={_onEdit}
+      onDelete={_onDelete}
+      onDownload={_onDownload}
+    />
+  );
+};
+export { Container as FileMenu };
+export type { ContainerProps as FileMenuProps };

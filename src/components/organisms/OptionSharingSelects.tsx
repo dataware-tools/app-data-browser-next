@@ -1,13 +1,20 @@
-import { Spacer, theme as themeInstance } from "@dataware-tools/app-common";
+import { Spacer } from "@dataware-tools/app-common";
 import { makeStyles } from "@material-ui/core/styles";
-import { useState, Fragment } from "react";
+import { useState } from "react";
 import {
   ActionType,
   OptionSharingSelectsItem,
   OptionSharingSelectsItemProps,
 } from "components/molecules/OptionSharingSelectsItem";
 import { produce } from "immer";
-import AddIcon from "@material-ui/icons/Add";
+import { AddListItemButton } from "components/atoms/AddListItemButton";
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  DragDropContextProps,
+} from "react-beautiful-dnd";
+import DragIndicatorIcon from "@material-ui/icons/DragIndicator";
 
 type ValuesType = OptionSharingSelectsItemProps["value"][];
 type OptionType = OptionSharingSelectsItemProps["options"][number];
@@ -21,6 +28,7 @@ type Props = {
     oldValue: string
   ) => void;
   restOptions: OptionSharingSelectsItemProps["options"];
+  onDragEnd: DragDropContextProps["onDragEnd"];
 } & Omit<ContainerProps, "onChange" | "allowDuplicatedOption" | "sortOptions">;
 
 type ContainerProps = {
@@ -30,6 +38,7 @@ type ContainerProps = {
   sortOptions?: (option1: OptionType, option2: OptionType) => number;
   deletable?: boolean;
   creatable?: boolean;
+  draggable?: boolean;
   selectProps?: OptionSharingSelectsItemProps["selectProps"];
   menuItemProps?: OptionSharingSelectsItemProps["menuItemProps"];
   space?: string;
@@ -42,58 +51,77 @@ const Component = ({
   space,
   onChange,
   creatable,
+  onDragEnd,
+  draggable,
   ...delegated
 }: Props): JSX.Element => {
   return (
     <div className={classes.root}>
-      {values.map((value, index) => {
-        return (
-          <Fragment key={index}>
-            <OptionSharingSelectsItem
-              value={value}
-              index={index}
-              onChange={onChange}
-              {...delegated}
-            />
-            {index < values.length - 1 ? (
-              <Spacer direction="vertical" size={space || "3vh"} />
-            ) : null}
-          </Fragment>
-        );
-      })}
+      <DragDropContext onDragEnd={onDragEnd}>
+        <Droppable droppableId="droppable" isDropDisabled={!draggable}>
+          {(provided) => (
+            <div {...provided.droppableProps} ref={provided.innerRef}>
+              {values.map((value, index) => {
+                return (
+                  <Draggable
+                    draggableId={`${index}`}
+                    index={index}
+                    isDragDisabled={!draggable}
+                    key={index}
+                  >
+                    {(provided) => (
+                      <div ref={provided.innerRef} {...provided.draggableProps}>
+                        <span className={classes.draggable}>
+                          {draggable ? (
+                            <span {...provided.dragHandleProps}>
+                              <DragIndicatorIcon />
+                            </span>
+                          ) : null}
+                          <OptionSharingSelectsItem
+                            value={value}
+                            index={index}
+                            onChange={onChange}
+                            {...delegated}
+                          />
+                        </span>
+                        {index < values.length - 1 ? (
+                          <Spacer direction="vertical" size={space || "3vh"} />
+                        ) : null}
+                      </div>
+                    )}
+                  </Draggable>
+                );
+              })}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
       {creatable ? (
         <>
           <Spacer direction="vertical" size={space || "3vh"} />
-          <div
-            onClick={() => onChange("create", 0, "", "")}
-            className={classes.addButton}
-          >
-            <AddIcon />
-          </div>
+          <AddListItemButton onClick={() => onChange("create", 0, "", "")} />
         </>
       ) : null}
     </div>
   );
 };
 
-const useStyles = makeStyles((theme: typeof themeInstance) => ({
+const useStyles = makeStyles({
   root: {
     display: "flex",
-    flex: 1,
     flexDirection: "column",
+    maxHeight: "40vh",
+    minHeight: "0",
+    overflow: "auto",
+    padding: "10px 0",
   },
-  addButton: {
+  draggable: {
     alignItems: "center",
-    backgroundColor: theme.palette.grey[300],
-    cursor: "pointer",
     display: "flex",
-    height: "40px",
-    justifyContent: "center",
-    "&:hover": {
-      backgroundColor: theme.palette.grey[400],
-    },
+    flexDirection: "row",
   },
-}));
+});
 
 const Container = ({
   options,
@@ -176,12 +204,24 @@ const Container = ({
     }
   };
 
+  const onDragEnd: Props["onDragEnd"] = (result) => {
+    if (result.destination) {
+      const newValues = produce(values, (draft) => {
+        const [removed] = draft.splice(result.source.index, 1);
+        // @ts-expect-error result.destination is not undefined
+        draft.splice(result.destination.index, 0, removed);
+      });
+      propsOnChange(newValues);
+    }
+  };
+
   return (
     <Component
       options={options}
       onChange={onChange}
       values={values}
       restOptions={restOptions}
+      onDragEnd={onDragEnd}
       {...delegated}
       classes={classes}
     />

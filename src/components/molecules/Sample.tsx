@@ -52,7 +52,7 @@ const useStyles = makeStyles((theme: typeof themeInstance) => ({
 const Container = ({ ...delegated }: ContainerProps): JSX.Element => {
   const classes = useStyles();
   const { user, getAccessTokenSilently: getAccessToken } = useAuth0();
-  const [data, error, cacheKey] = useListDatabases(getAccessToken, {});
+  const { data, error, cacheKey } = useListDatabases(getAccessToken, {});
   const onRevalidate = () => {
     mutate(cacheKey);
   };

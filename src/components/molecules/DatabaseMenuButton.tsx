@@ -1,11 +1,10 @@
 import { MouseEvent, useState } from "react";
-import MenuIcon from "@material-ui/icons/Menu";
+import { MoreHoriz as MoreIcon } from "@material-ui/icons";
 import {
   DatabaseMenu,
   DatabaseMenuProps,
 } from "components/molecules/DatabaseMenu";
 import { SquareIconButton } from "@dataware-tools/app-common";
-import { DatabaseConfigNameType } from "components/organisms/DatabaseConfigModal";
 
 type Props = {
   onOpen: (event: MouseEvent<HTMLDivElement>) => void | Promise<void>;
@@ -15,7 +14,8 @@ type Props = {
 } & ContainerProps;
 
 type ContainerProps = {
-  onMenuSelect: DatabaseMenuProps["onClick"];
+  onMenuSelect: (targetValue: string) => void;
+  menu: DatabaseMenuProps["menu"];
 };
 
 const Component = ({
@@ -25,7 +25,7 @@ const Component = ({
 }: Props): JSX.Element | null => {
   return (
     <div>
-      <SquareIconButton icon={<MenuIcon />} onClick={onOpen} />
+      <SquareIconButton icon={<MoreIcon />} onClick={onOpen} />
       <DatabaseMenu
         {...delegated}
         onClick={onMenuSelect as (value: string) => void}
@@ -56,7 +56,4 @@ const Container = ({ ...delegated }: ContainerProps): JSX.Element => {
 };
 
 export { Container as DatabaseMenuButton };
-export type {
-  ContainerProps as DatabaseMenuButtonProps,
-  DatabaseConfigNameType,
-};
+export type { ContainerProps as DatabaseMenuButtonProps };
