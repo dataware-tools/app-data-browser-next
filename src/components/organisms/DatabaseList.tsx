@@ -6,13 +6,12 @@ import {
   ErrorMessage,
   ErrorMessageProps,
   LoadingIndicator,
-  Table,
-  TableProps,
 } from "@dataware-tools/app-common";
+import { DataGrid, GridColumns } from "@material-ui/data-grid";
 
 type Props = {
   error?: ErrorMessageProps;
-  columns: TableProps["columns"];
+  columns: GridColumns;
   isFetchComplete: boolean;
   databases: DatabaseListItemProps["database"][];
   onSelectDatabase: (databaseId: string) => void;
@@ -32,14 +31,13 @@ const Component = ({
       {error ? (
         <ErrorMessage {...error} />
       ) : isFetchComplete ? (
-        <Table
+        <DataGrid
           columns={columns}
           rows={databases}
-          disableHoverCell
-          stickyHeader
-          onClickRow={(targetDetail) =>
-            onSelectDatabase(targetDetail.row.database_id as string)
-          }
+          onRowClick={(params) => onSelectDatabase(params.row.database_id)}
+          getRowId={(row) => row.database_id}
+          hideFooter
+          disableColumnMenu
         />
       ) : (
         <LoadingIndicator />
@@ -60,18 +58,20 @@ const Container = ({ page, perPage, search }: ContainerProps): JSX.Element => {
   const onSelectDatabase = (databaseId: string) =>
     history.push(`/databases/${databaseId}/records`);
 
-  const columns = [
+  const columns: GridColumns = [
     {
       field: "name",
-      ifEmpty: "No name...",
-      label: "Name",
-      type: "string" as const,
+      headerName: "Name",
+      flex: 1,
+      valueGetter: (param) => param.row.name || "No name...",
+      sortable: false,
     },
     {
       field: "description",
-      ifEmpty: "No description...",
-      label: "Description",
-      type: "string" as const,
+      headerName: "Description",
+      flex: 1,
+      valueGetter: (param) => param.row.name || "No description...",
+      sortable: false,
     },
   ];
   const error: Props["error"] = listDatabasesError
