@@ -104,10 +104,8 @@ export const JobViewer = ({ job, jobType }: JobViewerProps): JSX.Element => {
     .map(([key]) => job.output[key]);
   const error =
     job.output.code !== 200
-      ? // @ts-expect-error Fix API
-        job.output.reason
-        ? // @ts-expect-error Fix API
-          { reason: job.output.reason }
+      ? job.output.reason
+        ? { reason: job.output.reason }
         : { reason: "unknown Error" }
       : undefined;
 
