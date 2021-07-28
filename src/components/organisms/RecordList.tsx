@@ -5,7 +5,7 @@ import {
   metaStore,
 } from "@dataware-tools/app-common";
 import { RecordDetailModal } from "components/organisms/RecordDetailModal";
-import { useIsActionPermitted } from "globalStates";
+import { useIsActionPermitted, recordPaginateState } from "globalStates";
 import {
   useGetConfig,
   fetchMetaStore,
@@ -24,6 +24,7 @@ import {
 } from "@material-ui/data-grid";
 import IconButton from "@material-ui/core/IconButton";
 import DeleteIcon from "@material-ui/icons/Delete";
+import { useRecoilState } from "recoil";
 
 type Props = {
   error?: ErrorMessageProps;
@@ -32,6 +33,7 @@ type Props = {
   onCloseRecordDetailModal: () => void;
   records: metaStore.RecordModel[];
   onSelectRecord: DataGridProps["onCellClick"];
+  onSortModelChange: DataGridProps["onSortModelChange"];
 } & Pick<ContainerProps, "databaseId">;
 
 type ContainerProps = ParamTypeListRecords;
@@ -44,6 +46,7 @@ const Component = ({
   databaseId,
   selectedRecordId,
   onCloseRecordDetailModal,
+  onSortModelChange,
 }: Props): JSX.Element => {
   return (
     <>
@@ -56,8 +59,10 @@ const Component = ({
             columns={columns}
             onCellClick={onSelectRecord}
             getRowId={(row) => row.record_id}
+            onSortModelChange={onSortModelChange}
             hideFooter
             disableColumnMenu
+            sortingMode="server"
           />
           {selectedRecordId ? (
             <RecordDetailModal
@@ -87,6 +92,9 @@ const Container = ({
     undefined
   );
   const [error, setError] = useState<Props["error"] | undefined>(undefined);
+  const [{ sortKey, sortOrder }, setRecordPaginateState] = useRecoilState(
+    recordPaginateState
+  );
 
   const { data: getConfigRes, error: getConfigError } = useGetConfig(
     getAccessToken,
@@ -105,6 +113,8 @@ const Container = ({
     perPage,
     search,
     searchKey,
+    sortKey,
+    sortOrder,
   });
 
   const onDeleteRecord = async (record: GridCellParams) => {
@@ -143,6 +153,23 @@ const Container = ({
     }
   };
 
+  const onSortModelChange: Props["onSortModelChange"] = (model) => {
+    if (model.length > 0) {
+      const sortModel = model[0];
+      setRecordPaginateState((prev) => ({
+        ...prev,
+        sortKey: sortModel.field,
+        sortOrder:
+          sortModel.sort === "asc" ? 1 : sortModel.sort === "desc" ? -1 : 1,
+      }));
+    } else {
+      setRecordPaginateState((prev) => ({
+        ...prev,
+        sortKey: "record_id",
+        sortOrder: 1,
+      }));
+    }
+  };
   const DeleteButtonFieldName = "__DeleteButton__";
   const columns: Props["columns"] =
     getConfigRes?.columns
@@ -150,7 +177,6 @@ const Container = ({
       .map((column) => ({
         field: column.name,
         headerName: column.display_name,
-        sortable: false,
         flex: 1,
       })) || [];
   if (isPermittedDeleteRecord) {
@@ -208,6 +234,7 @@ const Container = ({
       databaseId={databaseId}
       onCloseRecordDetailModal={onCloseRecordDetailModal}
       onSelectRecord={onSelectRecord}
+      onSortModelChange={onSortModelChange}
       selectedRecordId={selectedRecordId}
     />
   );

@@ -23,11 +23,20 @@ type RecordPaginateState = {
   perPage: NonNullable<ParamTypeListRecords["perPage"]>;
   search: NonNullable<ParamTypeListRecords["search"]>;
   searchKey: NonNullable<ParamTypeListRecords["searchKey"]>;
+  sortKey: NonNullable<ParamTypeListRecords["sortKey"]>;
+  sortOrder: NonNullable<ParamTypeListRecords["sortOrder"]>;
 };
 
 export const recordPaginateState = atom<RecordPaginateState>({
   key: "recordPaginateState",
-  default: { page: 1, perPage: 20, search: "", searchKey: [] },
+  default: {
+    page: 1,
+    perPage: 20,
+    search: "",
+    searchKey: [],
+    sortKey: "record_id",
+    sortOrder: 1,
+  },
 });
 
 type DatabasePaginateState = {
