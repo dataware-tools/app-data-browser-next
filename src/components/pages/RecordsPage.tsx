@@ -250,14 +250,15 @@ const Page = (): JSX.Element => {
   }, [page, perPage, search]);
 
   useEffect(() => {
-    setRecordPaginateState({
+    setRecordPaginateState((prev) => ({
+      ...prev,
       page: Number(getQueryString("page")) || 1,
       perPage: Number(getQueryString("perPage")) || 20,
       search: getQueryString("searchText") || "",
       searchKey: getConfigRes?.columns
         .filter((column) => column.is_search_target)
         .map((column) => column.name) || ["record_id"],
-    });
+    }));
   }, [getConfigRes, setRecordPaginateState, databaseId]);
 
   useEffect(() => {
