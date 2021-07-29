@@ -1,7 +1,7 @@
 import MenuItem from "@material-ui/core/MenuItem";
 import { ReactNode, useState } from "react";
 import { Spacer } from "@dataware-tools/app-common";
-import { CircularProgress } from "@material-ui/core";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 type ComponentProps = {
   pending: boolean;
