@@ -28,6 +28,7 @@ import {
   uploadFileToFileProvider,
   useGetConfig,
   createSystemMetadata,
+  extractReasonFromFetchError,
 } from "utils";
 import {
   RecordEditModal,
@@ -217,7 +218,8 @@ const Container = ({
 
     if (createFileError) {
       await alert({
-        title: `Fail to upload: ${JSON.stringify(createFileError)}`,
+        title: "Fail to upload",
+        body: extractReasonFromFetchError(createFileError),
       });
       setIsAddingFile(false);
       return;
