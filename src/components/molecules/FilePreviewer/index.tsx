@@ -5,6 +5,7 @@ import { VideoPreviewer } from "./VideoPreviewer";
 import { metaStore } from "@dataware-tools/app-common";
 import { FileDownloadURLInjector } from "components/organisms/FileDownloadUrlInjector";
 import { RosbagPreviewer } from "./RosbagPreviewer";
+import { ImagePreviewer } from "./ImagePreviewer";
 const AudioPreviewer = dynamic<any>(
   () => import("./AudioPreviewer").then((module) => module.AudioPreviewer),
   { ssr: false }
@@ -43,6 +44,18 @@ const filePreviewerCandidates: Record<string, FilePreviewerContentWithSpec> = {
       <FileDownloadURLInjector
         file={file}
         render={(_, url) => <VideoPreviewer url={url} />}
+      />
+    ),
+  },
+  image: {
+    spec: {
+      extensions: [".jpg", ".jpeg", ".png", ".gif"],
+      contentTypes: ["image/.*"],
+    },
+    render: (file) => (
+      <FileDownloadURLInjector
+        file={file}
+        render={(_, url) => <ImagePreviewer url={url} />}
       />
     ),
   },
