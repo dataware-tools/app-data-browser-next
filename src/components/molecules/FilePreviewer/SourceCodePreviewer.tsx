@@ -8,7 +8,12 @@ const languages = {
   ts: "typescript",
   tsx: "typescript",
   py: "python",
+  json: "json",
+  sh: "bash",
+  yml: "yaml",
+  yaml: "yaml",
 };
+export const extensions = Object.keys(languages);
 
 type SourceCodePreviewerProps = { url: string; file: metaStore.FileModel };
 export const SourceCodePreviewer = ({

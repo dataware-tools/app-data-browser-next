@@ -5,7 +5,10 @@ import { VideoPreviewer } from "./VideoPreviewer";
 import { metaStore } from "@dataware-tools/app-common";
 import { FileDownloadURLInjector } from "components/organisms/FileDownloadUrlInjector";
 import { RosbagPreviewer } from "./RosbagPreviewer";
-import { SourceCodePreviewer } from "./SourceCodePreviewer";
+import {
+  SourceCodePreviewer,
+  extensions as sourceCodeExtensions,
+} from "./SourceCodePreviewer";
 const AudioPreviewer = dynamic<any>(
   () => import("./AudioPreviewer").then((module) => module.AudioPreviewer),
   { ssr: false }
@@ -49,7 +52,7 @@ const filePreviewerCandidates: Record<string, FilePreviewerContentWithSpec> = {
   },
   sourceCode: {
     spec: {
-      extensions: [".js", ".ts", ".jsx", ".tsx", ".py"],
+      extensions: sourceCodeExtensions,
       contentTypes: ["text/.*"],
     },
     render: (file) => (
