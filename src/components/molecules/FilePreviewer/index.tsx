@@ -5,6 +5,7 @@ import { VideoPreviewer } from "./VideoPreviewer";
 import { metaStore } from "@dataware-tools/app-common";
 import { FileDownloadURLInjector } from "components/organisms/FileDownloadUrlInjector";
 import { RosbagPreviewer } from "./RosbagPreviewer";
+import { MarkdownPreviewer } from "./MarkDownPreviewer";
 const AudioPreviewer = dynamic<any>(
   () => import("./AudioPreviewer").then((module) => module.AudioPreviewer),
   { ssr: false }
@@ -29,11 +30,20 @@ const filePreviewerCandidates: Record<string, FilePreviewerContentWithSpec> = {
     ),
   },
   text: {
-    spec: { extensions: [".txt", ".md"], contentTypes: ["text/.*"] },
+    spec: { extensions: [".txt"], contentTypes: ["text/.*"] },
     render: (file) => (
       <FileDownloadURLInjector
         file={file}
         render={(_, url) => <TextPreviewer url={url} />}
+      />
+    ),
+  },
+  markdown: {
+    spec: { extensions: [".md"], contentTypes: ["text/.*"] },
+    render: (file) => (
+      <FileDownloadURLInjector
+        file={file}
+        render={(_, url) => <MarkdownPreviewer url={url} />}
       />
     ),
   },
