@@ -153,10 +153,13 @@ const Container = ({
   const [isOpenRecordEditModal, setIsOpenRecordEditModal] = useState(false);
   const [isAddingFile, setIsAddingFile] = useState(false);
 
-  const { data: getRecordRes } = useGetRecord(getAccessToken, {
-    databaseId,
-    recordId,
-  });
+  const { data: getRecordRes, mutate: getRecordMutate } = useGetRecord(
+    getAccessToken,
+    {
+      databaseId,
+      recordId,
+    }
+  );
 
   const { data: listFilesRes, mutate: listFilesMutate } = useListFiles(
     getAccessToken,
@@ -231,6 +234,7 @@ const Container = ({
       });
 
       listFilesMutate(newListFilesRes, false);
+      getRecordMutate();
     }
 
     setIsAddingFile(false);
