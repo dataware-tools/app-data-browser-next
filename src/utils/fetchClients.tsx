@@ -87,7 +87,7 @@ const uploadFileToFileProvider = async (
     .then(async (res) => {
       if (!res.ok) {
         const error = await res.json();
-        return error;
+        throw error;
       }
       return res.json();
     })
