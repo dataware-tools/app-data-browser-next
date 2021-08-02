@@ -5,6 +5,7 @@ import { VideoPreviewer } from "./VideoPreviewer";
 import { metaStore } from "@dataware-tools/app-common";
 import { FileDownloadURLInjector } from "components/organisms/FileDownloadUrlInjector";
 import { RosbagPreviewer } from "./RosbagPreviewer";
+import { CsvPreviewer } from "./CsvPreviewer";
 const AudioPreviewer = dynamic<any>(
   () => import("./AudioPreviewer").then((module) => module.AudioPreviewer),
   { ssr: false }
@@ -34,6 +35,15 @@ const filePreviewerCandidates: Record<string, FilePreviewerContentWithSpec> = {
       <FileDownloadURLInjector
         file={file}
         render={(_, url) => <TextPreviewer url={url} />}
+      />
+    ),
+  },
+  csv: {
+    spec: { extensions: [".csv"], contentTypes: ["csv/.*"] },
+    render: (file) => (
+      <FileDownloadURLInjector
+        file={file}
+        render={(_, url) => <CsvPreviewer url={url} />}
       />
     ),
   },
