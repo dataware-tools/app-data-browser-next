@@ -5,6 +5,10 @@ import { VideoPreviewer } from "./VideoPreviewer";
 import { metaStore } from "@dataware-tools/app-common";
 import { FileDownloadURLInjector } from "components/organisms/FileDownloadUrlInjector";
 import { RosbagPreviewer } from "./RosbagPreviewer";
+import {
+  SourceCodePreviewer,
+  extensions as sourceCodeExtensions,
+} from "./SourceCodePreviewer";
 import { MarkdownPreviewer } from "./MarkDownPreviewer";
 import { ImagePreviewer } from "./ImagePreviewer";
 import { CsvPreviewer } from "./CsvPreviewer";
@@ -64,6 +68,18 @@ const filePreviewerCandidates: Record<string, FilePreviewerContentWithSpec> = {
       <FileDownloadURLInjector
         file={file}
         render={(_, url) => <VideoPreviewer url={url} />}
+      />
+    ),
+  },
+  sourceCode: {
+    spec: {
+      extensions: sourceCodeExtensions,
+      contentTypes: ["text/.*"],
+    },
+    render: (file) => (
+      <FileDownloadURLInjector
+        file={file}
+        render={(file, url) => <SourceCodePreviewer file={file} url={url} />}
       />
     ),
   },
