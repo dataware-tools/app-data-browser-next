@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { TextField } from "@material-ui/core";
+import TextField from "@material-ui/core/TextField";
 
 type TextPreviewerProps = { url: string };
 export const TextPreviewer = ({ url }: TextPreviewerProps): JSX.Element => {
