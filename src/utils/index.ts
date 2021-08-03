@@ -143,6 +143,17 @@ const initializeDatabaseConfig = async (
         ...currentConfig,
         columns: [
           {
+            name: "record_name",
+            display_name: "Record name",
+            dtype: "string",
+            aggregation: "first",
+            is_display_field: true,
+            is_search_target: true,
+            is_record_title: true,
+            order_of_input: 0,
+            necessity: "required",
+          },
+          {
             name: "created_by",
             display_name: "Created by",
             dtype: "string",
