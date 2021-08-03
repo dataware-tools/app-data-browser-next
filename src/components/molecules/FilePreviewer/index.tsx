@@ -5,6 +5,13 @@ import { VideoPreviewer } from "./VideoPreviewer";
 import { metaStore } from "@dataware-tools/app-common";
 import { FileDownloadURLInjector } from "components/organisms/FileDownloadUrlInjector";
 import { RosbagPreviewer } from "./RosbagPreviewer";
+import {
+  SourceCodePreviewer,
+  extensions as sourceCodeExtensions,
+} from "./SourceCodePreviewer";
+import { MarkdownPreviewer } from "./MarkDownPreviewer";
+import { ImagePreviewer } from "./ImagePreviewer";
+import { CsvPreviewer } from "./CsvPreviewer";
 const AudioPreviewer = dynamic<any>(
   () => import("./AudioPreviewer").then((module) => module.AudioPreviewer),
   { ssr: false }
@@ -29,11 +36,29 @@ const filePreviewerCandidates: Record<string, FilePreviewerContentWithSpec> = {
     ),
   },
   text: {
-    spec: { extensions: [".txt", ".md"], contentTypes: ["text/.*"] },
+    spec: { extensions: [".txt"], contentTypes: ["text/.*"] },
     render: (file) => (
       <FileDownloadURLInjector
         file={file}
         render={(_, url) => <TextPreviewer url={url} />}
+      />
+    ),
+  },
+  markdown: {
+    spec: { extensions: [".md"], contentTypes: ["text/.*"] },
+    render: (file) => (
+      <FileDownloadURLInjector
+        file={file}
+        render={(_, url) => <MarkdownPreviewer url={url} />}
+      />
+    ),
+  },
+  csv: {
+    spec: { extensions: [".csv"], contentTypes: ["csv/.*"] },
+    render: (file) => (
+      <FileDownloadURLInjector
+        file={file}
+        render={(_, url) => <CsvPreviewer url={url} />}
       />
     ),
   },
@@ -43,6 +68,30 @@ const filePreviewerCandidates: Record<string, FilePreviewerContentWithSpec> = {
       <FileDownloadURLInjector
         file={file}
         render={(_, url) => <VideoPreviewer url={url} />}
+      />
+    ),
+  },
+  sourceCode: {
+    spec: {
+      extensions: sourceCodeExtensions,
+      contentTypes: ["text/.*"],
+    },
+    render: (file) => (
+      <FileDownloadURLInjector
+        file={file}
+        render={(file, url) => <SourceCodePreviewer file={file} url={url} />}
+      />
+    ),
+  },
+  image: {
+    spec: {
+      extensions: [".jpg", ".jpeg", ".png", ".gif"],
+      contentTypes: ["image/.*"],
+    },
+    render: (file) => (
+      <FileDownloadURLInjector
+        file={file}
+        render={(_, url) => <ImagePreviewer url={url} />}
       />
     ),
   },
