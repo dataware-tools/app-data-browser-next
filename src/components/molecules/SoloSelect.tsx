@@ -2,7 +2,7 @@ import Select, { SelectProps } from "@material-ui/core/Select";
 import MenuItem, { MenuItemProps } from "@material-ui/core/MenuItem";
 import React from "react";
 import { Spacer, theme as themeInstance } from "@dataware-tools/app-common";
-import { makeStyles } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
 
 type OptionsType = { label: string; value: string }[];
 type Props = { classes: ReturnType<typeof useStyles> } & ContainerProps;
