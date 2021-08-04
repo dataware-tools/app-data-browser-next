@@ -34,7 +34,6 @@ type ValidateRuleType = ControllerProps["rules"];
 
 export type DatabaseDeleteModalDOMProps = {
   error?: ErrorMessageProps;
-  classes: ReturnType<typeof useStyles>;
   formControl: Control<ConfirmInputType>;
   validateRules: Record<keyof ConfirmInputType, ValidateRuleType>;
   validateErrors: FieldErrors<ConfirmInputType>;
@@ -50,12 +49,17 @@ export type DatabaseDeleteModalProps = {
   onClose: () => void;
 };
 
+const useStyles = makeStyles((theme: typeof themeInstance) => ({
+  caution: {
+    color: theme.palette.error.main,
+  },
+}));
+
 export const DatabaseDeleteModalDOM = (
   props: DatabaseDeleteModalDOMProps
 ): JSX.Element => {
   const {
     error,
-    classes,
     databaseId,
     onClose,
     formControl,
@@ -64,6 +68,7 @@ export const DatabaseDeleteModalDOM = (
     validateErrorMessages,
     ...dialogProps
   } = props;
+  const classes = useStyles();
 
   return (
     <ConfirmModal
@@ -105,12 +110,6 @@ export const DatabaseDeleteModalDOM = (
     />
   );
 };
-
-const useStyles = makeStyles((theme: typeof themeInstance) => ({
-  caution: {
-    color: theme.palette.error.main,
-  },
-}));
 
 export const DatabaseDeleteModal = (
   props: DatabaseDeleteModalProps
@@ -192,7 +191,6 @@ export const DatabaseDeleteModal = (
 
   return (
     <DatabaseDeleteModalDOM
-      classes={useStyles()}
       error={error}
       validateErrors={validateErrors}
       validateErrorMessages={validateErrorMessages}
