@@ -7,26 +7,28 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { mutate } from "swr";
 import { useListDatabases } from "utils/index";
 
-type Props = {
-  classes: ReturnType<typeof useStyles>;
+export type SampleDOMProps = {
   user: any;
   onRevalidate: () => void;
   error: any;
   data: any;
-} & ContainerProps;
+} & SampleProps;
 
-type ContainerProps = {
+export type SampleProps = {
   sample: string;
 };
 
-const Component = ({
-  classes,
-  onRevalidate,
-  user,
-  error,
-  data,
-  sample,
-}: Props): JSX.Element => {
+export const useStyles = makeStyles((theme: typeof themeInstance) => ({
+  sample: {
+    "&:hover": {
+      backgroundColor: theme.palette.action.hover,
+    },
+  },
+}));
+
+export const SampleDOM = (props: SampleDOMProps): JSX.Element => {
+  const { onRevalidate, user, error, data, sample } = props;
+  const classes = useStyles();
   return (
     <div>
       <h1 className={classes.sample}>Hello {user ? user.name : "world"}</h1>
@@ -41,16 +43,8 @@ const Component = ({
   );
 };
 
-const useStyles = makeStyles((theme: typeof themeInstance) => ({
-  sample: {
-    "&:hover": {
-      backgroundColor: theme.palette.action.hover,
-    },
-  },
-}));
-
-const Container = ({ ...delegated }: ContainerProps): JSX.Element => {
-  const classes = useStyles();
+export const Sample = (props: SampleProps): JSX.Element => {
+  const { ...delegated } = props;
   const { user, getAccessTokenSilently: getAccessToken } = useAuth0();
   const { data, error, cacheKey } = useListDatabases(getAccessToken, {});
   const onRevalidate = () => {
@@ -58,8 +52,7 @@ const Container = ({ ...delegated }: ContainerProps): JSX.Element => {
   };
 
   return (
-    <Component
-      classes={classes}
+    <SampleDOM
       user={user}
       data={data}
       error={error}
@@ -68,6 +61,3 @@ const Container = ({ ...delegated }: ContainerProps): JSX.Element => {
     />
   );
 };
-
-export { Container as Sample };
-export type { ContainerProps as SampleProps };
