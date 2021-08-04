@@ -8,7 +8,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "run-s lint test:unit test:tsc test:build",
+    "test": "run-s lint test:tsc test:unit test:build",
     "lint": "run-s lint:eslint lint:stylelint",
     "lint:eslint": "eslint .",
     "lint:stylelint": "stylelint ./src",
