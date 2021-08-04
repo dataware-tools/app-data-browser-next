@@ -3,7 +3,6 @@ import {
   addQueryString,
   ErrorMessage,
   LoadingIndicator,
-  SearchForm,
   Spacer,
   PerPageSelect,
   PageContainer,
@@ -51,6 +50,7 @@ import {
 
 import { Breadcrumbs } from "components/molecules/Breadcrumbs";
 import StorageIcon from "@material-ui/icons/Storage";
+import { SearchButton } from "components/molecules/SearchButton";
 
 type Props = {
   error?: ErrorMessageProps;
@@ -109,9 +109,9 @@ const Component = ({
             right={
               isFetchComplete ? (
                 <>
-                  <SearchForm
+                  <SearchButton
+                    defaultSearchText={searchText}
                     onSearch={onChangeSearchText}
-                    defaultValue={searchText}
                   />
                   <Spacer direction="horizontal" size="15px" />
                   <PerPageSelect
@@ -280,7 +280,11 @@ const Page = (): JSX.Element => {
     setRecordPaginateState((prev) => ({ ...prev, perPage }));
   };
   const onChangeSearchText: Props["onChangeSearchText"] = (searchText) => {
-    setRecordPaginateState((prev) => ({ ...prev, search: searchText }));
+    setRecordPaginateState((prev) => ({
+      ...prev,
+      search: searchText,
+      page: 1,
+    }));
   };
   const onEndInitializeDatabase: Props["onEndInitializeDatabase"] = () => {
     setIsNewDatabase(false);

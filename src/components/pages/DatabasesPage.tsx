@@ -3,7 +3,6 @@ import {
   addQueryString,
   ErrorMessage,
   LoadingIndicator,
-  SearchForm,
   Spacer,
   PerPageSelect,
   PageContainer,
@@ -29,6 +28,7 @@ import {
   DatabaseAddButtonProps,
 } from "components/organisms/DatabaseAddButton";
 import { useHistory } from "react-router-dom";
+import { SearchButton } from "components/molecules/SearchButton";
 
 type Props = {
   error?: ErrorMessageProps;
@@ -70,9 +70,9 @@ const Component = ({
             right={
               isFetchComplete ? (
                 <>
-                  <SearchForm
+                  <SearchButton
+                    defaultSearchText={searchText}
                     onSearch={onChangeSearchText}
-                    defaultValue={searchText}
                   />
                   <Spacer direction="horizontal" size="15px" />
                   <PerPageSelect
@@ -146,7 +146,11 @@ const Container = (): JSX.Element => {
     setDatabasePaginateState((prev) => ({ ...prev, perPage }));
   };
   const onChangeSearchText: Props["onChangeSearchText"] = (searchText) => {
-    setDatabasePaginateState((prev) => ({ ...prev, search: searchText }));
+    setDatabasePaginateState((prev) => ({
+      ...prev,
+      search: searchText,
+      page: 1,
+    }));
   };
 
   const onAddDatabaseSucceeded: Props["onAddDatabaseSucceeded"] = (
