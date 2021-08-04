@@ -1,7 +1,7 @@
 import { theme as themeInstance } from "@dataware-tools/app-common";
 import { makeStyles } from "@material-ui/core/styles";
 
-import { Button } from "@material-ui/core";
+import Button from "@material-ui/core/Button";
 
 import { useAuth0 } from "@auth0/auth0-react";
 import { mutate } from "swr";

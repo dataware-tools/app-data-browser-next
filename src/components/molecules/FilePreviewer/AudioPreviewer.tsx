@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Button } from "@material-ui/core";
+import Button from "@material-ui/core/Button";
 import { floatToTimecodeString } from "utils";
 import { ToolBar } from "@dataware-tools/app-common";
 import WaveSurfer from "wavesurfer.js";
