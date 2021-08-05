@@ -1,11 +1,7 @@
 import Dialog from "@material-ui/core/Dialog";
 import { useState, useEffect } from "react";
 import LoadingButton from "@material-ui/lab/LoadingButton";
-import {
-  useGetConfig,
-  fetchMetaStore,
-  extractReasonFromFetchError,
-} from "utils";
+import { useGetConfig, fetchMetaStore } from "utils";
 import { useAuth0 } from "@auth0/auth0-react";
 import {
   ErrorMessage,
@@ -21,6 +17,7 @@ import {
   usePrevious,
   NoticeableLetters,
   LoadingIndicator,
+  extractErrorMessageFromFetchError,
 } from "@dataware-tools/app-common";
 import { produce } from "immer";
 
@@ -132,10 +129,10 @@ const Container = ({
   const fetchError = getConfigError;
   useEffect(() => {
     if (fetchError) {
-      setError({
-        reason: extractReasonFromFetchError(fetchError),
-        instruction: "Please reload this page",
-      });
+      const { reason, instruction } = extractErrorMessageFromFetchError(
+        fetchError
+      );
+      setError({ reason, instruction });
     }
   }, [fetchError]);
 
@@ -176,10 +173,10 @@ const Container = ({
       );
 
       if (error) {
-        setError({
-          reason: extractReasonFromFetchError(error),
-          instruction: "Please reload this page",
-        });
+        const { reason, instruction } = extractErrorMessageFromFetchError(
+          error
+        );
+        setError({ reason, instruction });
       } else {
         getConfigMutate(data);
       }

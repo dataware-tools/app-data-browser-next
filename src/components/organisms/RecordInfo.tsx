@@ -1,6 +1,7 @@
 import {
   ErrorMessage,
   ErrorMessageProps,
+  extractErrorMessageFromFetchError,
   LoadingIndicator,
   metaStore,
   ToolBar,
@@ -86,11 +87,9 @@ const Container = ({ databaseId, recordId }: ContainerProps): JSX.Element => {
       (path: string) => !["", "/", "./.", "./", "/.", "."].includes(path)
     );
   }
+
   const error: Props["error"] = getRecordError
-    ? {
-        reason: JSON.stringify(getRecordError),
-        instruction: "Please reload this page",
-      }
+    ? extractErrorMessageFromFetchError(getRecordError)
     : undefined;
   const isFetchComplete = Boolean(!error && getRecordRes);
   const onToggleIsJsonView = () => {

@@ -2,6 +2,7 @@ import {
   confirm,
   ErrorMessage,
   ErrorMessageProps,
+  extractErrorMessageFromFetchError,
   metaStore,
 } from "@dataware-tools/app-common";
 import { RecordDetailModal } from "components/organisms/RecordDetailModal";
@@ -11,7 +12,6 @@ import {
   fetchMetaStore,
   useListRecords,
   ParamTypeListRecords,
-  extractReasonFromFetchError,
 } from "utils";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useEffect, useState } from "react";
@@ -143,10 +143,10 @@ const Container = ({
       );
 
       if (deleteRecordError) {
-        setError({
-          reason: extractReasonFromFetchError(deleteRecordError),
-          instruction: "Please reload this page",
-        });
+        const { reason, instruction } = extractErrorMessageFromFetchError(
+          deleteRecordError
+        );
+        setError({ reason, instruction });
       } else if (deleteRecordRes) {
         listRecordsMutate();
       }
@@ -195,10 +195,10 @@ const Container = ({
   const fetchError = listRecordsError || getConfigError;
   useEffect(() => {
     if (fetchError) {
-      setError({
-        reason: extractReasonFromFetchError(fetchError),
-        instruction: "Please reload this page",
-      });
+      const { reason, instruction } = extractErrorMessageFromFetchError(
+        fetchError
+      );
+      setError({ reason, instruction });
     } else if (columns.length <= 0) {
       setError({
         reason: "Display columns is not configured",

@@ -16,17 +16,13 @@ import {
   NoticeableLetters,
   usePrevious,
   ErrorMessageProps,
+  extractErrorMessageFromFetchError,
 } from "@dataware-tools/app-common";
 import LoadingButton, {
   LoadingButtonProps,
 } from "@material-ui/lab/LoadingButton";
 import { SoloSelect, SoloSelectProps } from "components/molecules/SoloSelect";
-import {
-  useGetConfig,
-  fetchMetaStore,
-  compStr,
-  extractReasonFromFetchError,
-} from "utils";
+import { useGetConfig, fetchMetaStore, compStr } from "utils";
 
 import {
   OptionSharingSelects,
@@ -151,10 +147,10 @@ const Container = ({
   const fetchError = getConfigError;
   useEffect(() => {
     if (fetchError) {
-      setError({
-        reason: extractReasonFromFetchError(fetchError),
-        instruction: "Please reload this page",
-      });
+      const { reason, instruction } = extractErrorMessageFromFetchError(
+        fetchError
+      );
+      setError({ reason, instruction });
     } else {
       setError(undefined);
     }
@@ -216,10 +212,10 @@ const Container = ({
       );
 
       if (updateConfigError) {
-        setError({
-          reason: extractReasonFromFetchError(fetchError),
-          instruction: "Please reload this page",
-        });
+        const { reason, instruction } = extractErrorMessageFromFetchError(
+          updateConfigError
+        );
+        setError({ reason, instruction });
       } else {
         getConfigMutate(updateConfigRes);
       }

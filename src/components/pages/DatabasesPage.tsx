@@ -13,6 +13,7 @@ import {
   ErrorMessageProps,
   SearchFormProps,
   PerPageSelectProps,
+  extractErrorMessageFromFetchError,
 } from "@dataware-tools/app-common";
 import { useAuth0 } from "@auth0/auth0-react";
 import { DatabaseList } from "components/organisms/DatabaseList";
@@ -156,10 +157,7 @@ const Container = (): JSX.Element => {
   };
 
   const error: Props["error"] = listDatabasesError
-    ? {
-        reason: JSON.stringify(listDatabasesError),
-        instruction: "Please reload this page",
-      }
+    ? extractErrorMessageFromFetchError(listDatabasesError)
     : undefined;
   const isFetchComplete = Boolean(!error && listDatabasesRes);
   const totalPage = listDatabasesRes?.number_of_pages || 0;

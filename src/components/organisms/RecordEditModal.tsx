@@ -1,4 +1,8 @@
-import { ErrorMessageProps, metaStore } from "@dataware-tools/app-common";
+import {
+  ErrorMessageProps,
+  extractErrorMessageFromFetchError,
+  metaStore,
+} from "@dataware-tools/app-common";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useEffect, useMemo, useState } from "react";
 import { useRecoilValue } from "recoil";
@@ -10,7 +14,6 @@ import {
   useListRecords,
   editableColumnDtype,
   isEditableColumnName,
-  extractReasonFromFetchError,
 } from "utils";
 import {
   MetadataEditModal,
@@ -81,10 +84,10 @@ const Container = ({
   const fetchError = getRecordError || getConfigError;
   useEffect(() => {
     if (fetchError) {
-      setError({
-        reason: extractReasonFromFetchError(fetchError),
-        instruction: "Please reload this page",
-      });
+      const { reason, instruction } = extractErrorMessageFromFetchError(
+        fetchError
+      );
+      setError({ reason, instruction });
     } else if (create && fields.length <= 0) {
       setError({
         reason: "Input fields is not configured",
@@ -118,10 +121,10 @@ const Container = ({
         );
 
     if (saveRecordError) {
-      setError({
-        reason: JSON.stringify(saveRecordError),
-        instruction: "Please reload thi page",
-      });
+      const { reason, instruction } = extractErrorMessageFromFetchError(
+        saveRecordError
+      );
+      setError({ reason, instruction });
       return false;
     }
 

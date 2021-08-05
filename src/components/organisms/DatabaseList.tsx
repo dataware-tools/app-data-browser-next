@@ -1,15 +1,12 @@
 import { DatabaseListItemProps } from "components/organisms/DatabaseListItem";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useHistory } from "react-router-dom";
-import {
-  extractReasonFromFetchError,
-  ParamTypeListDatabases,
-  useListDatabases,
-} from "utils";
+import { ParamTypeListDatabases, useListDatabases } from "utils";
 import {
   confirm,
   ErrorMessage,
   ErrorMessageProps,
+  extractErrorMessageFromFetchError,
   fetchMetaStore,
   LoadingIndicator,
   metaStore,
@@ -76,10 +73,10 @@ const Container = ({ page, perPage, search }: ContainerProps): JSX.Element => {
   const fetchError = listDatabasesError;
   useEffect(() => {
     if (fetchError) {
-      setError({
-        reason: extractReasonFromFetchError(fetchError),
-        instruction: "Please reload this page",
-      });
+      const { reason, instruction } = extractErrorMessageFromFetchError(
+        fetchError
+      );
+      setError({ reason, instruction });
     } else {
       setError(undefined);
     }
@@ -110,10 +107,10 @@ const Container = ({ page, perPage, search }: ContainerProps): JSX.Element => {
       );
 
       if (deleteDatabaseError) {
-        setError({
-          reason: extractReasonFromFetchError(deleteDatabaseError),
-          instruction: "Please reload this page",
-        });
+        const { reason, instruction } = extractErrorMessageFromFetchError(
+          deleteDatabaseError
+        );
+        setError({ reason, instruction });
       } else if (deleteDatabaseRes) {
         listDatabaseMutate();
       }
