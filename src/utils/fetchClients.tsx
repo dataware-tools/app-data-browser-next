@@ -366,21 +366,32 @@ const useCreateJwtToDownloadFile: UseAPIWithoutCache<
     error: undefined,
   });
 
-  useEffect(() => {
-    if (shouldFetch) {
-      fileProvider.OpenAPI.TOKEN = token;
-      fileProvider.OpenAPI.BASE = API_ROUTE.FILE.BASE;
-      fileProvider.DownloadService.createJwtToDownloadFile({
-        requestBody,
-      })
-        .then((fetchRes) => {
-          setRes({ data: fetchRes, error: undefined });
+  useEffect(
+    () => {
+      if (shouldFetch) {
+        fileProvider.OpenAPI.TOKEN = token;
+        fileProvider.OpenAPI.BASE = API_ROUTE.FILE.BASE;
+        fileProvider.DownloadService.createJwtToDownloadFile({
+          requestBody,
         })
-        .catch((error) => {
-          setRes({ data: undefined, error: error });
-        });
-    }
-  }, [token, shouldFetch]);
+          .then((fetchRes) => {
+            setRes({ data: fetchRes, error: undefined });
+          })
+          .catch((error) => {
+            setRes({ data: undefined, error: error });
+          });
+      }
+    },
+    // ! this deps is often cause of bug that repeating download file
+    [
+      token,
+      shouldFetch,
+      requestBody?.path,
+      requestBody?.content_type,
+      requestBody?.database_id,
+      requestBody?.record_id,
+    ]
+  );
 
   return res;
 };

@@ -7,7 +7,12 @@ import {
   FilePreviewModal,
   FilePreviewModalProps,
 } from "components/organisms/FilePreviewModal";
-import { useListFiles, fetchFileProvider, fetchMetaStore } from "utils";
+import {
+  useListFiles,
+  fetchFileProvider,
+  fetchMetaStore,
+  getFileName,
+} from "utils";
 import { useAuth0 } from "@auth0/auth0-react";
 import {
   alert,
@@ -19,7 +24,7 @@ import {
   LoadingIndicator,
   metaStore,
 } from "@dataware-tools/app-common";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { FileEditModal, FileEditModalProps } from "./FileEditModal";
 
 type Props = {
@@ -68,6 +73,7 @@ const Component = ({
           </List>
           {previewingFile ? (
             <FilePreviewModal
+              fileList={files}
               open={Boolean(previewingFile)}
               onClose={onCloseFilePreviewModal}
               file={previewingFile}
@@ -190,7 +196,22 @@ const Container = ({ databaseId, recordId }: ContainerProps): JSX.Element => {
 
   const onCloseFilePreviewModal = () => setPreviewingFile(undefined);
   const onCloseFileEditModal = () => setEditingFile(undefined);
-  const files = listFilesRes?.data || [];
+  const files = useMemo(
+    () =>
+      listFilesRes?.data
+        .filter(
+          (file) =>
+            file.path != null &&
+            file.path !== "" &&
+            file.path !== "/" &&
+            file.path !== "/."
+        )
+        .map((file) => ({
+          ...file,
+          displayPath: getFileName(file.path),
+        })) || [],
+    [listFilesRes]
+  );
   const error: Props["error"] = listFilesError
     ? {
         reason: JSON.stringify(listFilesError),

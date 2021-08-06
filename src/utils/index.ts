@@ -207,6 +207,9 @@ const floatToTimecodeString = (time: number | undefined): string => {
   );
 };
 
+const getFileName = (filePath: string): string =>
+  filePath.split("/").slice(-1)[0];
+
 export {
   APP_ROUTE,
   SwrOptions,
@@ -222,6 +225,7 @@ export {
   initializeDatabaseConfig,
   leftFillNum,
   floatToTimecodeString,
+  getFileName,
 };
 export * from "./fetchClients";
 export * from "./utilTypes";
