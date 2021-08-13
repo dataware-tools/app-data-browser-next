@@ -129,6 +129,7 @@ const Container = ({ databaseId, recordId }: ContainerProps): JSX.Element => {
     if (
       !(await confirm({
         title: "Are you sure you want to delete file?",
+        confirmMode: "delete",
       }))
     )
       return;
