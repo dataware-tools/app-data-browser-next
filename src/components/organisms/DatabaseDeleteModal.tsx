@@ -74,6 +74,7 @@ export const DatabaseDeleteModalDOM = (
     <ConfirmModal
       onClose={onClose}
       title={`Are you sure you want to delete ${databaseId}?`}
+      confirmMode="delete"
       body={
         error ? (
           <ErrorMessage {...error} />
