@@ -6,6 +6,7 @@ import ListItemText from "@material-ui/core/ListItemText";
 import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
 import { MouseEvent, useState } from "react";
 import { FileMenu } from "components/molecules/FileMenu";
+import { getFileName } from "utils";
 
 type FileType = metaStore.FileModel;
 type Props = {
@@ -56,7 +57,7 @@ const Component = ({
       <ListItemIcon>
         <DescriptionIcon />
       </ListItemIcon>
-      <ListItemText primary={file.path.split("/").slice(-1)[0]} />
+      <ListItemText primary={file.displayPath || getFileName(file.path)} />
       <ListItemSecondaryAction>
         <FileMenu
           {...menuProps}

@@ -27,7 +27,8 @@ import {
   DatabaseColumnsConfigType,
   DatabaseColumnsConfigNecessityType,
 } from "utils";
-import { FormControl, FormHelperText } from "@material-ui/core";
+import FormHelperText from "@material-ui/core/FormHelperText";
+import FormControl from "@material-ui/core/FormControl";
 
 type OptionType = {
   name: string;

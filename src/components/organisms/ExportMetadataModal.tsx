@@ -4,7 +4,8 @@ import LoadingButton from "@material-ui/lab/LoadingButton";
 import { extractReasonFromFetchError, useListRecords } from "utils/index";
 import Select from "@material-ui/core/Select";
 import MenuItem from "@material-ui/core/MenuItem";
-import { FormControl, InputLabel } from "@material-ui/core";
+import InputLabel from "@material-ui/core/InputLabel";
+import FormControl from "@material-ui/core/FormControl";
 import { makeStyles } from "@material-ui/core/styles";
 import {
   DialogBody,

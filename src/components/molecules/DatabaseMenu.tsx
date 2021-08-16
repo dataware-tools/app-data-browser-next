@@ -1,5 +1,5 @@
 import Menu from "@material-ui/core/Menu";
-import { MenuItem } from "@material-ui/core";
+import MenuItem from "@material-ui/core/MenuItem";
 
 type ComponentProps = {
   menu: ({ label?: string; value: string; className?: string } | undefined)[];
