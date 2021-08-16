@@ -88,7 +88,10 @@ const Container = ({ page, perPage, search }: ContainerProps): JSX.Element => {
   const onDeleteDatabase = async (data: GridCellParams) => {
     if (listDatabasesRes) {
       if (
-        !(await confirm({ title: "Are you sure you want to delete database?" }))
+        !(await confirm({
+          title: "Are you sure you want to delete database?",
+          confirmMode: "delete",
+        }))
       ) {
         return;
       }
