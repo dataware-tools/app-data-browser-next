@@ -120,7 +120,10 @@ const Container = ({
   const onDeleteRecord = async (record: GridCellParams) => {
     if (listRecordsRes) {
       if (
-        !(await confirm({ title: "Are you sure you want to delete record?" }))
+        !(await confirm({
+          title: "Are you sure you want to delete record?",
+          confirmMode: "delete",
+        }))
       ) {
         return;
       }
