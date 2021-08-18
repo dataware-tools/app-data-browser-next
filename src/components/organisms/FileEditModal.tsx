@@ -1,8 +1,11 @@
-import { ErrorMessageProps, metaStore } from "@dataware-tools/app-common";
+import {
+  ErrorMessageProps,
+  extractErrorMessageFromFetchError,
+  metaStore,
+} from "@dataware-tools/app-common";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useEffect, useMemo, useState } from "react";
 import {
-  extractReasonFromFetchError,
   compInputFields,
   fetchMetaStore,
   useGetConfig,
@@ -77,10 +80,10 @@ const Container = ({
   const fetchError = getFileError || getConfigError;
   useEffect(() => {
     if (fetchError) {
-      setError({
-        reason: extractReasonFromFetchError(fetchError),
-        instruction: "Please reload this page",
-      });
+      const { reason, instruction } = extractErrorMessageFromFetchError(
+        fetchError
+      );
+      setError({ reason, instruction });
     } else {
       setError(undefined);
     }
@@ -98,10 +101,10 @@ const Container = ({
     );
 
     if (saveFileError) {
-      setError({
-        reason: extractReasonFromFetchError(saveFileError),
-        instruction: "Please reload this page",
-      });
+      const { reason, instruction } = extractErrorMessageFromFetchError(
+        saveFileError
+      );
+      setError({ reason, instruction });
       return false;
     }
 

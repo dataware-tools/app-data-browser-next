@@ -20,6 +20,7 @@ import {
   confirm,
   ErrorMessage,
   ErrorMessageProps,
+  extractErrorMessageFromFetchError,
   fileProvider,
   LoadingIndicator,
   metaStore,
@@ -214,10 +215,7 @@ const Container = ({ databaseId, recordId }: ContainerProps): JSX.Element => {
     [listFilesRes]
   );
   const error: Props["error"] = listFilesError
-    ? {
-        reason: JSON.stringify(listFilesError),
-        instruction: "Please reload this page",
-      }
+    ? extractErrorMessageFromFetchError(listFilesError)
     : undefined;
   const isFetchComplete = Boolean(!error && listFilesRes);
 

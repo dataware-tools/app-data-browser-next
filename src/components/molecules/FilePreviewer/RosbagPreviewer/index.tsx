@@ -4,11 +4,11 @@ import {
   ErrorMessageProps,
   DialogTitle,
   ErrorMessage,
+  extractErrorMessageFromFetchError,
 } from "@dataware-tools/app-common";
 import { useAuth0 } from "@auth0/auth0-react";
 import { JobSubmitter } from "./JobSubmitter";
 import {
-  extractReasonFromFetchError,
   fetchJobStore,
   useGetJobTemplate,
   useGetJobTypes,
@@ -91,10 +91,10 @@ export const RosbagPreviewer = ({
     listJobTemplateError || getJobTemplateError || getJobTypeError;
   useEffect(() => {
     if (fetchError) {
-      setError({
-        reason: extractReasonFromFetchError(fetchError),
-        instruction: "Please reload this page",
-      });
+      const { reason, instruction } = extractErrorMessageFromFetchError(
+        fetchError
+      );
+      setError({ reason, instruction });
     } else {
       setError(undefined);
     }
@@ -115,10 +115,8 @@ export const RosbagPreviewer = ({
       }
     );
     if (error) {
-      setError({
-        reason: extractReasonFromFetchError(error),
-        instruction: "Please reload this page",
-      });
+      const { reason, instruction } = extractErrorMessageFromFetchError(error);
+      setError({ reason, instruction });
     } else {
       setJob(data);
     }

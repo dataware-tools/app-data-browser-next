@@ -14,6 +14,7 @@ import {
   SearchFormProps,
   PerPageSelectProps,
   deleteQueryString,
+  extractErrorMessageFromFetchError,
 } from "@dataware-tools/app-common";
 
 import { useAuth0 } from "@auth0/auth0-react";
@@ -32,7 +33,6 @@ import {
   useGetConfig,
   useListPermittedActions,
   UserActionType,
-  extractReasonFromFetchError,
   useGetDatabase,
 } from "utils";
 import { useRecoilState, useSetRecoilState } from "recoil";
@@ -229,10 +229,10 @@ const Page = (): JSX.Element => {
     listRecordsError || getConfigError || listPermittedActionError;
   useEffect(() => {
     if (fetchError) {
-      setError({
-        reason: extractReasonFromFetchError(fetchError),
-        instruction: "Please reload this page",
-      });
+      const { reason, instruction } = extractErrorMessageFromFetchError(
+        fetchError
+      );
+      setError({ reason, instruction });
     } else {
       setError(undefined);
     }

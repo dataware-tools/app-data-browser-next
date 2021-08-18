@@ -97,18 +97,6 @@ const compInputFields = (
   }
 };
 
-const extractReasonFromFetchError = (fetchError: {
-  body?: { detail?: unknown };
-}): string => {
-  if (typeof fetchError.body?.detail === "string") {
-    return fetchError.body?.detail;
-  } else if (fetchError.body?.detail) {
-    return JSON.stringify(fetchError.body.detail);
-  } else {
-    return JSON.stringify(fetchError);
-  }
-};
-
 const createSystemMetadata = (
   type: "add" | "update",
   user: { sub: string }
@@ -220,7 +208,6 @@ export {
   compInputFields,
   editableColumnDtype,
   isEditableColumnName,
-  extractReasonFromFetchError,
   createSystemMetadata,
   initializeDatabaseConfig,
   leftFillNum,

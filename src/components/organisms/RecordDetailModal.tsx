@@ -16,6 +16,7 @@ import {
   ErrorMessageProps,
   confirm,
   alert,
+  extractErrorMessageFromFetchError,
 } from "@dataware-tools/app-common";
 import Dialog from "@material-ui/core/Dialog";
 import { useState, useEffect } from "react";
@@ -28,7 +29,6 @@ import {
   uploadFileToFileProvider,
   useGetConfig,
   createSystemMetadata,
-  extractReasonFromFetchError,
 } from "utils";
 import {
   RecordEditModal,
@@ -222,7 +222,7 @@ const Container = ({
     if (createFileError) {
       await alert({
         title: "Fail to upload",
-        body: extractReasonFromFetchError(createFileError),
+        body: extractErrorMessageFromFetchError(createFileError).reason,
       });
       setIsAddingFile(false);
       return;
