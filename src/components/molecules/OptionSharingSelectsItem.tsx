@@ -1,10 +1,10 @@
-import Select, { SelectProps } from "@material-ui/core/Select";
-import MenuItem, { MenuItemProps } from "@material-ui/core/MenuItem";
 import IconButton from "@material-ui/core/IconButton";
-import DeleteIcon from "@material-ui/icons/Delete";
+import MenuItem, { MenuItemProps } from "@material-ui/core/MenuItem";
+import Select, { SelectProps } from "@material-ui/core/Select";
 import { makeStyles } from "@material-ui/core/styles";
-import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
+import DeleteIcon from "@material-ui/icons/Delete";
 import React from "react";
+import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
 
 type ActionType = "update" | "delete";
 type OptionsType = { label: string; value: string }[];

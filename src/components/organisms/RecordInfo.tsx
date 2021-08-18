@@ -1,3 +1,4 @@
+import { useAuth0 } from "@auth0/auth0-react";
 import {
   ErrorMessage,
   ErrorMessageProps,
@@ -6,13 +7,12 @@ import {
   metaStore,
   ToolBar,
 } from "@dataware-tools/app-common";
-import { useGetRecord } from "utils";
-import { useAuth0 } from "@auth0/auth0-react";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Switch from "@material-ui/core/Switch";
 import dynamic from "next/dynamic";
 import { useState } from "react";
-import Switch from "@material-ui/core/Switch";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
 import { RecordInfoTable } from "./RecordInfoTable";
+import { useGetRecord } from "utils";
 const ReactJson = dynamic(import("react-json-view"), { ssr: false });
 
 type Props = {

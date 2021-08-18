@@ -14,8 +14,8 @@ import {
   alert,
 } from "@dataware-tools/app-common";
 import Dialog from "@material-ui/core/Dialog";
-import { useState, useEffect } from "react";
 import LoadingButton from "@material-ui/lab/LoadingButton";
+import { useState, useEffect } from "react";
 import {
   MetadataInputFieldList,
   MetadataInputFieldListProps,

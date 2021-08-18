@@ -1,18 +1,3 @@
-import {
-  FileListItem,
-  FileListItemProps,
-} from "components/organisms/FileListItem";
-import List from "@material-ui/core/List";
-import {
-  FilePreviewModal,
-  FilePreviewModalProps,
-} from "components/organisms/FilePreviewModal";
-import {
-  useListFiles,
-  fetchFileProvider,
-  fetchMetaStore,
-  getFileName,
-} from "utils";
 import { useAuth0 } from "@auth0/auth0-react";
 import {
   alert,
@@ -25,8 +10,23 @@ import {
   LoadingIndicator,
   metaStore,
 } from "@dataware-tools/app-common";
+import List from "@material-ui/core/List";
 import { useState, useMemo } from "react";
 import { FileEditModal, FileEditModalProps } from "./FileEditModal";
+import {
+  FileListItem,
+  FileListItemProps,
+} from "components/organisms/FileListItem";
+import {
+  FilePreviewModal,
+  FilePreviewModalProps,
+} from "components/organisms/FilePreviewModal";
+import {
+  useListFiles,
+  fetchFileProvider,
+  fetchMetaStore,
+  getFileName,
+} from "utils";
 
 type Props = {
   error?: ErrorMessageProps;

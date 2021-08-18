@@ -1,4 +1,3 @@
-import Dialog, { DialogProps } from "@material-ui/core/Dialog";
 import {
   DialogBody,
   DialogContainer,
@@ -8,14 +7,15 @@ import {
   DialogWrapper,
   usePrevious,
 } from "@dataware-tools/app-common";
-import { FileType } from "components/organisms/FileListItem";
-import { FilePreviewer } from "components/molecules/FilePreviewer";
 import Button from "@material-ui/core/Button";
+import Dialog, { DialogProps } from "@material-ui/core/Dialog";
+import { makeStyles } from "@material-ui/core/styles";
 import ArrowBack from "@material-ui/icons/ArrowBack";
 import ArrowForward from "@material-ui/icons/ArrowForward";
 import { useState, useEffect } from "react";
+import { FilePreviewer } from "components/molecules/FilePreviewer";
+import { FileType } from "components/organisms/FileListItem";
 import { getFileName } from "utils";
-import { makeStyles } from "@material-ui/core/styles";
 
 export type FilePreviewModalPresentationProps = {
   goNextFile: () => void;
@@ -29,7 +29,7 @@ export type FilePreviewModalProps = DialogProps & {
   height?: string;
 };
 
-const useStyles = makeStyles({ nonCapitalize: { textTransform: "none", } });
+const useStyles = makeStyles({ nonCapitalize: { textTransform: "none" } });
 
 export const FilePreviewModalPresentation = (
   props: FilePreviewModalPresentationProps

@@ -1,11 +1,15 @@
 import {
-  InputConfigEditModal,
-  ConfigNameType as InputConfigNameType,
-} from "components/organisms/InputConfigEditModal";
-import {
   DisplayConfigEditModal,
   ConfigNameType as DisplayConfigNameType,
 } from "components/organisms/DisplayConfigEditModal";
+import {
+  ExportMetadataModal,
+  ConfigNameType as ExportMetadataNameType,
+} from "components/organisms/ExportMetadataModal";
+import {
+  InputConfigEditModal,
+  ConfigNameType as InputConfigNameType,
+} from "components/organisms/InputConfigEditModal";
 import {
   SearchConfigEditModal,
   ConfigNameType as SearchConfigNameType,
@@ -14,10 +18,6 @@ import {
   SecretConfigEditModal,
   ConfigNameType as SecretConfigNameType,
 } from "components/organisms/SecretConfigEditModal";
-import {
-  ExportMetadataModal,
-  ConfigNameType as ExportMetadataNameType,
-} from "components/organisms/ExportMetadataModal";
 
 type ContainerProps = {
   open: boolean;

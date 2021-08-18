@@ -1,7 +1,3 @@
-import Dialog from "@material-ui/core/Dialog";
-import { useState, useEffect } from "react";
-import LoadingButton from "@material-ui/lab/LoadingButton";
-import { useGetConfig, fetchMetaStore } from "utils";
 import { useAuth0 } from "@auth0/auth0-react";
 import {
   ErrorMessage,
@@ -19,12 +15,16 @@ import {
   LoadingIndicator,
   extractErrorMessageFromFetchError,
 } from "@dataware-tools/app-common";
+import Dialog from "@material-ui/core/Dialog";
+import LoadingButton from "@material-ui/lab/LoadingButton";
 import { produce } from "immer";
+import { useState, useEffect } from "react";
 
 import {
   OptionSharingSelects,
   OptionSharingSelectsProps,
 } from "components/organisms/OptionSharingSelects";
+import { useGetConfig, fetchMetaStore } from "utils";
 
 type ConfigNameType = "secret_columns";
 

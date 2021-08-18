@@ -1,20 +1,20 @@
 import { Spacer } from "@dataware-tools/app-common";
 import { makeStyles } from "@material-ui/core/styles";
-import { useState } from "react";
-import {
-  ActionType,
-  OptionSharingSelectsItem,
-  OptionSharingSelectsItemProps,
-} from "components/molecules/OptionSharingSelectsItem";
+import DragIndicatorIcon from "@material-ui/icons/DragIndicator";
 import { produce } from "immer";
-import { AddListItemButton } from "components/atoms/AddListItemButton";
+import { useState } from "react";
 import {
   DragDropContext,
   Droppable,
   Draggable,
   DragDropContextProps,
 } from "react-beautiful-dnd";
-import DragIndicatorIcon from "@material-ui/icons/DragIndicator";
+import { AddListItemButton } from "components/atoms/AddListItemButton";
+import {
+  ActionType,
+  OptionSharingSelectsItem,
+  OptionSharingSelectsItemProps,
+} from "components/molecules/OptionSharingSelectsItem";
 
 type ValuesType = OptionSharingSelectsItemProps["value"][];
 type OptionType = OptionSharingSelectsItemProps["options"][number];

@@ -1,7 +1,4 @@
-import { DatabaseListItemProps } from "components/organisms/DatabaseListItem";
 import { useAuth0 } from "@auth0/auth0-react";
-import { useHistory } from "react-router-dom";
-import { ParamTypeListDatabases, useListDatabases } from "utils";
 import {
   confirm,
   ErrorMessage,
@@ -11,16 +8,19 @@ import {
   LoadingIndicator,
   metaStore,
 } from "@dataware-tools/app-common";
+import IconButton from "@material-ui/core/IconButton";
 import {
   DataGrid,
   GridColumns,
   DataGridProps,
   GridCellParams,
 } from "@material-ui/data-grid";
+import DeleteIcon from "@material-ui/icons/Delete";
 import { produce } from "immer";
 import { useState, useEffect } from "react";
-import IconButton from "@material-ui/core/IconButton";
-import DeleteIcon from "@material-ui/icons/Delete";
+import { useHistory } from "react-router-dom";
+import { DatabaseListItemProps } from "components/organisms/DatabaseListItem";
+import { ParamTypeListDatabases, useListDatabases } from "utils";
 
 type Props = {
   error?: ErrorMessageProps;

@@ -1,6 +1,6 @@
 import { AUTH_CONFIG, metaStore } from "@dataware-tools/app-common";
-import { DatabaseConfigType, DatabaseColumnsConfigType } from "utils/utilTypes";
 import { fetchMetaStore } from "utils";
+import { DatabaseConfigType, DatabaseColumnsConfigType } from "utils/utilTypes";
 
 const APP_ROUTE = {
   HOME: "/",

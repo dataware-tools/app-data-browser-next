@@ -1,10 +1,14 @@
+import { useAuth0 } from "@auth0/auth0-react";
 import {
   ErrorMessageProps,
   extractErrorMessageFromFetchError,
   metaStore,
 } from "@dataware-tools/app-common";
-import { useAuth0 } from "@auth0/auth0-react";
 import { useEffect, useMemo, useState } from "react";
+import {
+  MetadataEditModal,
+  MetadataEditModalProps,
+} from "components/organisms/MetadataEditModal";
 import {
   compInputFields,
   fetchMetaStore,
@@ -14,11 +18,6 @@ import {
   editableColumnDtype,
   isEditableColumnName,
 } from "utils";
-
-import {
-  MetadataEditModal,
-  MetadataEditModalProps,
-} from "components/organisms/MetadataEditModal";
 
 type ContainerProps = {
   open: boolean;

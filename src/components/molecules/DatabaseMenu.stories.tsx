@@ -1,5 +1,5 @@
-import { DatabaseMenu } from "./DatabaseMenu";
 import { useState, MouseEventHandler } from "react";
+import { DatabaseMenu } from "./DatabaseMenu";
 
 export default {
   component: DatabaseMenu,

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useAuth0 } from "@auth0/auth0-react";
 import {
   jobStore,
   ErrorMessageProps,
@@ -6,15 +6,15 @@ import {
   ErrorMessage,
   extractErrorMessageFromFetchError,
 } from "@dataware-tools/app-common";
-import { useAuth0 } from "@auth0/auth0-react";
+import React, { useEffect, useState } from "react";
 import { JobSubmitter } from "./JobSubmitter";
+import { JobViewer } from "./JobViewer";
 import {
   fetchJobStore,
   useGetJobTemplate,
   useGetJobTypes,
   useListJobTemplate,
 } from "utils";
-import { JobViewer } from "./JobViewer";
 
 type Props = {
   error?: ErrorMessageProps;

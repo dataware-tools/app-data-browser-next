@@ -1,7 +1,7 @@
 import { jobStore } from "@dataware-tools/app-common";
 import Button from "@material-ui/core/Button";
-import { SoloSelect } from "components/molecules/SoloSelect";
 import { JobTemplateInfo } from "./JobTemplateInfo";
+import { SoloSelect } from "components/molecules/SoloSelect";
 
 type JobSubmitterProps = {
   jobTemplateId?: string;

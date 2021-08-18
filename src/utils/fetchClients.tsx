@@ -6,9 +6,9 @@ import {
   objToQueryString,
   permissionManager,
 } from "@dataware-tools/app-common";
+import { useState, useEffect } from "react";
 import useSWR, { SWRResponse } from "swr";
 import { AwaitType, DatabaseConfigType } from "utils/utilTypes";
-import { useState, useEffect } from "react";
 
 type Data<T> = T extends void | undefined | null
   ? "__fetchSuccess__" | undefined

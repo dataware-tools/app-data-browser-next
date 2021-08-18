@@ -1,7 +1,7 @@
-import React from "react";
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
-import Typography from "@material-ui/core/Typography";
 import Link from "@material-ui/core/Link";
+import Typography from "@material-ui/core/Typography";
+import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
+import React from "react";
 import { useHistory } from "react-router-dom";
 
 type ComponentProps = {

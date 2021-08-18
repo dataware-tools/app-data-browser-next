@@ -1,29 +1,29 @@
 import { Spacer } from "@dataware-tools/app-common";
 import { makeStyles } from "@material-ui/core/styles";
-import { AddListItemButton } from "components/atoms/AddListItemButton";
-import {
-  InputConfigListItem,
-  InputConfigListItemProps,
-  ActionType,
-} from "components/molecules/InputConfigListItem";
-import { useState } from "react";
+import DragIndicatorIcon from "@material-ui/icons/DragIndicator";
 import { produce } from "immer";
+import { useState } from "react";
 import {
   DragDropContext,
   Droppable,
   Draggable,
   DragDropContextProps,
 } from "react-beautiful-dnd";
-import DragIndicatorIcon from "@material-ui/icons/DragIndicator";
+import { AddListItemButton } from "components/atoms/AddListItemButton";
+import {
+  InputConfigListItem,
+  InputConfigListItemProps,
+  ActionType,
+} from "components/molecules/InputConfigListItem";
+import {
+  InputConfigAddModal,
+  InputConfigAddModalProps,
+} from "components/organisms/InputConfigAddModal";
 import {
   DatabaseColumnsConfigType,
   compInputFields,
   pydtkSystemColumns,
 } from "utils";
-import {
-  InputConfigAddModal,
-  InputConfigAddModalProps,
-} from "components/organisms/InputConfigAddModal";
 
 type ValueType = (InputConfigListItemProps["value"] & {
   order_of_input: DatabaseColumnsConfigType[number]["order_of_input"];

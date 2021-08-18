@@ -1,11 +1,11 @@
-import { makeStyles } from "@material-ui/core/styles";
-import Select from "@material-ui/core/Select";
-import MenuItem from "@material-ui/core/MenuItem";
 import { Spacer } from "@dataware-tools/app-common";
 import IconButton from "@material-ui/core/IconButton";
+import MenuItem from "@material-ui/core/MenuItem";
+import Select from "@material-ui/core/Select";
+import { makeStyles } from "@material-ui/core/styles";
 import DeleteIcon from "@material-ui/icons/Delete";
-import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
 import React, { ReactNode } from "react";
+import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
 import { DatabaseColumnsConfigType } from "utils";
 
 type ValueType = Required<

@@ -1,11 +1,11 @@
 import { TextCenteringSpan } from "@dataware-tools/app-common";
 import Button from "@material-ui/core/Button";
 import AddCircle from "@material-ui/icons/AddCircle";
+import { useState } from "react";
 import {
   RecordEditModal,
   RecordEditModalProps,
 } from "components/organisms/RecordEditModal";
-import { useState } from "react";
 
 type Props = {
   isOpenRecordAddModal: boolean;
