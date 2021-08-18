@@ -1,3 +1,4 @@
+import { useAuth0 } from "@auth0/auth0-react";
 import {
   DialogBody,
   DialogCloseButton,
@@ -13,10 +14,10 @@ import {
   usePrevious,
   extractErrorMessageFromFetchError,
 } from "@dataware-tools/app-common";
-import { useAuth0 } from "@auth0/auth0-react";
 import Box from "@material-ui/core/Box";
 import Dialog, { DialogProps } from "@material-ui/core/Dialog";
 import TextField from "@material-ui/core/TextField";
+import LoadingButton from "@material-ui/lab/LoadingButton";
 import { useEffect, useState } from "react";
 import {
   useForm,
@@ -26,7 +27,6 @@ import {
   DeepMap,
   FieldError,
 } from "react-hook-form";
-import LoadingButton from "@material-ui/lab/LoadingButton";
 import { useRecoilValue } from "recoil";
 import { databasePaginateState } from "globalStates";
 import {

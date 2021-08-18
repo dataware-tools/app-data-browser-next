@@ -1,7 +1,4 @@
-import { useState, useEffect } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
-import Dialog from "@material-ui/core/Dialog";
-import { produce } from "immer";
 import {
   ErrorMessage,
   metaStore,
@@ -18,16 +15,19 @@ import {
   ErrorMessageProps,
   extractErrorMessageFromFetchError,
 } from "@dataware-tools/app-common";
+import Dialog from "@material-ui/core/Dialog";
 import LoadingButton, {
   LoadingButtonProps,
 } from "@material-ui/lab/LoadingButton";
+import { produce } from "immer";
+import { useState, useEffect } from "react";
 import { SoloSelect, SoloSelectProps } from "components/molecules/SoloSelect";
-import { useGetConfig, fetchMetaStore, compStr } from "utils";
 
 import {
   OptionSharingSelects,
   OptionSharingSelectsProps,
 } from "components/organisms/OptionSharingSelects";
+import { useGetConfig, fetchMetaStore, compStr } from "utils";
 
 type ConfigNameType = "record_list_display_columns";
 

@@ -1,3 +1,4 @@
+import { useAuth0 } from "@auth0/auth0-react";
 import {
   Spacer,
   ErrorMessage,
@@ -18,11 +19,19 @@ import {
   alert,
   extractErrorMessageFromFetchError,
 } from "@dataware-tools/app-common";
+import Button from "@material-ui/core/Button";
 import Dialog from "@material-ui/core/Dialog";
+import EditIcon from "@material-ui/icons/Edit";
+import UploadIcon from "@material-ui/icons/Upload";
+import { produce } from "immer";
 import { useState, useEffect } from "react";
+import { RenderToggleByAction } from "components/atoms/RenderToggleByAction";
 import { FileList } from "components/organisms/FileList";
+import {
+  RecordEditModal,
+  RecordEditModalProps,
+} from "components/organisms/RecordEditModal";
 import { RecordInfo } from "components/organisms/RecordInfo";
-import { useAuth0 } from "@auth0/auth0-react";
 import {
   useGetRecord,
   useListFiles,
@@ -30,15 +39,6 @@ import {
   useGetConfig,
   createSystemMetadata,
 } from "utils";
-import {
-  RecordEditModal,
-  RecordEditModalProps,
-} from "components/organisms/RecordEditModal";
-import UploadIcon from "@material-ui/icons/Upload";
-import EditIcon from "@material-ui/icons/Edit";
-import Button from "@material-ui/core/Button";
-import { produce } from "immer";
-import { RenderToggleByAction } from "components/atoms/RenderToggleByAction";
 
 type Props = {
   title?: string;
