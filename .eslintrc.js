@@ -27,7 +27,7 @@ module.exports = {
     ecmaVersion: 12,
     sourceType: "module",
   },
-  plugins: ["react", "@typescript-eslint", "import"],
+  plugins: ["react", "@typescript-eslint", "import", "unused-imports"],
   settings: {
     react: {
       version: "detect",
@@ -66,5 +66,8 @@ module.exports = {
     // API response is snake case.
     camelcase: "off",
     "react/display-name": "off",
+    "sort-imports": "off",
+    "import/order": ["warn", { alphabetize: { order: "asc" } }],
+    "unused-imports/no-unused-imports": "error",
   },
 };
