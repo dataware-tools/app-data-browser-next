@@ -1,13 +1,11 @@
-import { theme as themeInstance } from "@dataware-tools/app-common";
-import { makeStyles } from "@material-ui/core/styles";
-
 import Button from "@material-ui/core/Button";
 
 import { useAuth0 } from "@auth0/auth0-react";
 import { mutate } from "swr";
 import { useListDatabases } from "utils/index";
+import Typography from "@material-ui/core/Typography";
 
-export type SampleDOMProps = {
+export type SamplePresentationProps = {
   user: any;
   onRevalidate: () => void;
   error: any;
@@ -18,20 +16,18 @@ export type SampleProps = {
   sample: string;
 };
 
-export const useStyles = makeStyles((theme: typeof themeInstance) => ({
-  sample: {
-    "&:hover": {
-      backgroundColor: theme.palette.action.hover,
-    },
-  },
-}));
-
-export const SampleDOM = (props: SampleDOMProps): JSX.Element => {
+export const SamplePresentation = (
+  props: SamplePresentationProps
+): JSX.Element => {
   const { onRevalidate, user, error, data, sample } = props;
-  const classes = useStyles();
   return (
     <div>
-      <h1 className={classes.sample}>Hello {user ? user.name : "world"}</h1>
+      <Typography
+        variant="h3"
+        sx={{ ":hover": { backgroundColor: "action.hover" } }}
+      >
+        Hello {user ? user.name : "world"}
+      </Typography>
       <div>this is {sample}</div>
       <Button onClick={onRevalidate}>revalidate API</Button>
       {error ? (
@@ -52,7 +48,7 @@ export const Sample = (props: SampleProps): JSX.Element => {
   };
 
   return (
-    <SampleDOM
+    <SamplePresentation
       user={user}
       data={data}
       error={error}
