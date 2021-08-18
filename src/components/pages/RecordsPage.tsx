@@ -50,8 +50,6 @@ import {
   useGetDatabase,
 } from "utils";
 
-
-
 type Props = {
   error?: ErrorMessageProps;
   searchText: SearchFormProps["defaultValue"];

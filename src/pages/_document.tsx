@@ -1,8 +1,8 @@
+import { theme } from "@dataware-tools/app-common";
+import { ServerStyleSheets } from "@material-ui/core/styles";
 import Document, { Head, Html, Main, NextScript } from "next/document";
 
 import React from "react";
-import { ServerStyleSheets } from "@material-ui/core/styles";
-import { theme } from "@dataware-tools/app-common";
 import { homepage } from "../../package.json";
 
 export const MetaHeader = (): JSX.Element => {

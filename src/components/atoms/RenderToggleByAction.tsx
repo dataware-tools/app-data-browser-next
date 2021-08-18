@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
-import { UserActionType } from "utils";
 import { useIsActionPermitted } from "globalStates";
+import { UserActionType } from "utils";
 
 type ContainerProps = {
   required: UserActionType;

@@ -1,13 +1,13 @@
-import { AppProps } from "next/app";
-import React, { useEffect } from "react";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import Head from "next/head";
-import { ThemeProvider, StylesProvider } from "@material-ui/core/styles";
-import { theme, PageWrapper } from "@dataware-tools/app-common";
-import { SWRConfig } from "swr";
-import { SwrOptions, authConfig, redirectUri } from "utils/index";
 import { AppState, Auth0Provider } from "@auth0/auth0-react";
+import { theme, PageWrapper } from "@dataware-tools/app-common";
+import CssBaseline from "@material-ui/core/CssBaseline";
+import { ThemeProvider, StylesProvider } from "@material-ui/core/styles";
+import { AppProps } from "next/app";
+import Head from "next/head";
+import React, { useEffect } from "react";
+import { SWRConfig } from "swr";
 import { repository } from "../../package.json";
+import { SwrOptions, authConfig, redirectUri } from "utils/index";
 import "./scrollbar.global.css";
 
 const App = ({ Component, pageProps }: AppProps): JSX.Element => {

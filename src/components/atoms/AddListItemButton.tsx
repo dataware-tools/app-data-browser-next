@@ -1,6 +1,6 @@
-import AddIcon from "@material-ui/icons/Add";
-import { makeStyles } from "@material-ui/core/styles";
 import { theme as themeInstance } from "@dataware-tools/app-common";
+import { makeStyles } from "@material-ui/core/styles";
+import AddIcon from "@material-ui/icons/Add";
 
 type Props = {
   classes: ReturnType<typeof useStyles>;

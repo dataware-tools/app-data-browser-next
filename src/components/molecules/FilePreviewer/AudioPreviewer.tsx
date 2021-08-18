@@ -1,12 +1,12 @@
-import { useEffect, useRef, useState } from "react";
-import Button from "@material-ui/core/Button";
-import { floatToTimecodeString } from "utils";
 import { ToolBar } from "@dataware-tools/app-common";
+import Button from "@material-ui/core/Button";
+import { useEffect, useRef, useState } from "react";
 import WaveSurfer from "wavesurfer.js";
 // @ts-expect-error Type-definitions are missing
 import CursorPlugin from "wavesurfer.js/dist/plugin/wavesurfer.cursor.js";
 // @ts-expect-error Type-definitions are missing
 import TimelinePlugin from "wavesurfer.js/dist/plugin/wavesurfer.timeline.js";
+import { floatToTimecodeString } from "utils";
 
 type AudioPreviewerProps = { url: string };
 export const AudioPreviewer = ({ url }: AudioPreviewerProps): JSX.Element => {

@@ -1,10 +1,10 @@
-import { DatabasesPage } from "components/pages/DatabasesPage";
-import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-import { IndexPage } from "components/pages/IndexPage";
-import { homepage } from "../../package.json";
 import { useEffect, useState } from "react";
-import { RecordsPage } from "components/pages/RecordsPage";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { RecoilRoot } from "recoil";
+import { homepage } from "../../package.json";
+import { DatabasesPage } from "components/pages/DatabasesPage";
+import { IndexPage } from "components/pages/IndexPage";
+import { RecordsPage } from "components/pages/RecordsPage";
 
 const Page = (): JSX.Element | null => {
   const [isMounted, setIsMounted] = useState(false);

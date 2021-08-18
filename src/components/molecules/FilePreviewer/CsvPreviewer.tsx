@@ -1,11 +1,11 @@
-import { useState, useEffect } from "react";
 import Table from "@material-ui/core/Table";
-import { parse } from "papaparse";
+import TableBody from "@material-ui/core/TableBody";
+import TableCell from "@material-ui/core/TableCell";
 import TableContainer from "@material-ui/core/TableContainer";
 import TableHead from "@material-ui/core/TableHead";
 import TableRow from "@material-ui/core/TableRow";
-import TableCell from "@material-ui/core/TableCell";
-import TableBody from "@material-ui/core/TableBody";
+import { parse } from "papaparse";
+import { useState, useEffect } from "react";
 
 type CsvPreviewerProps = { url: string };
 export const CsvPreviewer = ({

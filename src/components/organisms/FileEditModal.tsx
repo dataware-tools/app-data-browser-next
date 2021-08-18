@@ -19,7 +19,6 @@ import {
   isEditableColumnName,
 } from "utils";
 
-
 type ContainerProps = {
   open: boolean;
   onClose: () => void;

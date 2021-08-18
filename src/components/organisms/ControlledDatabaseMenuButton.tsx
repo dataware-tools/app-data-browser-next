@@ -1,3 +1,9 @@
+import { useAuth0 } from "@auth0/auth0-react";
+import { metaStore, theme as themeInstance } from "@dataware-tools/app-common";
+import { makeStyles } from "@material-ui/core/styles";
+import { useState } from "react";
+import { DatabaseDeleteModal } from "./DatabaseDeleteModal";
+import { DatabaseEditModal } from "./DatabaseEditModal";
 import {
   DatabaseMenuButton,
   DatabaseMenuButtonProps,
@@ -7,14 +13,8 @@ import { ExportMetadataModal } from "components/organisms/ExportMetadataModal";
 import { InputConfigEditModal } from "components/organisms/InputConfigEditModal";
 import { SearchConfigEditModal } from "components/organisms/SearchConfigEditModal";
 import { SecretConfigEditModal } from "components/organisms/SecretConfigEditModal";
-import { useState } from "react";
 import { useIsActionPermitted } from "globalStates";
-import { DatabaseEditModal } from "./DatabaseEditModal";
-import { metaStore, theme as themeInstance } from "@dataware-tools/app-common";
 import { useGetDatabase } from "utils";
-import { useAuth0 } from "@auth0/auth0-react";
-import { DatabaseDeleteModal } from "./DatabaseDeleteModal";
-import { makeStyles } from "@material-ui/core/styles";
 
 type Props = {
   menu: DatabaseMenuButtonProps["menu"];

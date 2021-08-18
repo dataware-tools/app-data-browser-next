@@ -1,5 +1,5 @@
-import { FileMenu } from "./FileMenu";
 import { useState, MouseEventHandler } from "react";
+import { FileMenu } from "./FileMenu";
 
 export default {
   component: FileMenu,

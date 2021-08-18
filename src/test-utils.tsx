@@ -1,10 +1,10 @@
-import React from "react";
-import { render, RenderOptions } from "@testing-library/react";
+import { AppState, Auth0Provider } from "@auth0/auth0-react";
+import { theme, AUTH_CONFIG } from "@dataware-tools/app-common";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import { ThemeProvider, StylesProvider } from "@material-ui/core/styles";
-import { theme, AUTH_CONFIG } from "@dataware-tools/app-common";
+import { render, RenderOptions } from "@testing-library/react";
+import React from "react";
 import { SWRConfig } from "swr";
-import { AppState, Auth0Provider } from "@auth0/auth0-react";
 
 export const authConfig = {
   domain: process.env.JEST_AUTH0_DOMAIN || AUTH_CONFIG.domain,

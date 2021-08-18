@@ -1,6 +1,6 @@
+import List from "@material-ui/core/List";
 import { Story } from "@storybook/react";
 import { FileListItem, FileListItemProps } from "./FileListItem";
-import List from "@material-ui/core/List";
 
 export default {
   component: FileListItem,

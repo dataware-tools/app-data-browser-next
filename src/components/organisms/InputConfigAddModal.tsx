@@ -1,19 +1,3 @@
-import Dialog from "@material-ui/core/Dialog";
-import Button from "@material-ui/core/Button";
-import Autocomplete, {
-  AutocompleteProps,
-  createFilterOptions,
-} from "@material-ui/core/Autocomplete";
-import TextField from "@material-ui/core/TextField";
-import Select from "@material-ui/core/Select";
-import MenuItem from "@material-ui/core/MenuItem";
-import {
-  useForm,
-  Controller,
-  ControllerProps,
-  Control,
-  FieldErrors,
-} from "react-hook-form";
 import {
   DialogToolBar,
   DialogBody,
@@ -23,12 +7,28 @@ import {
   DialogMain,
   DialogSubTitle,
 } from "@dataware-tools/app-common";
+import Autocomplete, {
+  AutocompleteProps,
+  createFilterOptions,
+} from "@material-ui/core/Autocomplete";
+import Button from "@material-ui/core/Button";
+import Dialog from "@material-ui/core/Dialog";
+import FormControl from "@material-ui/core/FormControl";
+import FormHelperText from "@material-ui/core/FormHelperText";
+import MenuItem from "@material-ui/core/MenuItem";
+import Select from "@material-ui/core/Select";
+import TextField from "@material-ui/core/TextField";
+import {
+  useForm,
+  Controller,
+  ControllerProps,
+  Control,
+  FieldErrors,
+} from "react-hook-form";
 import {
   DatabaseColumnsConfigType,
   DatabaseColumnsConfigNecessityType,
 } from "utils";
-import FormHelperText from "@material-ui/core/FormHelperText";
-import FormControl from "@material-ui/core/FormControl";
 
 type OptionType = {
   name: string;

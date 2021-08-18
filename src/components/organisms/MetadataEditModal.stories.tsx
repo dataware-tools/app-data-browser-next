@@ -1,6 +1,6 @@
+import { sleep } from "@dataware-tools/app-common";
 import { Story } from "@storybook/react";
 import { MetadataEditModal, MetadataEditModalProps } from "./MetadataEditModal";
-import { sleep } from "@dataware-tools/app-common";
 
 export default {
   component: MetadataEditModal,

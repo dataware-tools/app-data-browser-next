@@ -1,10 +1,10 @@
-import { MouseEvent, useState } from "react";
+import { SquareIconButton } from "@dataware-tools/app-common";
 import { MoreHoriz as MoreIcon } from "@material-ui/icons";
+import { MouseEvent, useState } from "react";
 import {
   DatabaseMenu,
   DatabaseMenuProps,
 } from "components/molecules/DatabaseMenu";
-import { SquareIconButton } from "@dataware-tools/app-common";
 
 type Props = {
   onOpen: (event: MouseEvent<HTMLDivElement>) => void | Promise<void>;

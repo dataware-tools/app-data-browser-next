@@ -1,6 +1,6 @@
+import { metaStore } from "@dataware-tools/app-common";
 import { useState, useEffect } from "react";
 import SyntaxHighlighter from "react-syntax-highlighter";
-import { metaStore } from "@dataware-tools/app-common";
 
 const languages = {
   js: "javascript",

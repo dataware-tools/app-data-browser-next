@@ -1,9 +1,9 @@
-import React from "react";
 import { jobStore } from "@dataware-tools/app-common";
 import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
-import TableRow from "@material-ui/core/TableRow";
 import TableCell from "@material-ui/core/TableCell";
+import TableRow from "@material-ui/core/TableRow";
+import React from "react";
 
 type JobInfoViewProps = {
   jobTemplate: jobStore.JobTemplateModel;
