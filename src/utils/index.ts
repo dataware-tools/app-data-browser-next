@@ -1,6 +1,6 @@
 import { AUTH_CONFIG, metaStore } from "@dataware-tools/app-common";
-import { DatabaseConfigType, DatabaseColumnsConfigType } from "utils/utilTypes";
 import { fetchMetaStore } from "utils";
+import { DatabaseConfigType, DatabaseColumnsConfigType } from "utils/utilTypes";
 
 const APP_ROUTE = {
   HOME: "/",
@@ -94,18 +94,6 @@ const compInputFields = (
     } else {
       return compStr(a.name, b.name);
     }
-  }
-};
-
-const extractReasonFromFetchError = (fetchError: {
-  body?: { detail?: unknown };
-}): string => {
-  if (typeof fetchError.body?.detail === "string") {
-    return fetchError.body?.detail;
-  } else if (fetchError.body?.detail) {
-    return JSON.stringify(fetchError.body.detail);
-  } else {
-    return JSON.stringify(fetchError);
   }
 };
 
@@ -220,7 +208,6 @@ export {
   compInputFields,
   editableColumnDtype,
   isEditableColumnName,
-  extractReasonFromFetchError,
   createSystemMetadata,
   initializeDatabaseConfig,
   leftFillNum,

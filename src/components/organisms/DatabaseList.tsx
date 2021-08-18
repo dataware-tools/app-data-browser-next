@@ -1,18 +1,15 @@
-import { DatabaseListItemProps } from "components/organisms/DatabaseListItem";
 import { useAuth0 } from "@auth0/auth0-react";
-import { useHistory } from "react-router-dom";
-import {
-  extractReasonFromFetchError,
-  ParamTypeListDatabases,
-  useListDatabases,
-} from "utils";
 import {
   ErrorMessage,
   ErrorMessageProps,
+  extractErrorMessageFromFetchError,
   LoadingIndicator,
 } from "@dataware-tools/app-common";
 import { DataGrid, GridColumns, DataGridProps } from "@material-ui/data-grid";
 import { useState, useEffect } from "react";
+import { useHistory } from "react-router-dom";
+import { DatabaseListItemProps } from "components/organisms/DatabaseListItem";
+import { ParamTypeListDatabases, useListDatabases } from "utils";
 
 type Props = {
   error?: ErrorMessageProps;
@@ -64,10 +61,10 @@ const Container = ({ page, perPage, search }: ContainerProps): JSX.Element => {
   const fetchError = listDatabasesError;
   useEffect(() => {
     if (fetchError) {
-      setError({
-        reason: extractReasonFromFetchError(fetchError),
-        instruction: "Please reload this page",
-      });
+      const { reason, instruction } = extractErrorMessageFromFetchError(
+        fetchError
+      );
+      setError({ reason, instruction });
     } else {
       setError(undefined);
     }

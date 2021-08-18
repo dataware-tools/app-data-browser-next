@@ -1,3 +1,4 @@
+import { useAuth0 } from "@auth0/auth0-react";
 import {
   getQueryString,
   addQueryString,
@@ -13,22 +14,22 @@ import {
   ErrorMessageProps,
   SearchFormProps,
   PerPageSelectProps,
+  extractErrorMessageFromFetchError,
 } from "@dataware-tools/app-common";
-import { useAuth0 } from "@auth0/auth0-react";
-import { DatabaseList } from "components/organisms/DatabaseList";
-import { useEffect } from "react";
 import Pagination from "@material-ui/core/Pagination";
+import StorageIcon from "@material-ui/icons/Storage";
+import { useEffect } from "react";
+import { useHistory } from "react-router-dom";
+import { useRecoilState } from "recoil";
 import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
 import { Breadcrumbs } from "components/molecules/Breadcrumbs";
-import StorageIcon from "@material-ui/icons/Storage";
-import { useListDatabases } from "utils";
-import { useRecoilState } from "recoil";
-import { databasePaginateState } from "globalStates";
 import {
   DatabaseAddButton,
   DatabaseAddButtonProps,
 } from "components/organisms/DatabaseAddButton";
-import { useHistory } from "react-router-dom";
+import { DatabaseList } from "components/organisms/DatabaseList";
+import { databasePaginateState } from "globalStates";
+import { useListDatabases } from "utils";
 
 type Props = {
   error?: ErrorMessageProps;
@@ -156,10 +157,7 @@ const Container = (): JSX.Element => {
   };
 
   const error: Props["error"] = listDatabasesError
-    ? {
-        reason: JSON.stringify(listDatabasesError),
-        instruction: "Please reload this page",
-      }
+    ? extractErrorMessageFromFetchError(listDatabasesError)
     : undefined;
   const isFetchComplete = Boolean(!error && listDatabasesRes);
   const totalPage = listDatabasesRes?.number_of_pages || 0;

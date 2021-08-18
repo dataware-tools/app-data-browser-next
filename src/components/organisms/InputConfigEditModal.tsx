@@ -1,16 +1,3 @@
-import Dialog from "@material-ui/core/Dialog";
-import { useState, useEffect } from "react";
-import LoadingButton from "@material-ui/lab/LoadingButton";
-import {
-  useGetConfig,
-  fetchMetaStore,
-  isEditableColumnName,
-  extractReasonFromFetchError,
-} from "utils";
-import {
-  InputConfigList,
-  InputConfigListProps,
-} from "components/organisms/InputConfigList";
 import { useAuth0 } from "@auth0/auth0-react";
 import {
   ErrorMessage,
@@ -26,8 +13,17 @@ import {
   NoticeableLetters,
   LoadingIndicator,
   ErrorMessageProps,
+  extractErrorMessageFromFetchError,
 } from "@dataware-tools/app-common";
+import Dialog from "@material-ui/core/Dialog";
+import LoadingButton from "@material-ui/lab/LoadingButton";
 import { produce } from "immer";
+import { useState, useEffect } from "react";
+import {
+  InputConfigList,
+  InputConfigListProps,
+} from "components/organisms/InputConfigList";
+import { useGetConfig, fetchMetaStore, isEditableColumnName } from "utils";
 
 type ConfigNameType = "record_add_editable_columns";
 type Props = {
@@ -114,10 +110,10 @@ const Container = ({
   const fetchError = getConfigError;
   useEffect(() => {
     if (fetchError) {
-      setError({
-        reason: extractReasonFromFetchError(fetchError),
-        instruction: "Please reload this page",
-      });
+      const { reason, instruction } = extractErrorMessageFromFetchError(
+        fetchError
+      );
+      setError({ reason, instruction });
     } else {
       setError(undefined);
     }
@@ -192,10 +188,10 @@ const Container = ({
       );
 
       if (updateConfigError) {
-        setError({
-          reason: extractReasonFromFetchError(updateConfigError),
-          instruction: "Please reload this page",
-        });
+        const { reason, instruction } = extractErrorMessageFromFetchError(
+          updateConfigError
+        );
+        setError({ reason, instruction });
       } else {
         getConfigMutate(updateConfigRes);
       }

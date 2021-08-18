@@ -1,3 +1,4 @@
+import { useAuth0 } from "@auth0/auth0-react";
 import {
   ConfirmModal,
   ConfirmModalProps,
@@ -6,7 +7,11 @@ import {
   ErrorMessage,
   theme as themeInstance,
   Spacer,
+  extractErrorMessageFromFetchError,
 } from "@dataware-tools/app-common";
+import TextField from "@material-ui/core/TextField";
+import { makeStyles } from "@material-ui/core/styles";
+import { useState } from "react";
 import {
   useForm,
   Controller,
@@ -14,20 +19,11 @@ import {
   Control,
   FieldErrors,
 } from "react-hook-form";
-import TextField from "@material-ui/core/TextField";
-import {
-  useListDatabases,
-  fetchMetaStore,
-  extractReasonFromFetchError,
-  APP_ROUTE,
-} from "utils";
-import { useRecoilValue } from "recoil";
-import { useAuth0 } from "@auth0/auth0-react";
 import { useHistory } from "react-router-dom";
-import { databasePaginateState } from "globalStates";
-import { useState } from "react";
+import { useRecoilValue } from "recoil";
 import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
-import { makeStyles } from "@material-ui/core/styles";
+import { databasePaginateState } from "globalStates";
+import { useListDatabases, fetchMetaStore, APP_ROUTE } from "utils";
 
 type ConfirmInputType = { databaseId: string };
 type ValidateRuleType = ControllerProps["rules"];
@@ -168,9 +164,12 @@ export const DatabaseDeleteModal = (
         );
 
         if (deleteDatabaseError) {
+          const { reason, instruction } = extractErrorMessageFromFetchError(
+            deleteDatabaseError
+          );
           setError({
-            reason: extractReasonFromFetchError(deleteDatabaseError),
-            instruction: "Please reload this page",
+            reason,
+            instruction,
           });
           cancelCloseModal = true;
         } else if (deleteDatabaseRes) {

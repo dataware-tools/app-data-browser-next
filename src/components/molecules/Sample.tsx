@@ -1,35 +1,32 @@
-import { theme as themeInstance } from "@dataware-tools/app-common";
-import { makeStyles } from "@material-ui/core/styles";
-
-import Button from "@material-ui/core/Button";
-
 import { useAuth0 } from "@auth0/auth0-react";
+import Button from "@material-ui/core/Button";
+import Typography from "@material-ui/core/Typography";
 import { mutate } from "swr";
 import { useListDatabases } from "utils/index";
 
-type Props = {
-  classes: ReturnType<typeof useStyles>;
+export type SamplePresentationProps = {
   user: any;
   onRevalidate: () => void;
   error: any;
   data: any;
-} & ContainerProps;
+} & SampleProps;
 
-type ContainerProps = {
+export type SampleProps = {
   sample: string;
 };
 
-const Component = ({
-  classes,
-  onRevalidate,
-  user,
-  error,
-  data,
-  sample,
-}: Props): JSX.Element => {
+export const SamplePresentation = (
+  props: SamplePresentationProps
+): JSX.Element => {
+  const { onRevalidate, user, error, data, sample } = props;
   return (
     <div>
-      <h1 className={classes.sample}>Hello {user ? user.name : "world"}</h1>
+      <Typography
+        variant="h3"
+        sx={{ ":hover": { backgroundColor: "action.hover" } }}
+      >
+        Hello {user ? user.name : "world"}
+      </Typography>
       <div>this is {sample}</div>
       <Button onClick={onRevalidate}>revalidate API</Button>
       {error ? (
@@ -41,16 +38,8 @@ const Component = ({
   );
 };
 
-const useStyles = makeStyles((theme: typeof themeInstance) => ({
-  sample: {
-    "&:hover": {
-      backgroundColor: theme.palette.action.hover,
-    },
-  },
-}));
-
-const Container = ({ ...delegated }: ContainerProps): JSX.Element => {
-  const classes = useStyles();
+export const Sample = (props: SampleProps): JSX.Element => {
+  const { ...delegated } = props;
   const { user, getAccessTokenSilently: getAccessToken } = useAuth0();
   const { data, error, cacheKey } = useListDatabases(getAccessToken, {});
   const onRevalidate = () => {
@@ -58,8 +47,7 @@ const Container = ({ ...delegated }: ContainerProps): JSX.Element => {
   };
 
   return (
-    <Component
-      classes={classes}
+    <SamplePresentation
       user={user}
       data={data}
       error={error}
@@ -68,6 +56,3 @@ const Container = ({ ...delegated }: ContainerProps): JSX.Element => {
     />
   );
 };
-
-export { Container as Sample };
-export type { ContainerProps as SampleProps };

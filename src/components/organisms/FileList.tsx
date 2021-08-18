@@ -1,8 +1,22 @@
+import { useAuth0 } from "@auth0/auth0-react";
+import {
+  alert,
+  API_ROUTE,
+  confirm,
+  ErrorMessage,
+  ErrorMessageProps,
+  extractErrorMessageFromFetchError,
+  fileProvider,
+  LoadingIndicator,
+  metaStore,
+} from "@dataware-tools/app-common";
+import List from "@material-ui/core/List";
+import { useState, useMemo } from "react";
+import { FileEditModal, FileEditModalProps } from "./FileEditModal";
 import {
   FileListItem,
   FileListItemProps,
 } from "components/organisms/FileListItem";
-import List from "@material-ui/core/List";
 import {
   FilePreviewModal,
   FilePreviewModalProps,
@@ -13,19 +27,6 @@ import {
   fetchMetaStore,
   getFileName,
 } from "utils";
-import { useAuth0 } from "@auth0/auth0-react";
-import {
-  alert,
-  API_ROUTE,
-  confirm,
-  ErrorMessage,
-  ErrorMessageProps,
-  fileProvider,
-  LoadingIndicator,
-  metaStore,
-} from "@dataware-tools/app-common";
-import { useState, useMemo } from "react";
-import { FileEditModal, FileEditModalProps } from "./FileEditModal";
 
 type Props = {
   error?: ErrorMessageProps;
@@ -214,10 +215,7 @@ const Container = ({ databaseId, recordId }: ContainerProps): JSX.Element => {
     [listFilesRes]
   );
   const error: Props["error"] = listFilesError
-    ? {
-        reason: JSON.stringify(listFilesError),
-        instruction: "Please reload this page",
-      }
+    ? extractErrorMessageFromFetchError(listFilesError)
     : undefined;
   const isFetchComplete = Boolean(!error && listFilesRes);
 

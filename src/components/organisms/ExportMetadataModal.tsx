@@ -1,12 +1,4 @@
-import Dialog from "@material-ui/core/Dialog";
-import { useState, useEffect } from "react";
-import LoadingButton from "@material-ui/lab/LoadingButton";
-import { extractReasonFromFetchError, useListRecords } from "utils/index";
-import Select from "@material-ui/core/Select";
-import MenuItem from "@material-ui/core/MenuItem";
-import InputLabel from "@material-ui/core/InputLabel";
-import FormControl from "@material-ui/core/FormControl";
-import { makeStyles } from "@material-ui/core/styles";
+import { useAuth0 } from "@auth0/auth0-react";
 import {
   DialogBody,
   DialogContainer,
@@ -20,11 +12,20 @@ import {
   ErrorMessageProps,
   ErrorMessage,
   alert,
+  extractErrorMessageFromFetchError,
 } from "@dataware-tools/app-common";
-import { useAuth0 } from "@auth0/auth0-react";
+import Dialog from "@material-ui/core/Dialog";
+import FormControl from "@material-ui/core/FormControl";
+import InputLabel from "@material-ui/core/InputLabel";
+import MenuItem from "@material-ui/core/MenuItem";
+import Select from "@material-ui/core/Select";
+import { makeStyles } from "@material-ui/core/styles";
+import LoadingButton from "@material-ui/lab/LoadingButton";
+import { useState, useEffect } from "react";
 
 // See: https://github.com/dolezel/react-csv-downloader#get-csv-contents
 import downloadCSV from "react-csv-downloader/dist/cjs/lib/csv";
+import { useListRecords } from "utils/index";
 
 type ConfigNameType = "export_metadata";
 
@@ -139,10 +140,10 @@ const Container = ({
   const fetchError = listRecordsError;
   useEffect(() => {
     if (fetchError) {
-      setError({
-        reason: extractReasonFromFetchError(fetchError),
-        instruction: "Please reload this page",
-      });
+      const { reason, instruction } = extractErrorMessageFromFetchError(
+        fetchError
+      );
+      setError({ reason, instruction });
     } else {
       setError(undefined);
     }

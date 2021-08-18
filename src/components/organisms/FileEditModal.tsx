@@ -1,8 +1,15 @@
-import { ErrorMessageProps, metaStore } from "@dataware-tools/app-common";
 import { useAuth0 } from "@auth0/auth0-react";
+import {
+  ErrorMessageProps,
+  extractErrorMessageFromFetchError,
+  metaStore,
+} from "@dataware-tools/app-common";
 import { useEffect, useMemo, useState } from "react";
 import {
-  extractReasonFromFetchError,
+  MetadataEditModal,
+  MetadataEditModalProps,
+} from "components/organisms/MetadataEditModal";
+import {
   compInputFields,
   fetchMetaStore,
   useGetConfig,
@@ -12,10 +19,6 @@ import {
   isEditableColumnName,
 } from "utils";
 
-import {
-  MetadataEditModal,
-  MetadataEditModalProps,
-} from "components/organisms/MetadataEditModal";
 
 type ContainerProps = {
   open: boolean;
@@ -77,10 +80,10 @@ const Container = ({
   const fetchError = getFileError || getConfigError;
   useEffect(() => {
     if (fetchError) {
-      setError({
-        reason: extractReasonFromFetchError(fetchError),
-        instruction: "Please reload this page",
-      });
+      const { reason, instruction } = extractErrorMessageFromFetchError(
+        fetchError
+      );
+      setError({ reason, instruction });
     } else {
       setError(undefined);
     }
@@ -98,10 +101,10 @@ const Container = ({
     );
 
     if (saveFileError) {
-      setError({
-        reason: extractReasonFromFetchError(saveFileError),
-        instruction: "Please reload this page",
-      });
+      const { reason, instruction } = extractErrorMessageFromFetchError(
+        saveFileError
+      );
+      setError({ reason, instruction });
       return false;
     }
 

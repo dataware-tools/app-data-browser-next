@@ -1,3 +1,4 @@
+import { useAuth0 } from "@auth0/auth0-react";
 import {
   getQueryString,
   addQueryString,
@@ -14,32 +15,18 @@ import {
   SearchFormProps,
   PerPageSelectProps,
   deleteQueryString,
+  extractErrorMessageFromFetchError,
 } from "@dataware-tools/app-common";
 
-import { useAuth0 } from "@auth0/auth0-react";
-import { useEffect, useState } from "react";
 import Pagination from "@material-ui/core/Pagination";
+import StorageIcon from "@material-ui/icons/Storage";
+import { useEffect, useState } from "react";
 import { useParams } from "react-router";
-import { RecordList, RecordListProps } from "components/organisms/RecordList";
-import {
-  RecordDetailModal,
-  RecordDetailModalProps,
-} from "components/organisms/RecordDetailModal";
-
-import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
-import {
-  useListRecords,
-  useGetConfig,
-  useListPermittedActions,
-  UserActionType,
-  extractReasonFromFetchError,
-  useGetDatabase,
-} from "utils";
 import { useRecoilState, useSetRecoilState } from "recoil";
-import { userActionsState, recordPaginateState } from "globalStates";
+import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
 import { RenderToggleByAction } from "components/atoms/RenderToggleByAction";
+import { Breadcrumbs } from "components/molecules/Breadcrumbs";
 import { ControlledDatabaseMenuButton } from "components/organisms/ControlledDatabaseMenuButton";
-
 import {
   DisplayConfigEditModal,
   DisplayConfigEditModalProps,
@@ -48,9 +35,22 @@ import {
   RecordAddButton,
   RecordAddButtonProps,
 } from "components/organisms/RecordAddButton";
+import {
+  RecordDetailModal,
+  RecordDetailModalProps,
+} from "components/organisms/RecordDetailModal";
+import { RecordList, RecordListProps } from "components/organisms/RecordList";
 
-import { Breadcrumbs } from "components/molecules/Breadcrumbs";
-import StorageIcon from "@material-ui/icons/Storage";
+import { userActionsState, recordPaginateState } from "globalStates";
+import {
+  useListRecords,
+  useGetConfig,
+  useListPermittedActions,
+  UserActionType,
+  useGetDatabase,
+} from "utils";
+
+
 
 type Props = {
   error?: ErrorMessageProps;
@@ -229,10 +229,10 @@ const Page = (): JSX.Element => {
     listRecordsError || getConfigError || listPermittedActionError;
   useEffect(() => {
     if (fetchError) {
-      setError({
-        reason: extractReasonFromFetchError(fetchError),
-        instruction: "Please reload this page",
-      });
+      const { reason, instruction } = extractErrorMessageFromFetchError(
+        fetchError
+      );
+      setError({ reason, instruction });
     } else {
       setError(undefined);
     }

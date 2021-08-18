@@ -1,7 +1,4 @@
-import { useState, useEffect } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
-import Dialog from "@material-ui/core/Dialog";
-import { produce } from "immer";
 import {
   ErrorMessage,
   metaStore,
@@ -16,22 +13,21 @@ import {
   NoticeableLetters,
   usePrevious,
   ErrorMessageProps,
+  extractErrorMessageFromFetchError,
 } from "@dataware-tools/app-common";
+import Dialog from "@material-ui/core/Dialog";
 import LoadingButton, {
   LoadingButtonProps,
 } from "@material-ui/lab/LoadingButton";
+import { produce } from "immer";
+import { useState, useEffect } from "react";
 import { SoloSelect, SoloSelectProps } from "components/molecules/SoloSelect";
-import {
-  useGetConfig,
-  fetchMetaStore,
-  compStr,
-  extractReasonFromFetchError,
-} from "utils";
 
 import {
   OptionSharingSelects,
   OptionSharingSelectsProps,
 } from "components/organisms/OptionSharingSelects";
+import { useGetConfig, fetchMetaStore, compStr } from "utils";
 
 type ConfigNameType = "record_list_display_columns";
 
@@ -151,10 +147,10 @@ const Container = ({
   const fetchError = getConfigError;
   useEffect(() => {
     if (fetchError) {
-      setError({
-        reason: extractReasonFromFetchError(fetchError),
-        instruction: "Please reload this page",
-      });
+      const { reason, instruction } = extractErrorMessageFromFetchError(
+        fetchError
+      );
+      setError({ reason, instruction });
     } else {
       setError(undefined);
     }
@@ -216,10 +212,10 @@ const Container = ({
       );
 
       if (updateConfigError) {
-        setError({
-          reason: extractReasonFromFetchError(fetchError),
-          instruction: "Please reload this page",
-        });
+        const { reason, instruction } = extractErrorMessageFromFetchError(
+          updateConfigError
+        );
+        setError({ reason, instruction });
       } else {
         getConfigMutate(updateConfigRes);
       }

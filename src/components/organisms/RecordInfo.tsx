@@ -1,17 +1,18 @@
+import { useAuth0 } from "@auth0/auth0-react";
 import {
   ErrorMessage,
   ErrorMessageProps,
+  extractErrorMessageFromFetchError,
   LoadingIndicator,
   metaStore,
   ToolBar,
 } from "@dataware-tools/app-common";
-import { useGetRecord } from "utils";
-import { useAuth0 } from "@auth0/auth0-react";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
+import Switch from "@material-ui/core/Switch";
 import dynamic from "next/dynamic";
 import { useState } from "react";
-import Switch from "@material-ui/core/Switch";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
 import { RecordInfoTable } from "./RecordInfoTable";
+import { useGetRecord } from "utils";
 const ReactJson = dynamic(import("react-json-view"), { ssr: false });
 
 type Props = {
@@ -86,11 +87,9 @@ const Container = ({ databaseId, recordId }: ContainerProps): JSX.Element => {
       (path: string) => !["", "/", "./.", "./", "/.", "."].includes(path)
     );
   }
+
   const error: Props["error"] = getRecordError
-    ? {
-        reason: JSON.stringify(getRecordError),
-        instruction: "Please reload this page",
-      }
+    ? extractErrorMessageFromFetchError(getRecordError)
     : undefined;
   const isFetchComplete = Boolean(!error && getRecordRes);
   const onToggleIsJsonView = () => {
