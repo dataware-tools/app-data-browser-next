@@ -1,22 +1,11 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import {
-  confirm,
   ErrorMessage,
   ErrorMessageProps,
   extractErrorMessageFromFetchError,
-  fetchMetaStore,
   LoadingIndicator,
-  metaStore,
 } from "@dataware-tools/app-common";
-import IconButton from "@material-ui/core/IconButton";
-import {
-  DataGrid,
-  GridColumns,
-  DataGridProps,
-  GridCellParams,
-} from "@material-ui/data-grid";
-import DeleteIcon from "@material-ui/icons/Delete";
-import { produce } from "immer";
+import { DataGrid, GridColumns, DataGridProps } from "@material-ui/data-grid";
 import { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import { DatabaseListItemProps } from "components/organisms/DatabaseListItem";
@@ -67,7 +56,6 @@ const Container = ({ page, perPage, search }: ContainerProps): JSX.Element => {
   const {
     data: listDatabasesRes,
     error: listDatabasesError,
-    mutate: listDatabaseMutate,
   } = useListDatabases(getAccessToken, { page, perPage, search });
 
   const fetchError = listDatabasesError;
@@ -82,47 +70,7 @@ const Container = ({ page, perPage, search }: ContainerProps): JSX.Element => {
     }
   }, [fetchError]);
 
-  const onDeleteDatabase = async (data: GridCellParams) => {
-    if (listDatabasesRes) {
-      if (
-        !(await confirm({
-          title: "Are you sure you want to delete database?",
-          confirmMode: "delete",
-        }))
-      ) {
-        return;
-      }
-
-      const newDatabaseList = produce(listDatabasesRes, (draft) => {
-        draft.data.splice(
-          draft.data.findIndex((d) => d.database_id === data.id),
-          1
-        );
-      });
-      listDatabaseMutate(newDatabaseList, false);
-
-      const [deleteDatabaseRes, deleteDatabaseError] = await fetchMetaStore(
-        getAccessToken,
-        metaStore.DatabaseService.deleteDatabase,
-        {
-          databaseId: String(data.id),
-        }
-      );
-
-      if (deleteDatabaseError) {
-        const { reason, instruction } = extractErrorMessageFromFetchError(
-          deleteDatabaseError
-        );
-        setError({ reason, instruction });
-      } else if (deleteDatabaseRes) {
-        listDatabaseMutate();
-      }
-    }
-  };
-
-  const DeleteButtonFieldName = "__DeleteButton__";
   const onSelectDatabase: Props["onSelectDatabase"] = (data) => {
-    if (data.field === DeleteButtonFieldName) return;
     history.push(`/databases/${data.id}/records`);
   };
 
@@ -139,16 +87,6 @@ const Container = ({ page, perPage, search }: ContainerProps): JSX.Element => {
       headerName: "Description",
       flex: 1,
       valueGetter: (param) => param.row.description || "No description...",
-      sortable: false,
-    },
-    {
-      field: DeleteButtonFieldName,
-      renderCell: (param) => (
-        <IconButton onClick={() => onDeleteDatabase(param)}>
-          <DeleteIcon />
-        </IconButton>
-      ),
-      renderHeader: () => <div />,
       sortable: false,
     },
   ];

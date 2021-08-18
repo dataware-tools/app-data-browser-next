@@ -2,7 +2,7 @@ import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 
 type ComponentProps = {
-  menu: ({ label?: string; value: string } | undefined)[];
+  menu: ({ label?: string; value: string; className?: string } | undefined)[];
   onClick: (targetValue: string) => void;
   onClose: () => void;
   open: boolean;
@@ -39,7 +39,7 @@ const Component = ({
               onClose();
             }}
           >
-            {item.label || item.value}
+            <span className={item.className}>{item.label || item.value}</span>
           </MenuItem>
         ) : null
       )}

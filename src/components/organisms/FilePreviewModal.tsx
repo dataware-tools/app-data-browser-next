@@ -29,7 +29,11 @@ export type FilePreviewModalProps = DialogProps & {
   height?: string;
 };
 
-const useStyles = makeStyles({ nonCapitalize: { textTransform: "none" } });
+const useStyles = makeStyles({
+  nonCapitalize: {
+    textTransform: "none",
+  },
+});
 
 export const FilePreviewModalPresentation = (
   props: FilePreviewModalPresentationProps

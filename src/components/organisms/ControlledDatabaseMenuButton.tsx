@@ -1,6 +1,8 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import { metaStore } from "@dataware-tools/app-common";
+import { metaStore, theme as themeInstance } from "@dataware-tools/app-common";
+import { makeStyles } from "@material-ui/core/styles";
 import { useState } from "react";
+import { DatabaseDeleteModal } from "./DatabaseDeleteModal";
 import { DatabaseEditModal } from "./DatabaseEditModal";
 import {
   DatabaseMenuButton,
@@ -21,6 +23,7 @@ type Props = {
   isOpenSearchConfigEditModal: boolean;
   isOpenSecretConfigEditModal: boolean;
   isOpenDatabaseEditModal: boolean;
+  isOpenDatabaseDeleteModal: boolean;
   isOpenExportMetadataModal: boolean;
   onSelectMenu: DatabaseMenuButtonProps["onMenuSelect"];
   onCloseDisplayConfigModal: () => void;
@@ -28,6 +31,7 @@ type Props = {
   onCloseSearchConfigEditModal: () => void;
   onCloseSecretConfigEditModal: () => void;
   onCloseDatabaseEditModal: () => void;
+  onCloseDatabaseDeleteModal: () => void;
   onCloseExportMetadataModal: () => void;
   databaseInfo?: metaStore.DatabaseModel;
 } & ContainerProps;
@@ -52,6 +56,8 @@ const Component = ({
   onCloseExportMetadataModal,
   isOpenDatabaseEditModal,
   onCloseDatabaseEditModal,
+  isOpenDatabaseDeleteModal,
+  onCloseDatabaseDeleteModal,
   databaseInfo,
 }: Props): JSX.Element => {
   return (
@@ -83,6 +89,12 @@ const Component = ({
         onClose={onCloseDatabaseEditModal}
         currentData={databaseInfo}
       />
+      {isOpenDatabaseDeleteModal ? (
+        <DatabaseDeleteModal
+          databaseId={databaseId}
+          onClose={onCloseDatabaseDeleteModal}
+        />
+      ) : null}
       <ExportMetadataModal
         databaseId={databaseId}
         open={isOpenExportMetadataModal}
@@ -92,13 +104,23 @@ const Component = ({
   );
 };
 
+const useStyles = makeStyles((theme: typeof themeInstance) => ({
+  deleteDatabase: {
+    color: theme.palette.error.main,
+  },
+}));
+
 const Container = ({
   databaseId,
   ...delegated
 }: ContainerProps): JSX.Element => {
+  const classes = useStyles();
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const isPermittedConfigureDatabase = useIsActionPermitted(
     "databases:write:update"
+  );
+  const isPermittedDeleteDatabase = useIsActionPermitted(
+    "databases:write:delete"
   );
   const [isOpenDisplayConfigModal, setIsOpenDisplayConfigModal] = useState(
     false
@@ -108,6 +130,9 @@ const Container = ({
   const [isOpenSecretConfigModal, setIsOpenSecretConfigModal] = useState(false);
   const [isOpenDatabaseEditModal, setIsOpenDatabaseEditModal] = useState(false);
   const [isOpenExportMetadataModal, setIsOpenExportMetadataModal] = useState(
+    false
+  );
+  const [isOpenDatabaseDeleteModal, setIsOpenDatabaseDeleteModal] = useState(
     false
   );
   const { data: getDatabaseRes } = useGetDatabase(getAccessToken, {
@@ -131,6 +156,9 @@ const Container = ({
       ? { value: "Update database info" }
       : undefined,
     { value: "Export metadata" },
+    isPermittedDeleteDatabase
+      ? { value: "Delete database", className: classes.deleteDatabase }
+      : undefined,
   ];
 
   const onSelectMenu: Props["onSelectMenu"] = (targetName) => {
@@ -153,6 +181,9 @@ const Container = ({
       case menu[5]?.value:
         setIsOpenExportMetadataModal(true);
         break;
+      case menu[6]?.value:
+        setIsOpenDatabaseDeleteModal(true);
+        break;
     }
   };
 
@@ -167,6 +198,7 @@ const Container = ({
       isOpenSecretConfigEditModal={isOpenSecretConfigModal}
       isOpenExportMetadataModal={isOpenExportMetadataModal}
       isOpenDatabaseEditModal={isOpenDatabaseEditModal}
+      isOpenDatabaseDeleteModal={isOpenDatabaseDeleteModal}
       menu={menu}
       onSelectMenu={onSelectMenu}
       onCloseDisplayConfigModal={() => setIsOpenDisplayConfigModal(false)}
@@ -175,6 +207,7 @@ const Container = ({
       onCloseSecretConfigEditModal={() => setIsOpenSecretConfigModal(false)}
       onCloseDatabaseEditModal={() => setIsOpenDatabaseEditModal(false)}
       onCloseExportMetadataModal={() => setIsOpenExportMetadataModal(false)}
+      onCloseDatabaseDeleteModal={() => setIsOpenDatabaseDeleteModal(false)}
     />
   );
 };
