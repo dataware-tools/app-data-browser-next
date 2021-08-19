@@ -2,8 +2,8 @@ import { Spacer } from "@dataware-tools/app-common";
 import IconButton from "@material-ui/core/IconButton";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
-import { makeStyles } from "@material-ui/core/styles";
 import DeleteIcon from "@material-ui/icons/Delete";
+import { makeStyles } from "@material-ui/styles";
 import React, { ReactNode } from "react";
 import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
 import { DatabaseColumnsConfigType } from "utils";
@@ -60,6 +60,7 @@ const Component = ({
             onUpdate(
               {
                 ...value,
+                // @ts-expect-error event.target.value have incorrect type
                 necessity: event.target.value,
               },
               { ...value }

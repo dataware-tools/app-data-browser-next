@@ -9,9 +9,9 @@ import {
 } from "@dataware-tools/app-common";
 import Button from "@material-ui/core/Button";
 import Dialog, { DialogProps } from "@material-ui/core/Dialog";
-import { makeStyles } from "@material-ui/core/styles";
 import ArrowBack from "@material-ui/icons/ArrowBack";
 import ArrowForward from "@material-ui/icons/ArrowForward";
+import { makeStyles } from "@material-ui/styles";
 import { useState, useEffect } from "react";
 import { FilePreviewer } from "components/molecules/FilePreviewer";
 import { FileType } from "components/organisms/FileListItem";

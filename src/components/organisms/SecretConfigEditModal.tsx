@@ -82,7 +82,7 @@ const Component = ({
                 right={
                   <LoadingButton
                     disabled={isDisableSaveButton}
-                    pending={isSaving}
+                    loading={isSaving}
                     onClick={onSave}
                   >
                     Save

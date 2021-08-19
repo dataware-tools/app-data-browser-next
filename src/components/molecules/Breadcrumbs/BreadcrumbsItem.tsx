@@ -1,30 +1,20 @@
+import Box from "@material-ui/core/Box";
 import Link from "@material-ui/core/Link";
 import Typography from "@material-ui/core/Typography";
-import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
 import React from "react";
 import { useHistory } from "react-router-dom";
 
-type ComponentProps = {
+export type BreadcrumbsItemProps = {
   link?: string;
   icon?: JSX.Element;
   text: string;
 };
 
-const useStyles = makeStyles((theme: Theme) =>
-  createStyles({
-    link: {
-      display: "flex",
-    },
-    icon: {
-      marginRight: theme.spacing(1),
-      width: 20,
-      height: 20,
-    },
-  })
-);
-
-const Component = ({ link, icon, text }: ComponentProps): JSX.Element => {
-  const classes = useStyles();
+export const BreadcrumbsItem = ({
+  link,
+  icon,
+  text,
+}: BreadcrumbsItemProps): JSX.Element => {
   const history = useHistory();
 
   function handleClick(event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
@@ -32,23 +22,24 @@ const Component = ({ link, icon, text }: ComponentProps): JSX.Element => {
     if (link) history.push(link);
   }
 
-  return link ? (
-    <Link
-      href="#"
-      color="inherit"
-      className={classes.link}
-      onClick={handleClick}
-    >
-      {icon && <span className={classes.icon}>{icon}</span>}
+  const Body = ({ icon, text }: { icon?: JSX.Element; text: string }) => (
+    <Box component="span" sx={{ display: "flex" }}>
+      {icon && (
+        <Box component="span" sx={{ marginRight: 1, width: 20, height: 20 }}>
+          {icon}
+        </Box>
+      )}
       {text}
+    </Box>
+  );
+
+  return link ? (
+    <Link href="#" color="inherit" onClick={handleClick}>
+      <Body icon={icon} text={text} />
     </Link>
   ) : (
-    <Typography color="textPrimary" className={classes.link}>
-      {icon && <span className={classes.icon}>{icon}</span>}
-      {text}
+    <Typography color="textPrimary">
+      <Body icon={icon} text={text} />
     </Typography>
   );
 };
-
-export { Component as BreadcrumbsItem };
-export type { ComponentProps as BreadcrumbsItemProps };

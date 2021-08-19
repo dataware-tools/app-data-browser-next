@@ -1,5 +1,6 @@
 const TsconfigPathsPlugin = require("tsconfig-paths-webpack-plugin");
 const path = require("path");
+const toPath = (filePath) => path.join(process.cwd(), filePath);
 
 module.exports = {
   stories: ["../src/**/*.stories.mdx", "../src/**/*.stories.@(js|jsx|ts|tsx)"],
@@ -25,11 +26,17 @@ module.exports = {
       })
     );
 
-    // See: https://storybook.js.org/docs/react/workflows/faq#how-do-i-setup-storybook-to-share-webpack-configuration-with-nextjs
-    // See: https://nextjs.org/docs/api-reference/next.config.js/custom-webpack-config
-    const nextConfig = require("../next.config.js");
-
-    if (nextConfig.webpack) return { ...config, ...nextConfig.webpack(config) };
-    else return config;
+    // Return the altered config
+    return {
+      ...config,
+      resolve: {
+        ...config.resolve,
+        alias: {
+          ...config.resolve.alias,
+          "@emotion/core": toPath("node_modules/@emotion/react"),
+          "emotion-theming": toPath("node_modules/@emotion/react"),
+        },
+      },
+    };
   },
 };

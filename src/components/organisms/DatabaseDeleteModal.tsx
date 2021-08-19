@@ -5,12 +5,11 @@ import {
   metaStore,
   ErrorMessageProps,
   ErrorMessage,
-  theme as themeInstance,
   Spacer,
   extractErrorMessageFromFetchError,
 } from "@dataware-tools/app-common";
+import Box from "@material-ui/core/Box";
 import TextField from "@material-ui/core/TextField";
-import { makeStyles } from "@material-ui/core/styles";
 import { useState } from "react";
 import {
   useForm,
@@ -28,7 +27,7 @@ import { useListDatabases, fetchMetaStore, APP_ROUTE } from "utils";
 type ConfirmInputType = { databaseId: string };
 type ValidateRuleType = ControllerProps["rules"];
 
-export type DatabaseDeleteModalDOMProps = {
+export type DatabaseDeleteModalPresentationProps = {
   error?: ErrorMessageProps;
   formControl: Control<ConfirmInputType>;
   validateRules: Record<keyof ConfirmInputType, ValidateRuleType>;
@@ -45,14 +44,8 @@ export type DatabaseDeleteModalProps = {
   onClose: () => void;
 };
 
-const useStyles = makeStyles((theme: typeof themeInstance) => ({
-  caution: {
-    color: theme.palette.error.main,
-  },
-}));
-
-export const DatabaseDeleteModalDOM = (
-  props: DatabaseDeleteModalDOMProps
+export const DatabaseDeleteModalPresentation = (
+  props: DatabaseDeleteModalPresentationProps
 ): JSX.Element => {
   const {
     error,
@@ -64,7 +57,6 @@ export const DatabaseDeleteModalDOM = (
     validateErrorMessages,
     ...dialogProps
   } = props;
-  const classes = useStyles();
 
   return (
     <ConfirmModal
@@ -76,9 +68,9 @@ export const DatabaseDeleteModalDOM = (
           <ErrorMessage {...error} />
         ) : (
           <ElemCenteringFlexDiv>
-            <span className={classes.caution}>
+            <Box component="span" sx={{ color: "error.main" }}>
               Type "{databaseId}" to confirm:
-            </span>
+            </Box>
             <Spacer direction="horizontal" size="1rem" />
             <Controller
               name="databaseId"
@@ -121,7 +113,7 @@ export const DatabaseDeleteModal = (
     formState: { errors: validateErrors },
   } = useForm<ConfirmInputType>();
   const [error, setError] = useState<
-    DatabaseDeleteModalDOMProps["error"] | undefined
+    DatabaseDeleteModalPresentationProps["error"] | undefined
   >(undefined);
 
   const { mutate: listDatabaseMutate } = useListDatabases(getAccessToken, {
@@ -130,7 +122,7 @@ export const DatabaseDeleteModal = (
     search,
   });
 
-  const validateRules: DatabaseDeleteModalDOMProps["validateRules"] = {
+  const validateRules: DatabaseDeleteModalPresentationProps["validateRules"] = {
     databaseId: {
       required: true,
       validate: {
@@ -138,13 +130,13 @@ export const DatabaseDeleteModal = (
       },
     },
   };
-  const validateErrorMessages: DatabaseDeleteModalDOMProps["validateErrorMessages"] = {
+  const validateErrorMessages: DatabaseDeleteModalPresentationProps["validateErrorMessages"] = {
     databaseId: {
       required: "Database id must be inputted",
       mismatch: "Database id is incorrect",
     },
   };
-  const onClose: DatabaseDeleteModalDOMProps["onClose"] = async (
+  const onClose: DatabaseDeleteModalPresentationProps["onClose"] = async (
     isConfirmed
   ) => {
     if (!isConfirmed) {
@@ -190,7 +182,7 @@ export const DatabaseDeleteModal = (
   };
 
   return (
-    <DatabaseDeleteModalDOM
+    <DatabaseDeleteModalPresentation
       error={error}
       validateErrors={validateErrors}
       validateErrorMessages={validateErrorMessages}

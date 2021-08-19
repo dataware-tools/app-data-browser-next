@@ -16,4 +16,8 @@ const Template: Story<DatabaseMenuButtonProps> = (args) => (
 export const Default = Template.bind({});
 Default.args = {
   onMenuSelect: (target) => window.alert(`click ${target}!`),
+  menu: [
+    { value: "normal" },
+    { value: "danger", boxProps: { color: "error.main" } },
+  ],
 };

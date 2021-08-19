@@ -1,8 +1,8 @@
 import IconButton from "@material-ui/core/IconButton";
 import MenuItem, { MenuItemProps } from "@material-ui/core/MenuItem";
 import Select, { SelectProps } from "@material-ui/core/Select";
-import { makeStyles } from "@material-ui/core/styles";
 import DeleteIcon from "@material-ui/icons/Delete";
+import { makeStyles } from "@material-ui/styles";
 import React from "react";
 import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
 

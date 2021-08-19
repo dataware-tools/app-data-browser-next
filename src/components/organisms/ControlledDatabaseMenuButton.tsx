@@ -1,6 +1,5 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import { metaStore, theme as themeInstance } from "@dataware-tools/app-common";
-import { makeStyles } from "@material-ui/core/styles";
+import { metaStore } from "@dataware-tools/app-common";
 import { useState } from "react";
 import { DatabaseDeleteModal } from "./DatabaseDeleteModal";
 import { DatabaseEditModal } from "./DatabaseEditModal";
@@ -104,17 +103,10 @@ const Component = ({
   );
 };
 
-const useStyles = makeStyles((theme: typeof themeInstance) => ({
-  deleteDatabase: {
-    color: theme.palette.error.main,
-  },
-}));
-
 const Container = ({
   databaseId,
   ...delegated
 }: ContainerProps): JSX.Element => {
-  const classes = useStyles();
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const isPermittedConfigureDatabase = useIsActionPermitted(
     "databases:write:update"
@@ -157,7 +149,7 @@ const Container = ({
       : undefined,
     { value: "Export metadata" },
     isPermittedDeleteDatabase
-      ? { value: "Delete database", className: classes.deleteDatabase }
+      ? { value: "Delete database", boxProps: { color: "error.main" } }
       : undefined,
   ];
 
