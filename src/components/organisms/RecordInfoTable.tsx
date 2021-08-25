@@ -3,7 +3,7 @@ import Table from "@material-ui/core/Table";
 import TableBody from "@material-ui/core/TableBody";
 import MuiTableCell, { TableCellProps } from "@material-ui/core/TableCell";
 import TableRow from "@material-ui/core/TableRow";
-import { makeStyles } from "@material-ui/core/styles";
+import { makeStyles } from "@material-ui/styles";
 import dynamic from "next/dynamic";
 const ReactJson = dynamic(import("react-json-view"), { ssr: false });
 

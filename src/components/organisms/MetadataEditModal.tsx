@@ -73,7 +73,7 @@ const Component = ({
                 </DialogMain>
                 <DialogToolBar
                   right={
-                    <LoadingButton pending={isSaving} onClick={onSave}>
+                    <LoadingButton loading={isSaving} onClick={onSave}>
                       Save
                     </LoadingButton>
                   }

@@ -1,12 +1,12 @@
 import { useForm } from "react-hook-form";
-import { DatabaseDeleteModalDOM } from "./DatabaseDeleteModal";
+import { DatabaseDeleteModalPresentation } from "./DatabaseDeleteModal";
 
 export default {
-  component: DatabaseDeleteModalDOM,
+  component: DatabaseDeleteModalPresentation,
   title: "DatabaseDeleteModal",
 };
 
-export const Default = () => {
+export const Default = (): JSX.Element => {
   const {
     control,
     handleSubmit,
@@ -23,7 +23,7 @@ export const Default = () => {
     },
   };
   return (
-    <DatabaseDeleteModalDOM
+    <DatabaseDeleteModalPresentation
       validateErrors={validateErrors}
       validateErrorMessages={validateErrorMessages}
       validateRules={validateRules}

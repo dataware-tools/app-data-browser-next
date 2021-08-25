@@ -39,7 +39,7 @@ type Props = {
   recordTitleColumn: SoloSelectProps["value"];
   recordTitleColumnOptions: SoloSelectProps["options"];
   isDisableSaveButton: LoadingButtonProps["disabled"];
-  isSaving: LoadingButtonProps["pending"];
+  isSaving: LoadingButtonProps["loading"];
   onChangeDisplayColumns: OptionSharingSelectsProps["onChange"];
   onChangeRecordTitleColumn: SoloSelectProps["onChange"];
   onSave: LoadingButtonProps["onClick"];
@@ -100,7 +100,7 @@ const Component = ({
                   right={
                     <LoadingButton
                       disabled={isDisableSaveButton}
-                      pending={isSaving}
+                      loading={isSaving}
                       onClick={onSave}
                     >
                       Save

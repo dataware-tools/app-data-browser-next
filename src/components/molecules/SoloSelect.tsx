@@ -1,11 +1,11 @@
-import { Spacer, theme as themeInstance } from "@dataware-tools/app-common";
+import { Spacer } from "@dataware-tools/app-common";
+import Box from "@material-ui/core/Box";
 import MenuItem, { MenuItemProps } from "@material-ui/core/MenuItem";
 import Select, { SelectProps } from "@material-ui/core/Select";
-import { makeStyles } from "@material-ui/core/styles";
 import React from "react";
 
 type OptionsType = { label: string; value: string }[];
-type Props = { classes: ReturnType<typeof useStyles> } & ContainerProps;
+type Props = ContainerProps;
 
 type ContainerProps = {
   label?: string;
@@ -17,7 +17,6 @@ type ContainerProps = {
 };
 
 const Component = ({
-  classes,
   value,
   onChange,
   options,
@@ -26,10 +25,26 @@ const Component = ({
   label,
 }: Props): JSX.Element => {
   return (
-    <div className={classes.root}>
+    <Box
+      sx={{
+        color: "text.secondary",
+        display: "flex",
+        flexDirection: "row",
+      }}
+    >
       {label ? (
         <>
-          <label className={classes.label}>{label}</label>
+          <Box
+            component="label"
+            sx={{
+              alignItems: "center",
+              display: "flex",
+              fontSize: "0.9rem",
+              justifyContent: "center",
+            }}
+          >
+            {label}
+          </Box>
           <Spacer direction="horizontal" size="8px" />
         </>
       ) : null}
@@ -45,28 +60,13 @@ const Component = ({
           </MenuItem>
         ))}
       </Select>
-    </div>
+    </Box>
   );
 };
 
-const useStyles = makeStyles((theme: typeof themeInstance) => ({
-  root: {
-    color: theme.palette.text.secondary,
-    display: "flex",
-    flexDirection: "row",
-  },
-  label: {
-    alignItems: "center",
-    display: "flex",
-    fontSize: "0.9rem",
-    justifyContent: "center",
-  },
-}));
-
 const Container = React.memo(
   ({ ...delegated }: ContainerProps): JSX.Element => {
-    const classes = useStyles();
-    return <Component classes={classes} {...delegated} />;
+    return <Component {...delegated} />;
   }
 );
 

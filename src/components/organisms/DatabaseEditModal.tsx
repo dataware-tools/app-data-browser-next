@@ -149,7 +149,7 @@ const Component = <T extends boolean>({
         </DialogContainer>
         <DialogToolBar
           right={
-            <LoadingButton pending={isSubmitting} onClick={onSubmit}>
+            <LoadingButton loading={isSubmitting} onClick={onSubmit}>
               Save
             </LoadingButton>
           }

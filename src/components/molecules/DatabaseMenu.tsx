@@ -1,8 +1,12 @@
+import Box, { BoxProps } from "@material-ui/core/Box";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 
 type ComponentProps = {
-  menu: ({ label?: string; value: string; className?: string } | undefined)[];
+  menu: (
+    | { label?: string; value: string; boxProps?: Omit<BoxProps, "children"> }
+    | undefined
+  )[];
   onClick: (targetValue: string) => void;
   onClose: () => void;
   open: boolean;
@@ -39,7 +43,7 @@ const Component = ({
               onClose();
             }}
           >
-            <span className={item.className}>{item.label || item.value}</span>
+            <Box {...item.boxProps}>{item.label || item.value}</Box>
           </MenuItem>
         ) : null
       )}

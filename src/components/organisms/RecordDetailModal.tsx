@@ -123,7 +123,7 @@ const Component = ({
                 <FileUploadButton
                   onFileChange={onAddFile}
                   startIcon={<UploadIcon />}
-                  pending={isAddingFile}
+                  loading={isAddingFile}
                 >
                   Add File
                 </FileUploadButton>

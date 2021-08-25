@@ -19,8 +19,8 @@ import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
-import { makeStyles } from "@material-ui/core/styles";
 import LoadingButton from "@material-ui/lab/LoadingButton";
+import { makeStyles } from "@material-ui/styles";
 import { useState, useEffect } from "react";
 
 // See: https://github.com/dolezel/react-csv-downloader#get-csv-contents
@@ -89,7 +89,7 @@ const Component = ({
         </DialogContainer>
         <DialogToolBar
           right={
-            <LoadingButton onClick={onExport} pending={!isFetchComplete}>
+            <LoadingButton onClick={onExport} loading={!isFetchComplete}>
               Export
             </LoadingButton>
           }
