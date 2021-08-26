@@ -1,10 +1,20 @@
-import { RosbagPreviewer } from "./";
+import { Story } from "@storybook/react";
+import { RosbagPreviewer, RosbagPreviewerProps } from "./";
+import { TestAuthProvider, CONST_STORY_BOOK } from "test-utils";
 
 export default {
   component: RosbagPreviewer,
-  title: "FilePreview/Rosbag",
+  title: "FilePreview/RosbagPreviewer",
 };
 
-export const Rosbag = (): JSX.Element => (
-  <RosbagPreviewer filePath="https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/360/Big_Buck_Bunny_360_10s_1MB.mp4" />
+const Template: Story<RosbagPreviewerProps> = (args) => (
+  <TestAuthProvider>
+    <RosbagPreviewer {...args} />
+  </TestAuthProvider>
 );
+export const Default = Template.bind({});
+Default.args = {
+  filePath:
+    "/data_pool_8/meti-tmp/tracking_results/car3/2020-12-17-12-51-47/2020-12-17-12-51-47.bag",
+};
+Default.parameters = { ...CONST_STORY_BOOK.PARAM_SKIP_VISUAL_REGRESSION_TEST };

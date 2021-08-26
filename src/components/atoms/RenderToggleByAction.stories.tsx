@@ -10,15 +10,19 @@ export default {
 };
 
 const Template: Story<RenderToggleByActionProps> = (args) => (
-  <RenderToggleByAction {...args} />
+  <div>
+    Rendered below if you have appropriate permission
+    <br />
+    <RenderToggleByAction {...args} />
+  </div>
 );
 
 export const Render = Template.bind({});
-Render.args = { children: <div>render</div>, required: "databases:write" };
+Render.args = { children: <div>rendered!</div>, required: "databases:write" };
 
 export const NotRender = Template.bind({});
 NotRender.args = {
   children: <div>not render</div>,
   // @ts-expect-error for test
-  required: "unknown",
+  required: "EndUser",
 };

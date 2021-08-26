@@ -33,6 +33,7 @@ yarn-error.log*
 
 #storybook
 .storybook
+storybook-static
 
 #minified
 *.min.js
