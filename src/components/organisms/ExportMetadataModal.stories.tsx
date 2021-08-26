@@ -3,6 +3,7 @@ import {
   ExportMetadataModal,
   ExportMetadataModalProps,
 } from "./ExportMetadataModal";
+import { CONST_STORY_BOOK, TestAuthProvider } from "test-utils";
 
 export default {
   component: ExportMetadataModal,
@@ -10,8 +11,11 @@ export default {
 };
 
 const Template: Story<ExportMetadataModalProps> = (args) => (
-  <ExportMetadataModal {...args} />
+  <TestAuthProvider>
+    <ExportMetadataModal {...args} />
+  </TestAuthProvider>
 );
 
 export const Default = Template.bind({});
-Default.args = { open: true, databaseId: "default" };
+Default.args = { open: true, databaseId: CONST_STORY_BOOK.DATABASE_ID };
+Default.parameters = { ...CONST_STORY_BOOK.PARAM_SKIP_VISUAL_REGRESSION_TEST };

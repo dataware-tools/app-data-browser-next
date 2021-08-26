@@ -1,26 +1,32 @@
 import { Story } from "@storybook/react";
 import { FilePreviewer, FilePreviewerProps } from "./";
+import { CONST_STORY_BOOK, TestAuthProvider } from "test-utils";
 
 export default {
   component: FilePreviewer,
-  title: "FilePreview",
+  title: "FilePreviewer",
 };
 
 const Template: Story<FilePreviewerProps> = (args) => (
-  <FilePreviewer {...args} />
+  <TestAuthProvider>
+    <FilePreviewer {...args} />
+  </TestAuthProvider>
 );
 
 export const Default = Template.bind({});
 Default.args = {
   file: {
-    path: "",
+    path: `/opt/uploaded_data/database_${CONST_STORY_BOOK.DATABASE_ID}/record_${CONST_STORY_BOOK.RECORD_ID}/test.txt`,
   },
 };
+Default.parameters = { ...CONST_STORY_BOOK.PARAM_SKIP_VISUAL_REGRESSION_TEST };
 
-export const Text = Template.bind({});
-Text.args = {
+export const FetchFailed = Template.bind({});
+FetchFailed.args = {
   file: {
-    path:
-      "/opt/uploaded_data/database_default/record_20210719-023706-793/test.txt",
+    path: "/unknown.unknown",
   },
+};
+FetchFailed.parameters = {
+  ...CONST_STORY_BOOK.PARAM_SKIP_VISUAL_REGRESSION_TEST,
 };

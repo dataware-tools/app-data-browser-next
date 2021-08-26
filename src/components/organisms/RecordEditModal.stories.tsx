@@ -1,5 +1,6 @@
 import { Story } from "@storybook/react";
 import { RecordEditModal, RecordEditModalProps } from "./RecordEditModal";
+import { TestAuthProvider, CONST_STORY_BOOK } from "test-utils";
 
 export default {
   component: RecordEditModal,
@@ -7,25 +8,29 @@ export default {
 };
 
 const Template: Story<RecordEditModalProps> = (args) => (
-  <RecordEditModal {...args} />
+  <TestAuthProvider>
+    <RecordEditModal {...args} />
+  </TestAuthProvider>
 );
 
 export const AddRecord = Template.bind({});
 AddRecord.args = {
   create: true,
-  databaseId: "test1",
+  databaseId: CONST_STORY_BOOK.DATABASE_ID,
   onClose: () => console.log("close!"),
   onSubmitSucceeded: (newRecord) =>
     window.alert(`submit success! ${JSON.stringify(newRecord)}`),
   open: true,
 };
+AddRecord.parameters = CONST_STORY_BOOK.PARAM_SKIP_VISUAL_REGRESSION_TEST;
 
 export const EditRecord = Template.bind({});
 EditRecord.args = {
-  databaseId: "test1",
+  databaseId: CONST_STORY_BOOK.DATABASE_ID,
   onClose: () => console.log("close!"),
   onSubmitSucceeded: (newRecord) =>
     window.alert(`submit success! ${JSON.stringify(newRecord)}`),
   open: true,
-  recordId: "20210602-142444-783",
+  recordId: CONST_STORY_BOOK.RECORD_ID,
 };
+EditRecord.parameters = CONST_STORY_BOOK.PARAM_SKIP_VISUAL_REGRESSION_TEST;

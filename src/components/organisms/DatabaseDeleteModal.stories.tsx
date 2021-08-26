@@ -33,6 +33,8 @@ export const Default = (): JSX.Element => {
         handleSubmit((data) => console.log(data))();
         return { cancelCloseModal: true };
       }}
+      // need for visual regression test
+      disablePortal
     />
   );
 };
