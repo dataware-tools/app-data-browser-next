@@ -11,7 +11,7 @@ const Container = ({
   required,
   children,
 }: ContainerProps): JSX.Element | null => {
-  const isPermitted = useIsActionPermitted(required);
+  const isPermitted = useIsActionPermitted(required || "__noAction");
   return isPermitted ? <>{children}</> : null;
 };
 

@@ -8,7 +8,7 @@ import CursorPlugin from "wavesurfer.js/dist/plugin/wavesurfer.cursor.js";
 import TimelinePlugin from "wavesurfer.js/dist/plugin/wavesurfer.timeline.js";
 import { floatToTimecodeString } from "utils";
 
-type AudioPreviewerProps = { url: string };
+export type AudioPreviewerProps = { url: string };
 export const AudioPreviewer = ({ url }: AudioPreviewerProps): JSX.Element => {
   const wavesurfer = useRef<WaveSurfer | null>(null);
   const waveformRef = useRef<HTMLDivElement | null>(null);

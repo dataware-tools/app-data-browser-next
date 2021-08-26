@@ -1,10 +1,17 @@
-import { AudioPreviewer } from "./AudioPreviewer";
+import { Story } from "@storybook/react";
+import { AudioPreviewer, AudioPreviewerProps } from "./AudioPreviewer";
+import { CONST_STORY_BOOK } from "test-utils";
 
 export default {
   component: AudioPreviewer,
-  title: "FilePreview/Audio",
+  title: "FilePreview/AudioPreviewer",
 };
-
-export const Audio = () => (
-  <AudioPreviewer url="https://wavesurfer-js.org/example/media/demo.wav" />
+const Template: Story<AudioPreviewerProps> = (args) => (
+  <AudioPreviewer {...args} />
 );
+
+export const Default = Template.bind({});
+Default.args = {
+  url: "https://wavesurfer-js.org/example/media/demo.wav",
+};
+Default.parameters = { ...CONST_STORY_BOOK.PARAM_SKIP_VISUAL_REGRESSION_TEST };

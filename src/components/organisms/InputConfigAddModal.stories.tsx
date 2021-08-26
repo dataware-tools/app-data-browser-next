@@ -4,6 +4,7 @@ import {
   InputConfigAddModalProps,
   NewColumnType,
 } from "./InputConfigAddModal";
+import { CONST_STORY_BOOK } from "test-utils";
 
 export default {
   component: InputConfigAddModal,
@@ -25,3 +26,6 @@ Default.args = {
   ],
   alreadyUsedDisplayNames: ["Test1", "Test2"],
 };
+// TODO: Include visual regression test.
+// (If InputConfigAddModal can consume "disablePortal" props, this story may be able to be included visual regression test)
+Default.parameters = { ...CONST_STORY_BOOK.PARAM_SKIP_VISUAL_REGRESSION_TEST };

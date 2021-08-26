@@ -6,7 +6,7 @@ export default {
   title: "DatabaseMenu",
 };
 
-export const Default = (): JSX.Element => {
+export const Controlled = (): JSX.Element => {
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLButtonElement>(
     null
   );

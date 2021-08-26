@@ -27,7 +27,7 @@ type Props = {
   job?: jobStore.JobPostedModel;
 };
 
-type RosbagPreviewerProps = { filePath: string };
+export type RosbagPreviewerProps = { filePath: string };
 const RosbagPreviewerDOM = ({
   error,
   onChangeJobTemplate,

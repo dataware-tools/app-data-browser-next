@@ -1,6 +1,7 @@
 import { sleep } from "@dataware-tools/app-common";
 import { Story } from "@storybook/react";
 import { MetadataEditModal, MetadataEditModalProps } from "./MetadataEditModal";
+import { CONST_STORY_BOOK } from "test-utils";
 
 export default {
   component: MetadataEditModal,
@@ -29,6 +30,11 @@ AddMetadata.args = {
   ],
   create: true,
 };
+// TODO: Include visual regression test.
+// (If MetadataEditModal can consume "disablePortal" props, this story may be able to be included visual regression test)
+AddMetadata.parameters = {
+  ...CONST_STORY_BOOK.PARAM_SKIP_VISUAL_REGRESSION_TEST,
+};
 
 export const EditMetadata = Template.bind({});
 EditMetadata.args = {
@@ -56,6 +62,11 @@ EditMetadata.args = {
     test2: "test2",
   },
 };
+// TODO: Include visual regression test.
+// (If MetadataEditModal can consume "disablePortal" props, this story may be able to be included visual regression test)
+EditMetadata.parameters = {
+  ...CONST_STORY_BOOK.PARAM_SKIP_VISUAL_REGRESSION_TEST,
+};
 
 export const NoConfigErrorOccur = Template.bind({});
 NoConfigErrorOccur.args = {
@@ -65,11 +76,17 @@ NoConfigErrorOccur.args = {
     sleep(1000);
     return Math.random() > 0.5;
   },
+  fields: [],
   open: true,
   currentMetadata: {
     test1: "test1",
     test2: "test2",
   },
+};
+// TODO: Include visual regression test.
+// (If MetadataEditModal can consume "disablePortal" props, this story may be able to be included visual regression test)
+NoConfigErrorOccur.parameters = {
+  ...CONST_STORY_BOOK.PARAM_SKIP_VISUAL_REGRESSION_TEST,
 };
 
 export const FetchErrorOccur = Template.bind({});
@@ -85,4 +102,9 @@ FetchErrorOccur.args = {
     reason: "Fetch error occur!",
     instruction: "Please reload this page",
   },
+};
+// TODO: Include visual regression test.
+// (If MetadataEditModal can consume "disablePortal" props, this story may be able to be included visual regression test)
+FetchErrorOccur.parameters = {
+  ...CONST_STORY_BOOK.PARAM_SKIP_VISUAL_REGRESSION_TEST,
 };

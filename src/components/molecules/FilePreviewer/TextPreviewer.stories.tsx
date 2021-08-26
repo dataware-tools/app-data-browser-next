@@ -1,10 +1,16 @@
-import { TextPreviewer } from "./TextPreviewer";
+import { Story } from "@storybook/react";
+import { TextPreviewer, TextPreviewerProps } from "./TextPreviewer";
 
 export default {
   component: TextPreviewer,
-  title: "FilePreview/Text",
+  title: "FilePreview/TextPreviewer",
 };
-
-export const Text = (): JSX.Element => (
-  <TextPreviewer url="https://raw.githubusercontent.com/dataware-tools/pydtk/master/README.md" />
+const Template: Story<TextPreviewerProps> = (args) => (
+  <TextPreviewer {...args} />
 );
+
+export const Default = Template.bind({});
+Default.args = {
+  url:
+    "https://raw.githubusercontent.com/dataware-tools/pydtk/master/README.md",
+};

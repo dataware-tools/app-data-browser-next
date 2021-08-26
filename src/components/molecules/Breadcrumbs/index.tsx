@@ -18,3 +18,4 @@ const Component = ({ items }: ComponentProps): JSX.Element => {
 };
 
 export { Component as Breadcrumbs };
+export type { ComponentProps as BreadcrumbsProps };
