@@ -1,6 +1,6 @@
-import { render, screen, TestAuthProvider } from "test-utils";
 import "@testing-library/jest-dom/extend-expect";
 import { Sample } from "./Sample";
+import { render, screen, TestAuthProvider } from "test-utils";
 
 describe("SampleComponent", () => {
   test("is rendered", async () => {

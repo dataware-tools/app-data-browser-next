@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { RecoilRoot } from "recoil";
-import { homepage } from "../../package.json";
+import packageInfo from "../../package.json";
 import { DatabasesPage } from "components/pages/DatabasesPage";
 import { IndexPage } from "components/pages/IndexPage";
 import { RecordsPage } from "components/pages/RecordsPage";
@@ -19,7 +19,7 @@ const Page = (): JSX.Element | null => {
 
   return (
     <RecoilRoot>
-      <Router basename={homepage}>
+      <Router basename={packageInfo.homepage}>
         <Switch>
           <Route exact path="/">
             <IndexPage />
