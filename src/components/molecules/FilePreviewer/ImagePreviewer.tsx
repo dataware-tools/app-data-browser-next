@@ -13,7 +13,7 @@ export const ImagePreviewer = ({ url }: ImagePreviewerProps): JSX.Element => {
   const classes = useStyles();
   return (
     <div className={classes.imageContainer}>
-      <img src={url} />
+      <img src={url} alt="preview of image file" />
     </div>
   );
 };

@@ -10,4 +10,5 @@ module.exports = {
     config.resolve.modules = [path.resolve(__dirname, "src"), "node_modules"];
     return config;
   },
+  eslint: { ignoreDuringBuilds: true },
 };

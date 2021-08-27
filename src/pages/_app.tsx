@@ -7,7 +7,7 @@ import { AppProps } from "next/app";
 import Head from "next/head";
 import React, { useEffect } from "react";
 import { SWRConfig } from "swr";
-import { repository } from "../../package.json";
+import packageInfo from "../../package.json";
 import { SwrOptions, authConfig, redirectUri } from "utils/index";
 import "./scrollbar.global.css";
 
@@ -51,7 +51,7 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
                 redirectUri={redirectUri}
                 onRedirectCallback={onRedirectCallback}
               >
-                <PageWrapper repository={repository}>
+                <PageWrapper repository={packageInfo.repository}>
                   <Component {...pageProps} />
                 </PageWrapper>
               </Auth0Provider>
