@@ -11,7 +11,7 @@ import { useHistory } from "react-router-dom";
 import { DatabaseListItemProps } from "components/organisms/DatabaseListItem";
 import { ParamTypeListDatabases, useListDatabases } from "utils";
 
-type Props = {
+export type DatabaseListPresentationProps = {
   error?: ErrorMessageProps;
   columns: GridColumns;
   isFetchComplete: boolean;
@@ -19,15 +19,15 @@ type Props = {
   onSelectDatabase: DataGridProps["onCellClick"];
 };
 
-type ContainerProps = ParamTypeListDatabases;
+export type DatabaseListProps = ParamTypeListDatabases;
 
-const Component = ({
+export const DatabaseListPresentation = ({
   error,
   columns,
   isFetchComplete,
   databases,
   onSelectDatabase,
-}: Props): JSX.Element => {
+}: DatabaseListPresentationProps): JSX.Element => {
   return (
     <>
       {error ? (
@@ -48,10 +48,16 @@ const Component = ({
   );
 };
 
-const Container = ({ page, perPage, search }: ContainerProps): JSX.Element => {
+export const DatabaseList = ({
+  page,
+  perPage,
+  search,
+}: DatabaseListProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const history = useHistory();
-  const [error, setError] = useState<Props["error"] | undefined>(undefined);
+  const [error, setError] = useState<
+    DatabaseListPresentationProps["error"] | undefined
+  >(undefined);
 
   const {
     data: listDatabasesRes,
@@ -70,7 +76,9 @@ const Container = ({ page, perPage, search }: ContainerProps): JSX.Element => {
     }
   }, [fetchError]);
 
-  const onSelectDatabase: Props["onSelectDatabase"] = (data) => {
+  const onSelectDatabase: DatabaseListPresentationProps["onSelectDatabase"] = (
+    data
+  ) => {
     history.push(`/databases/${data.id}/records`);
   };
 
@@ -94,7 +102,7 @@ const Container = ({ page, perPage, search }: ContainerProps): JSX.Element => {
   const databases = listDatabasesRes?.data || [];
 
   return (
-    <Component
+    <DatabaseListPresentation
       error={error}
       columns={columns}
       databases={databases}
@@ -103,6 +111,3 @@ const Container = ({ page, perPage, search }: ContainerProps): JSX.Element => {
     />
   );
 };
-
-export { Container as DatabaseList };
-export type { ContainerProps as DatabaseListProps };

@@ -1,58 +1,49 @@
 import { Spacer } from "@dataware-tools/app-common";
+import Box from "@material-ui/core/Box";
 import IconButton from "@material-ui/core/IconButton";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import DeleteIcon from "@material-ui/icons/Delete";
-import { makeStyles } from "@material-ui/styles";
 import React, { ReactNode } from "react";
 import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
 import { DatabaseColumnsConfigType } from "utils";
 
-type ValueType = Required<
+export type ValueType = Required<
   Pick<DatabaseColumnsConfigType[number], "display_name" | "name" | "necessity">
 >;
 
-type ActionType = "change" | "delete";
+export type ActionType = "change" | "delete";
 
-type Props = { classes: ReturnType<typeof useStyles> } & ContainerProps;
-type ContainerProps = {
+export type InputConfigListItemPresentationProps = InputConfigListItemProps;
+export type InputConfigListItemProps = {
   value: ValueType;
   label: ReactNode;
   onUpdate: (newValue: ValueType, oldValue: ValueType) => void;
   onDelete: (deletedValue: ValueType) => void;
 };
 
-const useStyles = makeStyles({
-  root: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "space-between",
-  },
-  left: {
-    display: "flex",
-    flexDirection: "row",
-  },
-  right: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "flex-end",
-  },
-  inputSelect: {
-    minWidth: 160,
-  },
-});
-
-const Component = ({
-  classes,
+export const InputConfigListItemPresentation = ({
   value,
   label,
   onUpdate,
   onDelete,
-}: Props): JSX.Element => {
+}: InputConfigListItemPresentationProps): JSX.Element => {
   return (
-    <div className={classes.root}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "row",
+        justifyContent: "space-between",
+      }}
+    >
       {label}
-      <div className={classes.right}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "row",
+          justifyContent: "flex-end",
+        }}
+      >
         <Spacer direction="horizontal" size="10px" />
         <Select
           value={value.necessity}
@@ -67,7 +58,7 @@ const Component = ({
             )
           }
           variant="outlined"
-          className={classes.inputSelect}
+          sx={{ minWidth: "160px" }}
         >
           <MenuItem value="required">Required</MenuItem>
           <MenuItem value="recommended">Recommended</MenuItem>
@@ -79,21 +70,13 @@ const Component = ({
             <DeleteIcon />
           </IconButton>
         </ElemCenteringFlexDiv>
-      </div>
-    </div>
+      </Box>
+    </Box>
   );
 };
 
-const Container = React.memo(
-  ({ ...delegated }: ContainerProps): JSX.Element => {
-    const classes = useStyles();
-    return <Component classes={classes} {...delegated} />;
+export const InputConfigListItem = React.memo(
+  ({ ...delegated }: InputConfigListItemProps): JSX.Element => {
+    return <InputConfigListItemPresentation {...delegated} />;
   }
 );
-
-export { Container as InputConfigListItem };
-export type {
-  ContainerProps as InputConfigListItemProps,
-  ValueType,
-  ActionType,
-};

@@ -2,7 +2,7 @@ import Box, { BoxProps } from "@material-ui/core/Box";
 import Menu from "@material-ui/core/Menu";
 import MenuItem from "@material-ui/core/MenuItem";
 
-type ComponentProps = {
+export type DatabaseMenuProps = {
   menu: (
     | { label?: string; value: string; boxProps?: Omit<BoxProps, "children"> }
     | undefined
@@ -13,13 +13,13 @@ type ComponentProps = {
   anchorEl: HTMLElement | null;
 };
 
-const Component = ({
+export const DatabaseMenu = ({
   menu,
   onClick,
   onClose,
   open,
   anchorEl,
-}: ComponentProps): JSX.Element => {
+}: DatabaseMenuProps): JSX.Element => {
   return (
     <Menu
       open={open}
@@ -50,6 +50,3 @@ const Component = ({
     </Menu>
   );
 };
-
-export { Component as DatabaseMenu };
-export type { ComponentProps as DatabaseMenuProps };

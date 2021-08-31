@@ -15,7 +15,7 @@ import { SecretConfigEditModal } from "components/organisms/SecretConfigEditModa
 import { useIsActionPermitted } from "globalStates";
 import { useGetDatabase } from "utils";
 
-type Props = {
+export type ControlledDatabaseMenuButtonPresentationProps = {
   menu: DatabaseMenuButtonProps["menu"];
   isOpenDisplayConfigModal: boolean;
   isOpenInputConfigEditModal: boolean;
@@ -33,13 +33,13 @@ type Props = {
   onCloseDatabaseDeleteModal: () => void;
   onCloseExportMetadataModal: () => void;
   databaseInfo?: metaStore.DatabaseModel;
-} & ContainerProps;
+} & ControlledDatabaseMenuButtonProps;
 
-type ContainerProps = {
+export type ControlledDatabaseMenuButtonProps = {
   databaseId: string;
 };
 
-const Component = ({
+export const ControlledDatabaseMenuButtonPresentation = ({
   databaseId,
   onSelectMenu,
   menu,
@@ -58,7 +58,7 @@ const Component = ({
   isOpenDatabaseDeleteModal,
   onCloseDatabaseDeleteModal,
   databaseInfo,
-}: Props): JSX.Element => {
+}: ControlledDatabaseMenuButtonPresentationProps): JSX.Element => {
   return (
     <>
       <DatabaseMenuButton onMenuSelect={onSelectMenu} menu={menu} />
@@ -103,10 +103,10 @@ const Component = ({
   );
 };
 
-const Container = ({
+export const ControlledDatabaseMenuButton = ({
   databaseId,
   ...delegated
-}: ContainerProps): JSX.Element => {
+}: ControlledDatabaseMenuButtonProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const isPermittedConfigureDatabase = useIsActionPermitted(
     "databases:write:update"
@@ -131,7 +131,7 @@ const Container = ({
     databaseId,
   });
 
-  const menu: Props["menu"] = [
+  const menu: ControlledDatabaseMenuButtonPresentationProps["menu"] = [
     isPermittedConfigureDatabase
       ? { value: "Configure display columns" }
       : undefined,
@@ -153,7 +153,9 @@ const Container = ({
       : undefined,
   ];
 
-  const onSelectMenu: Props["onSelectMenu"] = (targetName) => {
+  const onSelectMenu: ControlledDatabaseMenuButtonPresentationProps["onSelectMenu"] = (
+    targetName
+  ) => {
     switch (targetName) {
       case menu[0]?.value:
         setIsOpenDisplayConfigModal(true);
@@ -180,7 +182,7 @@ const Container = ({
   };
 
   return (
-    <Component
+    <ControlledDatabaseMenuButtonPresentation
       {...delegated}
       databaseInfo={getDatabaseRes}
       databaseId={databaseId}
@@ -203,6 +205,3 @@ const Container = ({
     />
   );
 };
-
-export { Container as ControlledDatabaseMenuButton };
-export type { ContainerProps as ControlledDatabaseMenuButtonProps };

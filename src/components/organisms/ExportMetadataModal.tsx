@@ -14,47 +14,45 @@ import {
   alert,
   extractErrorMessageFromFetchError,
 } from "@dataware-tools/app-common";
+import Box from "@material-ui/core/Box";
 import Dialog from "@material-ui/core/Dialog";
 import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import MenuItem from "@material-ui/core/MenuItem";
 import Select from "@material-ui/core/Select";
 import LoadingButton from "@material-ui/lab/LoadingButton";
-import { makeStyles } from "@material-ui/styles";
 import { useState, useEffect } from "react";
 
 // See: https://github.com/dolezel/react-csv-downloader#get-csv-contents
 import downloadCSV from "react-csv-downloader/dist/cjs/lib/csv";
 import { useListRecords } from "utils/index";
 
-type ConfigNameType = "export_metadata";
+export type ConfigNameType = "export_metadata";
 
-type ComponentProps = ContainerProps & {
-  classes: ReturnType<typeof useStyles>;
+export type ExportMetadataModalPresentationProps = {
   exportType: string;
   onExport: () => Promise<void>;
   onChangeExportType: (newExportType: string) => void;
   error?: ErrorMessageProps;
   isFetchComplete: boolean;
-};
+} & ExportMetadataModalProps;
 
-type ContainerProps = {
+export type ExportMetadataModalProps = {
   open: boolean;
   onClose: () => void;
   databaseId: string;
 };
 
-const Component = ({
+export const ExportMetadataModalPresentation = ({
   open,
   error,
   onClose,
   databaseId,
-  classes,
   exportType,
   onExport,
   onChangeExportType,
   isFetchComplete,
-}: ComponentProps): JSX.Element => {
+}: ExportMetadataModalPresentationProps): JSX.Element => {
   return (
     <Dialog open={open} maxWidth="xl" onClose={onClose}>
       <DialogWrapper>
@@ -68,7 +66,15 @@ const Component = ({
               <ErrorMessage {...error} />
             ) : (
               <DialogMain>
-                <div className={classes.body}>
+                <Box
+                  sx={{
+                    alignItems: "center",
+                    display: "flex",
+                    flexShrink: 0,
+                    justifyContent: "center",
+                    width: "100%",
+                  }}
+                >
                   <FormControl>
                     <InputLabel id="export-type-label">Format: </InputLabel>
                     <Select
@@ -82,7 +88,7 @@ const Component = ({
                       <MenuItem value="CSV">CSV</MenuItem>
                     </Select>
                   </FormControl>
-                </div>
+                </Box>
               </DialogMain>
             )}
           </DialogBody>
@@ -99,23 +105,12 @@ const Component = ({
   );
 };
 
-const useStyles = makeStyles({
-  body: {
-    alignItems: "center",
-    display: "flex",
-    flexShrink: 0,
-    justifyContent: "center",
-    width: "100%",
-  },
-});
-
-const Container = ({
+export const ExportMetadataModal = ({
   databaseId,
   open,
   ...delegated
-}: ContainerProps): JSX.Element => {
+}: ExportMetadataModalProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
-  const classes = useStyles();
   const [exportType, setExportType] = useState<string>("JSON");
   const [error, setError] = useState<ErrorMessageProps | undefined>(undefined);
 
@@ -214,8 +209,7 @@ const Container = ({
   const isFetchComplete = Boolean(!fetchError && listRecordsRes);
 
   return (
-    <Component
-      classes={classes}
+    <ExportMetadataModalPresentation
       isFetchComplete={isFetchComplete}
       exportType={exportType}
       databaseId={databaseId}
@@ -227,6 +221,3 @@ const Container = ({
     />
   );
 };
-
-export { Container as ExportMetadataModal };
-export type { ContainerProps as ExportMetadataModalProps, ConfigNameType };

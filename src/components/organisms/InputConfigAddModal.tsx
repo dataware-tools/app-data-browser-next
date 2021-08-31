@@ -35,13 +35,13 @@ type OptionType = {
   display_name: string;
   newOption?: boolean;
 };
-type NewColumnType = Required<
+export type NewColumnType = Required<
   Pick<DatabaseColumnsConfigType[number], "display_name" | "name" | "necessity">
 >;
 type NameAutocompleteProps = AutocompleteProps<OptionType, false, false, true>;
 type ValidateRuleType = ControllerProps["rules"];
 
-type Props = {
+export type InputConfigAddModalPresentationProps = {
   formControl: Control<NewColumnType>;
   validateRules: Record<keyof NewColumnType, ValidateRuleType>;
   validateErrors: FieldErrors<NewColumnType>;
@@ -54,11 +54,11 @@ type Props = {
   necessity?: DatabaseColumnsConfigNecessityType;
   onAdd: () => void;
 } & Omit<
-  ContainerProps,
+  InputConfigAddModalProps,
   "onSave" | "alreadyUsedNames" | "alreadyUsedDisplayNames"
 >;
 
-type ContainerProps = {
+export type InputConfigAddModalProps = {
   options: OptionType[];
   open: boolean;
   onClose: () => void;
@@ -66,7 +66,8 @@ type ContainerProps = {
   alreadyUsedNames: string[];
   alreadyUsedDisplayNames: string[];
 };
-const Component = ({
+
+export const InputConfigAddModalPresentation = ({
   open,
   options,
   onClose,
@@ -77,7 +78,7 @@ const Component = ({
   validateRules,
   validateErrors,
   validateErrorMessages,
-}: Props) => {
+}: InputConfigAddModalPresentationProps): JSX.Element => {
   return (
     <Dialog open={open} onClose={onClose} fullWidth>
       <DialogWrapper>
@@ -188,14 +189,15 @@ const Component = ({
     </Dialog>
   );
 };
-const Container = ({
+
+export const InputConfigAddModal = ({
   options,
   open,
   onClose,
   onSave,
   alreadyUsedNames,
   alreadyUsedDisplayNames,
-}: ContainerProps): JSX.Element => {
+}: InputConfigAddModalProps): JSX.Element => {
   const {
     control,
     handleSubmit,
@@ -238,7 +240,10 @@ const Container = ({
   };
 
   const filter = createFilterOptions<OptionType>();
-  const filterNameOptions: Props["filterNameOptions"] = (options, params) => {
+  const filterNameOptions: InputConfigAddModalPresentationProps["filterNameOptions"] = (
+    options,
+    params
+  ) => {
     const filtered = filter(options, params);
     const { inputValue } = params;
 
@@ -256,7 +261,9 @@ const Container = ({
     return filtered;
   };
 
-  const getNameOptionLabel: Props["getNameOptionLabel"] = (option) => {
+  const getNameOptionLabel: InputConfigAddModalPresentationProps["getNameOptionLabel"] = (
+    option
+  ) => {
     if (typeof option === "string") {
       return option;
     }
@@ -269,7 +276,7 @@ const Container = ({
   });
 
   return (
-    <Component
+    <InputConfigAddModalPresentation
       validateErrors={validateErrors}
       validateErrorMessages={validateErrorMessages}
       validateRules={validateRules}
@@ -283,6 +290,3 @@ const Container = ({
     />
   );
 };
-
-export { Container as InputConfigAddModal };
-export type { ContainerProps as InputConfigAddModalProps, NewColumnType };

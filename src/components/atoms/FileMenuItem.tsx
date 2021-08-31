@@ -3,22 +3,22 @@ import CircularProgress from "@material-ui/core/CircularProgress";
 import MenuItem from "@material-ui/core/MenuItem";
 import { ReactNode, useState } from "react";
 
-type ComponentProps = {
+export type FileMenuItemPresentationProps = {
   pending: boolean;
-} & ContainerProps;
+} & FileMenuItemProps;
 
-type ContainerProps = {
+export type FileMenuItemProps = {
   onClick: () => void | Promise<void>;
   icon: ReactNode;
   text: string;
 };
 
-const Component = ({
+export const FileMenuItemPresentation = ({
   onClick,
   pending,
   icon,
   text,
-}: ComponentProps): JSX.Element => (
+}: FileMenuItemPresentationProps): JSX.Element => (
   <MenuItem onClick={onClick} disabled={pending}>
     {pending ? <CircularProgress size="1rem" /> : icon}
     <Spacer direction="horizontal" size="5px" />
@@ -26,7 +26,10 @@ const Component = ({
   </MenuItem>
 );
 
-const Container = ({ onClick, ...delegated }: ContainerProps): JSX.Element => {
+export const FileMenuItem = ({
+  onClick,
+  ...delegated
+}: FileMenuItemProps): JSX.Element => {
   const [pending, setPending] = useState(false);
   const _onClick = async () => {
     setPending(true);
@@ -34,8 +37,11 @@ const Container = ({ onClick, ...delegated }: ContainerProps): JSX.Element => {
     setPending(false);
   };
 
-  return <Component pending={pending} onClick={_onClick} {...delegated} />;
+  return (
+    <FileMenuItemPresentation
+      pending={pending}
+      onClick={_onClick}
+      {...delegated}
+    />
+  );
 };
-
-export { Container as FileMenuItem };
-export type { ContainerProps as FileMenuItemProps };

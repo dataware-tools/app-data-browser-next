@@ -31,7 +31,7 @@ import { DatabaseList } from "components/organisms/DatabaseList";
 import { databasePaginateState } from "globalStates";
 import { useListDatabases } from "utils";
 
-type Props = {
+export type DatabasesPagePresentationProps = {
   error?: ErrorMessageProps;
   searchText: SearchFormProps["defaultValue"];
   perPageOptions: PerPageSelectProps["values"];
@@ -45,7 +45,7 @@ type Props = {
   onAddDatabaseSucceeded: DatabaseAddButtonProps["onAddDatabaseSucceeded"];
 };
 
-const Component = ({
+export const DatabasesPagePresentation = ({
   error,
   searchText,
   perPage,
@@ -57,7 +57,7 @@ const Component = ({
   onChangePerPage,
   onChangePage,
   onAddDatabaseSucceeded,
-}: Props) => {
+}: DatabasesPagePresentationProps): JSX.Element => {
   return (
     <>
       <PageContainer>
@@ -116,7 +116,7 @@ const Component = ({
   );
 };
 
-const Container = (): JSX.Element => {
+export const DatabasesPage = (): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const history = useHistory();
   const [{ page, perPage, search }, setDatabasePaginateState] = useRecoilState(
@@ -141,29 +141,33 @@ const Container = (): JSX.Element => {
     addQueryString({ page, perPage, search }, "replace");
   }, [page, perPage, search]);
 
-  const onChangePage: Props["onChangePage"] = (page) =>
+  const onChangePage: DatabasesPagePresentationProps["onChangePage"] = (page) =>
     setDatabasePaginateState((prev) => ({ ...prev, page }));
-  const onChangePerPage: Props["onChangePerPage"] = (perPage) => {
+  const onChangePerPage: DatabasesPagePresentationProps["onChangePerPage"] = (
+    perPage
+  ) => {
     setDatabasePaginateState((prev) => ({ ...prev, perPage }));
   };
-  const onChangeSearchText: Props["onChangeSearchText"] = (searchText) => {
+  const onChangeSearchText: DatabasesPagePresentationProps["onChangeSearchText"] = (
+    searchText
+  ) => {
     setDatabasePaginateState((prev) => ({ ...prev, search: searchText }));
   };
 
-  const onAddDatabaseSucceeded: Props["onAddDatabaseSucceeded"] = (
+  const onAddDatabaseSucceeded: DatabasesPagePresentationProps["onAddDatabaseSucceeded"] = (
     newDatabase
   ) => {
     history.push(`/databases/${newDatabase.database_id}/records?new=true`);
   };
 
-  const error: Props["error"] = listDatabasesError
+  const error: DatabasesPagePresentationProps["error"] = listDatabasesError
     ? extractErrorMessageFromFetchError(listDatabasesError)
     : undefined;
   const isFetchComplete = Boolean(!error && listDatabasesRes);
   const totalPage = listDatabasesRes?.number_of_pages || 0;
 
   return (
-    <Component
+    <DatabasesPagePresentation
       error={error}
       isFetchComplete={isFetchComplete}
       onChangePage={onChangePage}
@@ -178,5 +182,3 @@ const Container = (): JSX.Element => {
     />
   );
 };
-
-export { Container as DatabasesPage };

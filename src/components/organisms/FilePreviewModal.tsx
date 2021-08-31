@@ -11,7 +11,6 @@ import Button from "@material-ui/core/Button";
 import Dialog, { DialogProps } from "@material-ui/core/Dialog";
 import ArrowBack from "@material-ui/icons/ArrowBack";
 import ArrowForward from "@material-ui/icons/ArrowForward";
-import { makeStyles } from "@material-ui/styles";
 import { useState, useEffect } from "react";
 import { FilePreviewer } from "components/molecules/FilePreviewer";
 import { FileType } from "components/organisms/FileListItem";
@@ -29,24 +28,14 @@ export type FilePreviewModalProps = DialogProps & {
   height?: string;
 };
 
-const useStyles = makeStyles({
-  nonCapitalize: {
-    textTransform: "none",
-  },
-});
-
-export const FilePreviewModalPresentation = (
-  props: FilePreviewModalPresentationProps
-): JSX.Element => {
-  const {
-    file,
-    height,
-    goPrevFile,
-    goNextFile,
-    fileNames,
-    ...dialogProps
-  } = props;
-  const classes = useStyles();
+export const FilePreviewModalPresentation = ({
+  file,
+  height,
+  goPrevFile,
+  goNextFile,
+  fileNames,
+  ...dialogProps
+}: FilePreviewModalPresentationProps): JSX.Element => {
   return (
     <Dialog {...dialogProps}>
       <DialogWrapper>
@@ -56,8 +45,9 @@ export const FilePreviewModalPresentation = (
               startIcon={<ArrowBack />}
               onClick={goPrevFile}
               variant="text"
+              sx={{ textTransform: "none" }}
             >
-              <span className={classes.nonCapitalize}>{fileNames.prev}</span>
+              {fileNames.prev}
             </Button>
           }
           right={
@@ -65,8 +55,9 @@ export const FilePreviewModalPresentation = (
               endIcon={<ArrowForward />}
               onClick={goNextFile}
               variant="text"
+              sx={{ textTransform: "none" }}
             >
-              <span className={classes.nonCapitalize}>{fileNames.next}</span>
+              {fileNames.next}
             </Button>
           }
         />
@@ -83,8 +74,12 @@ export const FilePreviewModalPresentation = (
   );
 };
 
-export const FilePreviewModal = (props: FilePreviewModalProps): JSX.Element => {
-  const { fileList, open, file: initFile, ...delegated } = props;
+export const FilePreviewModal = ({
+  fileList,
+  open,
+  file: initFile,
+  ...delegated
+}: FilePreviewModalProps): JSX.Element => {
   const [currentFile, setCurrentFile] = useState(initFile);
 
   const initializeState = () => {

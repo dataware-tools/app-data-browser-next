@@ -15,10 +15,13 @@ export type SampleProps = {
   sample: string;
 };
 
-export const SamplePresentation = (
-  props: SamplePresentationProps
-): JSX.Element => {
-  const { onRevalidate, user, error, data, sample } = props;
+export const SamplePresentation = ({
+  onRevalidate,
+  user,
+  error,
+  data,
+  sample,
+}: SamplePresentationProps): JSX.Element => {
   return (
     <div>
       <Typography
@@ -38,8 +41,7 @@ export const SamplePresentation = (
   );
 };
 
-export const Sample = (props: SampleProps): JSX.Element => {
-  const { ...delegated } = props;
+export const Sample = ({ ...delegated }: SampleProps): JSX.Element => {
   const { user, getAccessTokenSilently: getAccessToken } = useAuth0();
   const { data, error, cacheKey } = useListDatabases(getAccessToken, {});
   const onRevalidate = () => {

@@ -11,7 +11,7 @@ import {
 } from "./SourceCodePreviewer";
 import { TextPreviewer } from "./TextPreviewer";
 import { VideoPreviewer } from "./VideoPreviewer";
-import { FileDownloadURLInjector } from "components/organisms/FileDownloadUrlInjector";
+import { FileDownloadUrlInjector } from "components/organisms/FileDownloadUrlInjector";
 const AudioPreviewer = dynamic<any>(
   () => import("./AudioPreviewer").then((module) => module.AudioPreviewer),
   { ssr: false }
@@ -29,7 +29,7 @@ const filePreviewerCandidates: Record<string, FilePreviewerContentWithSpec> = {
   default: {
     spec: { extensions: [".*"], contentTypes: [".*"] },
     render: (file) => (
-      <FileDownloadURLInjector
+      <FileDownloadUrlInjector
         file={file}
         render={() => <DefaultPreviewer />}
       />
@@ -38,7 +38,7 @@ const filePreviewerCandidates: Record<string, FilePreviewerContentWithSpec> = {
   text: {
     spec: { extensions: [".txt"], contentTypes: ["text/.*"] },
     render: (file) => (
-      <FileDownloadURLInjector
+      <FileDownloadUrlInjector
         file={file}
         render={(_, url) => <TextPreviewer url={url} />}
       />
@@ -47,7 +47,7 @@ const filePreviewerCandidates: Record<string, FilePreviewerContentWithSpec> = {
   markdown: {
     spec: { extensions: [".md"], contentTypes: ["text/.*"] },
     render: (file) => (
-      <FileDownloadURLInjector
+      <FileDownloadUrlInjector
         file={file}
         render={(_, url) => <MarkdownPreviewer url={url} />}
       />
@@ -56,7 +56,7 @@ const filePreviewerCandidates: Record<string, FilePreviewerContentWithSpec> = {
   csv: {
     spec: { extensions: [".csv"], contentTypes: ["csv/.*"] },
     render: (file) => (
-      <FileDownloadURLInjector
+      <FileDownloadUrlInjector
         file={file}
         render={(_, url) => <CsvPreviewer url={url} />}
       />
@@ -65,7 +65,7 @@ const filePreviewerCandidates: Record<string, FilePreviewerContentWithSpec> = {
   video: {
     spec: { extensions: [".mp4"], contentTypes: ["video/.*"] },
     render: (file) => (
-      <FileDownloadURLInjector
+      <FileDownloadUrlInjector
         file={file}
         render={(_, url) => <VideoPreviewer url={url} />}
       />
@@ -77,7 +77,7 @@ const filePreviewerCandidates: Record<string, FilePreviewerContentWithSpec> = {
       contentTypes: ["text/.*"],
     },
     render: (file) => (
-      <FileDownloadURLInjector
+      <FileDownloadUrlInjector
         file={file}
         render={(file, url) => <SourceCodePreviewer file={file} url={url} />}
       />
@@ -89,7 +89,7 @@ const filePreviewerCandidates: Record<string, FilePreviewerContentWithSpec> = {
       contentTypes: ["image/.*"],
     },
     render: (file) => (
-      <FileDownloadURLInjector
+      <FileDownloadUrlInjector
         file={file}
         render={(_, url) => <ImagePreviewer url={url} />}
       />
@@ -102,7 +102,7 @@ const filePreviewerCandidates: Record<string, FilePreviewerContentWithSpec> = {
   audio: {
     spec: { extensions: [".wav", ".mp3"], contentTypes: ["audio/.*"] },
     render: (file) => (
-      <FileDownloadURLInjector
+      <FileDownloadUrlInjector
         file={file}
         render={(_, url) => <AudioPreviewer url={url} />}
       />
@@ -135,9 +135,9 @@ const isContentTypeSupported = (
     : false;
 };
 
-type ContainerProps = { file: FileType };
+export type FilePreviewerProps = { file: FileType };
 
-const Container = ({ file }: ContainerProps): JSX.Element => {
+export const FilePreviewer = ({ file }: FilePreviewerProps): JSX.Element => {
   const [, previewer] = Object.entries(filePreviewerCandidates).find(
     ([, candidate]) => {
       return (
@@ -151,6 +151,3 @@ const Container = ({ file }: ContainerProps): JSX.Element => {
     ? previewer.render(file)
     : filePreviewerCandidates.default.render(file);
 };
-
-export { Container as FilePreviewer };
-export type { ContainerProps as FilePreviewerProps };

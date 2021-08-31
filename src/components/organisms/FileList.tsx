@@ -28,7 +28,7 @@ import {
   getFileName,
 } from "utils";
 
-type Props = {
+export type FileListPresentationProps = {
   error?: ErrorMessageProps;
   isFetchComplete: boolean;
   files: FileListItemProps["file"][];
@@ -40,14 +40,14 @@ type Props = {
   onCloseFilePreviewModal: FilePreviewModalProps["onClose"];
   onCloseFileEditModal: FileEditModalProps["onClose"];
   editingFile?: metaStore.FileModel;
-} & ContainerProps;
+} & FileListProps;
 
-type ContainerProps = {
+export type FileListProps = {
   databaseId: string;
   recordId: string;
 };
 
-const Component = ({
+export const FileListPresentation = ({
   files,
   isFetchComplete,
   error,
@@ -58,7 +58,7 @@ const Component = ({
   editingFile,
   onCloseFileEditModal,
   ...delegated
-}: Props): JSX.Element => {
+}: FileListPresentationProps): JSX.Element => {
   return (
     <>
       {error ? (
@@ -100,7 +100,10 @@ const Component = ({
   );
 };
 
-const Container = ({ databaseId, recordId }: ContainerProps): JSX.Element => {
+export const FileList = ({
+  databaseId,
+  recordId,
+}: FileListProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const [previewingFile, setPreviewingFile] = useState<
     metaStore.FileModel | undefined
@@ -214,13 +217,13 @@ const Container = ({ databaseId, recordId }: ContainerProps): JSX.Element => {
         })) || [],
     [listFilesRes]
   );
-  const error: Props["error"] = listFilesError
+  const error: FileListPresentationProps["error"] = listFilesError
     ? extractErrorMessageFromFetchError(listFilesError)
     : undefined;
   const isFetchComplete = Boolean(!error && listFilesRes);
 
   return (
-    <Component
+    <FileListPresentation
       databaseId={databaseId}
       recordId={recordId}
       error={error}
@@ -237,6 +240,3 @@ const Container = ({ databaseId, recordId }: ContainerProps): JSX.Element => {
     />
   );
 };
-
-export { Container as FileList };
-export type { ContainerProps as FileListProps };

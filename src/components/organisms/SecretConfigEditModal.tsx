@@ -26,9 +26,9 @@ import {
 } from "components/organisms/OptionSharingSelects";
 import { useGetConfig, fetchMetaStore } from "utils";
 
-type ConfigNameType = "secret_columns";
+export type ConfigNameType = "secret_columns";
 
-type Props = {
+export type SecretConfigEditModalPresentationProps = {
   error?: ErrorMessageProps;
   isFetchComplete: boolean;
   onChangeSecretColumns: OptionSharingSelectsProps["onChange"];
@@ -37,15 +37,15 @@ type Props = {
   isDisableSaveButton: boolean;
   isSaving: boolean;
   onSave: () => void;
-} & Omit<ContainerProps, "databaseId">;
+} & Omit<SecretConfigEditModalProps, "databaseId">;
 
-type ContainerProps = {
+export type SecretConfigEditModalProps = {
   open: boolean;
   databaseId: string;
   onClose: () => void;
 };
 
-const Component = ({
+export const SecretConfigEditModalPresentation = ({
   open,
   onClose,
   error,
@@ -56,7 +56,7 @@ const Component = ({
   isDisableSaveButton,
   isSaving,
   onSave,
-}: Props) => {
+}: SecretConfigEditModalPresentationProps): JSX.Element => {
   return (
     <Dialog open={open} maxWidth="xl" onClose={onClose}>
       <DialogWrapper>
@@ -98,11 +98,12 @@ const Component = ({
     </Dialog>
   );
 };
-const Container = ({
+
+export const SecretConfigEditModal = ({
   open,
   onClose,
   databaseId,
-}: ContainerProps): JSX.Element => {
+}: SecretConfigEditModalProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const [isSaving, setIsSaving] = useState(false);
   const [secretColumns, setSecretColumns] = useState<string[]>([]);
@@ -195,7 +196,7 @@ const Container = ({
   const isDisableSaveButton = secretColumns.includes("");
 
   return (
-    <Component
+    <SecretConfigEditModalPresentation
       isDisableSaveButton={isDisableSaveButton}
       isFetchComplete={isFetchComplete}
       isSaving={isSaving}
@@ -209,6 +210,3 @@ const Container = ({
     />
   );
 };
-
-export { Container as SecretConfigEditModal };
-export type { ContainerProps as SecretConfigEditModalProps, ConfigNameType };

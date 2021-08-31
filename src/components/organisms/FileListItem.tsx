@@ -8,18 +8,18 @@ import { MouseEvent, useState } from "react";
 import { FileMenu } from "components/molecules/FileMenu";
 import { getFileName } from "utils";
 
-type FileType = metaStore.FileModel;
-type Props = {
+export type FileType = metaStore.FileModel;
+export type FileListItemPresentationProps = {
   menuProps: {
     onClose: () => void;
     open: boolean;
     anchorEl: HTMLDivElement | null;
   };
   onMenuOpen: (event: MouseEvent<HTMLDivElement>) => void | Promise<void>;
-} & ContainerProps;
+} & FileListItemProps;
 
 type onMenuClick = (file: FileType) => void | Promise<void>;
-type ContainerProps = {
+export type FileListItemProps = {
   onPreview: onMenuClick;
   onEdit: onMenuClick;
   onDelete: onMenuClick;
@@ -27,7 +27,7 @@ type ContainerProps = {
   file: FileType;
 };
 
-const Component = ({
+export const FileListItemPresentation = ({
   file,
   onMenuOpen,
   menuProps,
@@ -35,7 +35,7 @@ const Component = ({
   onEdit,
   onDelete,
   onDownload,
-}: Props): JSX.Element | null => {
+}: FileListItemPresentationProps): JSX.Element | null => {
   if (
     file.path == null ||
     file.path === "" ||
@@ -71,10 +71,13 @@ const Component = ({
   );
 };
 
-const Container = ({ file, ...delegated }: ContainerProps): JSX.Element => {
+export const FileListItem = ({
+  file,
+  ...delegated
+}: FileListItemProps): JSX.Element => {
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLDivElement>(null);
   const isMenuOpen = Boolean(menuAnchorEl);
-  const onMenuOpen: Props["onMenuOpen"] = (event) => {
+  const onMenuOpen: FileListItemPresentationProps["onMenuOpen"] = (event) => {
     setMenuAnchorEl(event.currentTarget);
   };
   const onMenuClose = () => {
@@ -82,7 +85,7 @@ const Container = ({ file, ...delegated }: ContainerProps): JSX.Element => {
   };
 
   return (
-    <Component
+    <FileListItemPresentation
       file={file}
       onMenuOpen={onMenuOpen}
       menuProps={{
@@ -94,6 +97,3 @@ const Container = ({ file, ...delegated }: ContainerProps): JSX.Element => {
     />
   );
 };
-
-export { Container as FileListItem };
-export type { ContainerProps as FileListItemProps, FileType };

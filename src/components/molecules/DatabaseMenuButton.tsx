@@ -6,23 +6,23 @@ import {
   DatabaseMenuProps,
 } from "components/molecules/DatabaseMenu";
 
-type Props = {
+export type DatabaseMenuButtonPresentationProps = {
   onOpen: (event: MouseEvent<HTMLDivElement>) => void | Promise<void>;
   onClose: DatabaseMenuProps["onClose"];
   open: DatabaseMenuProps["open"];
   anchorEl: DatabaseMenuProps["anchorEl"];
-} & ContainerProps;
+} & DatabaseMenuButtonProps;
 
-type ContainerProps = {
+export type DatabaseMenuButtonProps = {
   onMenuSelect: (targetValue: string) => void;
   menu: DatabaseMenuProps["menu"];
 };
 
-const Component = ({
+export const DatabaseMenuButtonPresentation = ({
   onOpen,
   onMenuSelect,
   ...delegated
-}: Props): JSX.Element | null => {
+}: DatabaseMenuButtonPresentationProps): JSX.Element | null => {
   return (
     <div>
       <SquareIconButton icon={<MoreIcon />} onClick={onOpen} />
@@ -34,10 +34,12 @@ const Component = ({
   );
 };
 
-const Container = ({ ...delegated }: ContainerProps): JSX.Element => {
+export const DatabaseMenuButton = ({
+  ...delegated
+}: DatabaseMenuButtonProps): JSX.Element => {
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLDivElement>(null);
   const isMenuOpen = Boolean(menuAnchorEl);
-  const onMenuOpen: Props["onOpen"] = (event) => {
+  const onMenuOpen: DatabaseMenuButtonPresentationProps["onOpen"] = (event) => {
     setMenuAnchorEl(event.currentTarget);
   };
   const onMenuClose = () => {
@@ -45,7 +47,7 @@ const Container = ({ ...delegated }: ContainerProps): JSX.Element => {
   };
 
   return (
-    <Component
+    <DatabaseMenuButtonPresentation
       onOpen={onMenuOpen}
       open={isMenuOpen}
       onClose={onMenuClose}
@@ -54,6 +56,3 @@ const Container = ({ ...delegated }: ContainerProps): JSX.Element => {
     />
   );
 };
-
-export { Container as DatabaseMenuButton };
-export type { ContainerProps as DatabaseMenuButtonProps };

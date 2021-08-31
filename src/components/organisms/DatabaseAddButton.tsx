@@ -7,22 +7,22 @@ import {
   DatabaseEditModalProps,
 } from "components/organisms/DatabaseEditModal";
 
-type Props = {
+export type DatabaseAddButtonPresentationProps = {
   isOpenDatabaseAddModal: boolean;
   onOpenDatabaseAddModal: () => void;
   onCloseDatabaseAddModal: () => void;
-} & ContainerProps;
+} & DatabaseAddButtonProps;
 
-type ContainerProps = {
+export type DatabaseAddButtonProps = {
   onAddDatabaseSucceeded?: DatabaseEditModalProps<true>["onSubmitSucceeded"];
 };
 
-const Component = ({
+export const DatabaseAddButtonPresentation = ({
   onOpenDatabaseAddModal,
   isOpenDatabaseAddModal,
   onCloseDatabaseAddModal,
   onAddDatabaseSucceeded,
-}: Props) => {
+}: DatabaseAddButtonPresentationProps): JSX.Element => {
   return (
     <>
       <Button onClick={onOpenDatabaseAddModal} startIcon={<AddCircle />}>
@@ -38,13 +38,15 @@ const Component = ({
   );
 };
 
-const Container = ({ ...delegated }: ContainerProps): JSX.Element => {
+export const DatabaseAddButton = ({
+  ...delegated
+}: DatabaseAddButtonProps): JSX.Element => {
   const [isOpenDatabaseAddModal, setIsOpenDatabaseAddModal] = useState(false);
 
   const onOpenDatabaseAddModal = () => setIsOpenDatabaseAddModal(true);
   const onCloseDatabaseAddModal = () => setIsOpenDatabaseAddModal(false);
   return (
-    <Component
+    <DatabaseAddButtonPresentation
       {...delegated}
       isOpenDatabaseAddModal={isOpenDatabaseAddModal}
       onOpenDatabaseAddModal={onOpenDatabaseAddModal}
@@ -52,6 +54,3 @@ const Container = ({ ...delegated }: ContainerProps): JSX.Element => {
     />
   );
 };
-
-export { Container as DatabaseAddButton };
-export type { ContainerProps as DatabaseAddButtonProps };

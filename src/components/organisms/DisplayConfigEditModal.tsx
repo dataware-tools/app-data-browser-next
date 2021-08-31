@@ -29,9 +29,9 @@ import {
 } from "components/organisms/OptionSharingSelects";
 import { useGetConfig, fetchMetaStore, compStr } from "utils";
 
-type ConfigNameType = "record_list_display_columns";
+export type ConfigNameType = "record_list_display_columns";
 
-type Props = {
+export type DisplayConfigEditModalPresentationProps = {
   error?: ErrorMessageProps;
   displayColumns: OptionSharingSelectsProps["values"];
   displayColumnsOptions: OptionSharingSelectsProps["options"];
@@ -43,15 +43,15 @@ type Props = {
   onChangeDisplayColumns: OptionSharingSelectsProps["onChange"];
   onChangeRecordTitleColumn: SoloSelectProps["onChange"];
   onSave: LoadingButtonProps["onClick"];
-} & ContainerProps;
+} & DisplayConfigEditModalProps;
 
-type ContainerProps = {
+export type DisplayConfigEditModalProps = {
   open: boolean;
   databaseId: string;
   onClose: () => void;
 };
 
-const Component = ({
+export const DisplayConfigEditModalPresentation = ({
   open,
   error,
   displayColumnsOptions,
@@ -65,7 +65,7 @@ const Component = ({
   onChangeDisplayColumns,
   onChangeRecordTitleColumn,
   onSave,
-}: Props) => {
+}: DisplayConfigEditModalPresentationProps): JSX.Element => {
   return (
     <Dialog open={open} maxWidth="xl" onClose={onClose}>
       <DialogWrapper>
@@ -115,11 +115,12 @@ const Component = ({
     </Dialog>
   );
 };
-const Container = ({
+
+export const DisplayConfigEditModal = ({
   open,
   onClose,
   databaseId,
-}: ContainerProps): JSX.Element => {
+}: DisplayConfigEditModalProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const [isSaving, setIsSaving] = useState(false);
   const [displayColumns, setDisplayColumns] = useState<string[]>([]);
@@ -235,7 +236,7 @@ const Container = ({
     displayColumns.length <= 0 || displayColumns.includes("");
 
   return (
-    <Component
+    <DisplayConfigEditModalPresentation
       databaseId={databaseId}
       displayColumns={displayColumns}
       displayColumnsOptions={columnOptions}
@@ -253,6 +254,3 @@ const Container = ({
     />
   );
 };
-
-export { Container as DisplayConfigEditModal };
-export type { ContainerProps as DisplayConfigEditModalProps, ConfigNameType };

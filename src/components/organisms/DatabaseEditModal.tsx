@@ -35,15 +35,18 @@ import {
   useListDatabases,
 } from "utils";
 
-type Props<T extends boolean> = {
+export type DatabaseEditModalPresentationProps<T extends boolean> = {
   onSubmit: () => Promise<void>;
   isSubmitting: boolean;
   error?: ErrorMessageProps;
   formErrors: DeepMap<FormInput, FieldError>;
   control: Control<FormInput>;
-} & Omit<ContainerProps<T>, "onSubmitSucceeded" | "databaseId" | "currentData">;
+} & Omit<
+  DatabaseEditModalProps<T>,
+  "onSubmitSucceeded" | "databaseId" | "currentData"
+>;
 
-type ContainerProps<T extends boolean> = {
+export type DatabaseEditModalProps<T extends boolean> = {
   onClose: () => void;
   onSubmitSucceeded?: (newDatabase: metaStore.DatabaseModel) => void;
   databaseId?: T extends true ? never : string;
@@ -57,7 +60,7 @@ type FormInput = {
   description?: string;
 };
 
-const Component = <T extends boolean>({
+export const DatabaseEditModalPresentation = <T extends boolean>({
   onClose,
   error,
   onSubmit,
@@ -66,7 +69,7 @@ const Component = <T extends boolean>({
   control,
   add,
   ...delegated
-}: Props<T>) => {
+}: DatabaseEditModalPresentationProps<T>): JSX.Element => {
   return (
     <Dialog {...delegated} onClose={onClose}>
       <DialogWrapper>
@@ -159,7 +162,7 @@ const Component = <T extends boolean>({
   );
 };
 
-const Container = <T extends boolean>({
+export const DatabaseEditModal = <T extends boolean>({
   onSubmitSucceeded,
   open,
   onClose,
@@ -167,7 +170,7 @@ const Container = <T extends boolean>({
   add,
   currentData,
   ...delegated
-}: ContainerProps<T>): JSX.Element => {
+}: DatabaseEditModalProps<T>): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const {
     control,
@@ -284,7 +287,7 @@ const Container = <T extends boolean>({
   };
 
   return (
-    <Component
+    <DatabaseEditModalPresentation
       add={add}
       open={open}
       onClose={onClose}
@@ -297,6 +300,3 @@ const Container = <T extends boolean>({
     />
   );
 };
-
-export { Container as DatabaseEditModal };
-export type { ContainerProps as DatabaseEditModalProps };
