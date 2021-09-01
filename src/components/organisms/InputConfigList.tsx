@@ -1,6 +1,6 @@
 import { Spacer } from "@dataware-tools/app-common";
+import Box from "@material-ui/core/Box";
 import DragIndicatorIcon from "@material-ui/icons/DragIndicator";
-import { makeStyles } from "@material-ui/styles";
 import { produce } from "immer";
 import { useState } from "react";
 import {
@@ -13,7 +13,6 @@ import { AddListItemButton } from "components/atoms/AddListItemButton";
 import {
   InputConfigListItem,
   InputConfigListItemProps,
-  ActionType,
 } from "components/molecules/InputConfigListItem";
 import {
   InputConfigAddModal,
@@ -25,11 +24,11 @@ import {
   pydtkSystemColumns,
 } from "utils";
 
-type ValueType = (InputConfigListItemProps["value"] & {
+export type ValueType = (InputConfigListItemProps["value"] & {
   order_of_input: DatabaseColumnsConfigType[number]["order_of_input"];
 })[];
-type Props = {
-  classes: ReturnType<typeof useStyles>;
+
+export type InputConfigListPresentationProps = {
   onUpdate: InputConfigListItemProps["onUpdate"];
   onDelete: InputConfigListItemProps["onDelete"];
   onAdd: InputConfigAddModalProps["onSave"];
@@ -39,17 +38,16 @@ type Props = {
   alreadyUsedColumnNames: InputConfigAddModalProps["alreadyUsedNames"];
   alreadyUsedColumnDisplayNames: InputConfigAddModalProps["alreadyUsedDisplayNames"];
   onDragEnd: DragDropContextProps["onDragEnd"];
-} & Omit<ContainerProps, "onChange">;
+} & Omit<InputConfigListProps, "onChange">;
 
-type ContainerProps = {
+export type InputConfigListProps = {
   value: ValueType;
   restColumns: InputConfigAddModalProps["options"];
   onChange: (newValue: ValueType) => void;
 };
 
-const Component = ({
+export const InputConfigListPresentation = ({
   value,
-  classes,
   onUpdate,
   onDelete,
   onOpenAddModal,
@@ -60,9 +58,18 @@ const Component = ({
   alreadyUsedColumnDisplayNames,
   alreadyUsedColumnNames,
   onDragEnd,
-}: Props): JSX.Element => {
+}: InputConfigListPresentationProps): JSX.Element => {
   return (
-    <div className={classes.root}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        maxHeight: "40vh",
+        minHeight: "0",
+        overflow: "auto",
+        padding: "10px 0",
+      }}
+    >
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId="droppable">
           {(provided) => (
@@ -74,15 +81,20 @@ const Component = ({
                       <div ref={provided.innerRef} {...provided.draggableProps}>
                         <InputConfigListItem
                           label={
-                            <span
-                              className={classes.draggable}
+                            <Box
+                              component="span"
+                              sx={{
+                                alignItems: "center",
+                                display: "flex",
+                                flexDirection: "row",
+                              }}
                               {...provided.dragHandleProps}
                             >
                               <DragIndicatorIcon />
                               {config.name}
                               <br />
                               {`(display name: ${config.display_name})`}
-                            </span>
+                            </Box>
                           }
                           value={config}
                           onUpdate={onUpdate}
@@ -110,36 +122,19 @@ const Component = ({
           alreadyUsedDisplayNames={alreadyUsedColumnDisplayNames}
         />
       ) : null}
-    </div>
+    </Box>
   );
 };
 
-const useStyles = makeStyles({
-  root: {
-    display: "flex",
-    flexDirection: "column",
-    maxHeight: "40vh",
-    minHeight: "0",
-    overflow: "auto",
-    padding: "10px 0",
-  },
-  draggable: {
-    alignItems: "center",
-    display: "flex",
-    flexDirection: "row",
-  },
-});
-
-const Container = ({
+export const InputConfigList = ({
   value,
   onChange,
   restColumns: initRestColumns,
-}: ContainerProps): JSX.Element => {
-  const classes = useStyles();
+}: InputConfigListProps): JSX.Element => {
   const [openAddModal, setOpenAddModal] = useState(false);
-  const [restColumns, setRestColumns] = useState<Props["restColumns"]>(
-    initRestColumns
-  );
+  const [restColumns, setRestColumns] = useState<
+    InputConfigListPresentationProps["restColumns"]
+  >(initRestColumns);
 
   const order =
     value
@@ -149,7 +144,7 @@ const Container = ({
       .sort(compInputFields)
       .map((column) => column.name) || [];
 
-  const onAdd: Props["onAdd"] = (newColumn) => {
+  const onAdd: InputConfigListPresentationProps["onAdd"] = (newColumn) => {
     onChange(
       value.some((prevColumn) => prevColumn.name === newColumn.name)
         ? value.map((prevColumn) =>
@@ -178,7 +173,7 @@ const Container = ({
     });
   };
 
-  const onDelete: Props["onDelete"] = (oldValue) => {
+  const onDelete: InputConfigListPresentationProps["onDelete"] = (oldValue) => {
     onChange(
       value.map((column) =>
         column.name === oldValue.name
@@ -208,7 +203,10 @@ const Container = ({
     });
   };
 
-  const onUpdate: Props["onUpdate"] = (newValue, oldValue) => {
+  const onUpdate: InputConfigListPresentationProps["onUpdate"] = (
+    newValue,
+    oldValue
+  ) => {
     onChange(
       value.map((column) =>
         column.name === oldValue.name ? { ...column, ...newValue } : column
@@ -216,7 +214,7 @@ const Container = ({
     );
   };
 
-  const onDragEnd: Props["onDragEnd"] = (result) => {
+  const onDragEnd: InputConfigListPresentationProps["onDragEnd"] = (result) => {
     if (result.destination) {
       const newOrder = produce(order, (draft) => {
         const [removed] = draft.splice(result.source.index, 1);
@@ -251,8 +249,7 @@ const Container = ({
   ];
 
   return (
-    <Component
-      classes={classes}
+    <InputConfigListPresentation
       alreadyUsedColumnNames={alreadyUsedColumnNames}
       alreadyUsedColumnDisplayNames={alreadyUsedColumnDisplayNames}
       onAdd={onAdd}
@@ -267,6 +264,3 @@ const Container = ({
     />
   );
 };
-
-export { Container as InputConfigList };
-export type { ContainerProps as InputConfigListProps, ActionType, ValueType };

@@ -26,9 +26,9 @@ import {
 } from "components/organisms/OptionSharingSelects";
 import { useGetConfig, fetchMetaStore } from "utils";
 
-type ConfigNameType = "record_search_target_columns";
+export type ConfigNameType = "record_search_target_columns";
 
-type Props = {
+export type SearchConfigEditModalPresentationProps = {
   error?: ErrorMessageProps;
   isFetchComplete: boolean;
   onChangeSearchTargetColumns: OptionSharingSelectsProps["onChange"];
@@ -37,15 +37,15 @@ type Props = {
   isDisableSaveButton: boolean;
   isSaving: boolean;
   onSave: () => void;
-} & Omit<ContainerProps, "databaseId">;
+} & Omit<SearchConfigEditModalProps, "databaseId">;
 
-type ContainerProps = {
+export type SearchConfigEditModalProps = {
   open: boolean;
   databaseId: string;
   onClose: () => void;
 };
 
-const Component = ({
+export const SearchConfigEditModalPresentation = ({
   open,
   onClose,
   error,
@@ -56,7 +56,7 @@ const Component = ({
   isDisableSaveButton,
   isSaving,
   onSave,
-}: Props) => {
+}: SearchConfigEditModalPresentationProps): JSX.Element => {
   return (
     <Dialog open={open} maxWidth="xl" onClose={onClose}>
       <DialogWrapper>
@@ -99,11 +99,11 @@ const Component = ({
   );
 };
 
-const Container = ({
+export const SearchConfigEditModal = ({
   open,
   onClose,
   databaseId,
-}: ContainerProps): JSX.Element => {
+}: SearchConfigEditModalProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const [isSaving, setIsSaving] = useState(false);
   const [searchTargetColumns, setSearchTargetColumns] = useState<string[]>([]);
@@ -198,7 +198,7 @@ const Container = ({
     searchTargetColumns.length <= 0 || searchTargetColumns.includes("");
 
   return (
-    <Component
+    <SearchConfigEditModalPresentation
       isDisableSaveButton={isDisableSaveButton}
       isFetchComplete={isFetchComplete}
       isSaving={isSaving}
@@ -212,6 +212,3 @@ const Container = ({
     />
   );
 };
-
-export { Container as SearchConfigEditModal };
-export type { ContainerProps as SearchConfigEditModalProps, ConfigNameType };

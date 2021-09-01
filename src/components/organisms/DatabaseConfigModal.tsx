@@ -19,24 +19,24 @@ import {
   ConfigNameType as SecretConfigNameType,
 } from "components/organisms/SecretConfigEditModal";
 
-type ContainerProps = {
+export type DatabaseConfigModalProps = {
   open: boolean;
   databaseId: string;
   onClose: () => void;
   configName: DatabaseConfigNameType;
 };
 
-type DatabaseConfigNameType =
+export type DatabaseConfigNameType =
   | InputConfigNameType
   | DisplayConfigNameType
   | SearchConfigNameType
   | ExportMetadataNameType
   | SecretConfigNameType;
 
-const Container = ({
+export const DatabaseConfigModal = ({
   configName,
   ...delegated
-}: ContainerProps): JSX.Element => {
+}: DatabaseConfigModalProps): JSX.Element => {
   switch (configName) {
     case "record_add_editable_columns":
       return <InputConfigEditModal {...delegated} />;
@@ -49,10 +49,4 @@ const Container = ({
     case "export_metadata":
       return <ExportMetadataModal {...delegated} />;
   }
-};
-
-export { Container as DatabaseConfigModal };
-export type {
-  ContainerProps as DatabaseConfigModalProps,
-  DatabaseConfigNameType,
 };

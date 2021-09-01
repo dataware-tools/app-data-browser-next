@@ -21,14 +21,14 @@ import {
   MetadataInputFieldListProps,
 } from "components/organisms/MetadataInputFieldList";
 
-type Props = {
+export type MetadataEditModalPresentationProps = {
   nonFilledRequiredFieldNames: MetadataInputFieldListProps["nonFilledRequiredFieldNames"];
   prefixInputElementId: MetadataInputFieldListProps["prefixInputElementId"];
   isSaving: boolean;
   onSave: () => void;
-} & Omit<ContainerProps, "onSubmit">;
+} & Omit<MetadataEditModalProps, "onSubmit">;
 
-type ContainerProps = {
+export type MetadataEditModalProps = {
   open: boolean;
   create?: boolean;
   currentMetadata: MetadataInputFieldListProps["currentMetadata"];
@@ -39,7 +39,7 @@ type ContainerProps = {
   onSubmit: (newMetadata: Record<string, unknown>) => Promise<boolean>;
 };
 
-const Component = ({
+export const MetadataEditModalPresentation = ({
   open,
   error,
   create,
@@ -51,7 +51,7 @@ const Component = ({
   title,
   onClose,
   onSave,
-}: Props) => {
+}: MetadataEditModalPresentationProps): JSX.Element => {
   return (
     <Dialog open={open} maxWidth="xl" onClose={onClose}>
       <DialogWrapper>
@@ -88,14 +88,15 @@ const Component = ({
     </Dialog>
   );
 };
-const Container = ({
+
+export const MetadataEditModal = ({
   open,
   onClose,
   create,
   fields,
   onSubmit,
   ...delegated
-}: ContainerProps): JSX.Element => {
+}: MetadataEditModalProps): JSX.Element => {
   const [isSaving, setIsSaving] = useState(false);
   const [
     nonFilledRequiredFieldNames,
@@ -177,7 +178,7 @@ const Container = ({
   };
 
   return (
-    <Component
+    <MetadataEditModalPresentation
       {...delegated}
       fields={fields}
       isSaving={isSaving}
@@ -190,6 +191,3 @@ const Container = ({
     />
   );
 };
-
-export { Container as MetadataEditModal };
-export type { ContainerProps as MetadataEditModalProps };

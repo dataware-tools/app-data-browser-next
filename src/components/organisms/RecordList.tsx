@@ -26,7 +26,7 @@ import {
   ParamTypeListRecords,
 } from "utils";
 
-type Props = {
+export type RecordListPresentationProps = {
   error?: ErrorMessageProps;
   columns: GridColumns;
   selectedRecordId?: string;
@@ -34,11 +34,11 @@ type Props = {
   records: metaStore.RecordModel[];
   onSelectRecord: DataGridProps["onCellClick"];
   onSortModelChange: DataGridProps["onSortModelChange"];
-} & Pick<ContainerProps, "databaseId">;
+} & Pick<RecordListProps, "databaseId">;
 
-type ContainerProps = ParamTypeListRecords;
+export type RecordListProps = ParamTypeListRecords;
 
-const Component = ({
+export const RecordListPresentation = ({
   error,
   records,
   onSelectRecord,
@@ -47,7 +47,7 @@ const Component = ({
   selectedRecordId,
   onCloseRecordDetailModal,
   onSortModelChange,
-}: Props): JSX.Element => {
+}: RecordListPresentationProps): JSX.Element => {
   return (
     <>
       {error ? (
@@ -78,20 +78,22 @@ const Component = ({
   );
 };
 
-const Container = ({
+export const RecordList = ({
   databaseId,
   page,
   perPage,
   search,
   searchKey,
   ...delegated
-}: ContainerProps): JSX.Element => {
+}: RecordListProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const isPermittedDeleteRecord = useIsActionPermitted("metadata:write:delete");
   const [selectedRecordId, setSelectedRecordId] = useState<string | undefined>(
     undefined
   );
-  const [error, setError] = useState<Props["error"] | undefined>(undefined);
+  const [error, setError] = useState<
+    RecordListPresentationProps["error"] | undefined
+  >(undefined);
   const [{ sortKey, sortOrder }, setRecordPaginateState] = useRecoilState(
     recordPaginateState
   );
@@ -156,7 +158,9 @@ const Container = ({
     }
   };
 
-  const onSortModelChange: Props["onSortModelChange"] = (model) => {
+  const onSortModelChange: RecordListPresentationProps["onSortModelChange"] = (
+    model
+  ) => {
     if (model.length > 0) {
       const sortModel = model[0];
       setRecordPaginateState((prev) => ({
@@ -174,7 +178,7 @@ const Container = ({
     }
   };
   const DeleteButtonFieldName = "__DeleteButton__";
-  const columns: Props["columns"] =
+  const columns: RecordListPresentationProps["columns"] =
     getConfigRes?.columns
       .filter((column) => column.is_display_field)
       .map((column) => ({
@@ -212,7 +216,9 @@ const Container = ({
     }
   }, [fetchError, columns.length]);
 
-  const onSelectRecord: Props["onSelectRecord"] = (record) => {
+  const onSelectRecord: RecordListPresentationProps["onSelectRecord"] = (
+    record
+  ) => {
     if (record.field === DeleteButtonFieldName) {
       return;
     }
@@ -229,7 +235,7 @@ const Container = ({
   const records = listRecordsRes?.data || [];
 
   return (
-    <Component
+    <RecordListPresentation
       {...delegated}
       error={error}
       columns={columns}
@@ -242,6 +248,3 @@ const Container = ({
     />
   );
 };
-
-export { Container as RecordList };
-export type { ContainerProps as RecordListProps };

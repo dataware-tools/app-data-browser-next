@@ -9,7 +9,7 @@ import Button from "@material-ui/core/Button";
 import Popover from "@material-ui/core/Popover";
 import { MouseEvent, useState } from "react";
 
-type JobViewerDOMProps = {
+type JobViewerPresentationProps = {
   error?: ErrorMessageProps;
   anchorEl?: HTMLElement;
   onOpenPopover: (event: MouseEvent<HTMLElement>, script: string) => void;
@@ -24,7 +24,7 @@ type JobViewerProps = {
   job: jobStore.JobPostedModel;
 };
 
-const JobViewerDOM = ({
+const JobViewerPresentation = ({
   error,
   anchorEl,
   onOpenPopover,
@@ -32,7 +32,7 @@ const JobViewerDOM = ({
   onClickExecuteButton,
   scripts,
   currentShownScript,
-}: JobViewerDOMProps): JSX.Element => {
+}: JobViewerPresentationProps): JSX.Element => {
   return (
     <>
       {error ? (
@@ -81,7 +81,10 @@ export const JobViewer = ({ job, jobType }: JobViewerProps): JSX.Element => {
     string | undefined
   >(undefined);
 
-  const onOpenPopover: JobViewerDOMProps["onOpenPopover"] = (event, script) => {
+  const onOpenPopover: JobViewerPresentationProps["onOpenPopover"] = (
+    event,
+    script
+  ) => {
     setAnchorEl(event.currentTarget);
     setCurrentShownScript(script);
   };
@@ -91,7 +94,7 @@ export const JobViewer = ({ job, jobType }: JobViewerProps): JSX.Element => {
     setCurrentShownScript(undefined);
   };
 
-  const onClickExecuteButton: JobViewerDOMProps["onClickExecuteButton"] = (
+  const onClickExecuteButton: JobViewerPresentationProps["onClickExecuteButton"] = (
     script
   ) => {
     // eslint-disable-next-line no-eval
@@ -110,7 +113,7 @@ export const JobViewer = ({ job, jobType }: JobViewerProps): JSX.Element => {
       : undefined;
 
   return (
-    <JobViewerDOM
+    <JobViewerPresentation
       anchorEl={anchorEl}
       scripts={scripts}
       error={error}

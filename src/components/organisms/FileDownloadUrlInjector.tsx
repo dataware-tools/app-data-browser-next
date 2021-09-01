@@ -8,12 +8,15 @@ import { useCreateJwtToDownloadFile } from "utils";
 
 type FileType = metaStore.FileModel;
 
-type ContainerProps = {
+export type FileDownloadUrlInjectorProps = {
   file: FileType;
   render: (file: FileType, downloadURL: string) => JSX.Element;
 };
 
-const Container = ({ file, render }: ContainerProps): JSX.Element => {
+export const FileDownloadUrlInjector = ({
+  file,
+  render,
+}: FileDownloadUrlInjectorProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
 
   const {
@@ -38,6 +41,3 @@ const Container = ({ file, render }: ContainerProps): JSX.Element => {
     <LoadingIndicator />
   );
 };
-
-export { Container as FileDownloadURLInjector };
-export type { ContainerProps as FileDownloadUrlInjectorProps };

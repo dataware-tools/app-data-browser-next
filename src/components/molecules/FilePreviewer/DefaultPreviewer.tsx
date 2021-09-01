@@ -1,5 +1,3 @@
-const Container = (): JSX.Element => {
+export const DefaultPreviewer = (): JSX.Element => {
   return <div>Not supported</div>;
 };
-
-export { Container as DefaultPreviewer };

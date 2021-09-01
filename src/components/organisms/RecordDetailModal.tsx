@@ -40,7 +40,7 @@ import {
   createSystemMetadata,
 } from "utils";
 
-type Props = {
+export type RecordDetailModalPresentationProps = {
   title?: string;
   onChangeTab: DialogTabBarProps["onChange"];
   tabNames: DialogTabBarProps["tabNames"];
@@ -51,16 +51,16 @@ type Props = {
   onCloseRecordEditModal: RecordEditModalProps["onClose"];
   onAddFile: FileUploadButtonProps["onFileChange"];
   onEditRecord: () => void;
-} & ContainerProps;
+} & RecordDetailModalProps;
 
-type ContainerProps = {
+export type RecordDetailModalProps = {
   open: boolean;
   onClose: () => void;
   recordId: string;
   databaseId: string;
 };
 
-const Component = ({
+export const RecordDetailModalPresentation = ({
   open,
   onClose,
   recordId,
@@ -75,7 +75,7 @@ const Component = ({
   onCloseRecordEditModal,
   onAddFile,
   onEditRecord,
-}: Props) => {
+}: RecordDetailModalPresentationProps): JSX.Element => {
   const currentTabName = tabNames[selectedTabIndex];
   return (
     <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
@@ -142,12 +142,12 @@ const Component = ({
   );
 };
 
-const Container = ({
+export const RecordDetailModal = ({
   open,
   onClose,
   databaseId,
   recordId,
-}: ContainerProps): JSX.Element => {
+}: RecordDetailModalProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken, user } = useAuth0();
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
   const [isOpenRecordEditModal, setIsOpenRecordEditModal] = useState(false);
@@ -249,7 +249,7 @@ const Container = ({
   const title = titleColumn ? getRecordRes?.[titleColumn] : "No title";
 
   return (
-    <Component
+    <RecordDetailModalPresentation
       onEditRecord={onEditRecord}
       databaseId={databaseId}
       isAddingFile={isAddingFile}
@@ -266,5 +266,3 @@ const Container = ({
     />
   );
 };
-export { Container as RecordDetailModal };
-export type { ContainerProps as RecordDetailModalProps };

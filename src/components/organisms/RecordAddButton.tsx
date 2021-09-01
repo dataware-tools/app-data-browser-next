@@ -7,24 +7,24 @@ import {
   RecordEditModalProps,
 } from "components/organisms/RecordEditModal";
 
-type Props = {
+export type RecordAddButtonPresentationProps = {
   isOpenRecordAddModal: boolean;
   onOpenRecordAddModal: () => void;
   onCloseRecordAddModal: () => void;
-} & ContainerProps;
+} & RecordAddButtonProps;
 
-type ContainerProps = {
+export type RecordAddButtonProps = {
   databaseId: string;
   onAddRecordSucceeded: RecordEditModalProps["onSubmitSucceeded"];
 };
 
-const Component = ({
+export const RecordAddButtonPresentation = ({
   onOpenRecordAddModal,
   isOpenRecordAddModal,
   onCloseRecordAddModal,
   databaseId,
   onAddRecordSucceeded,
-}: Props) => {
+}: RecordAddButtonPresentationProps): JSX.Element => {
   return (
     <>
       <Button onClick={onOpenRecordAddModal} startIcon={<AddCircle />}>
@@ -41,13 +41,15 @@ const Component = ({
   );
 };
 
-const Container = ({ ...delegated }: ContainerProps): JSX.Element => {
+export const RecordAddButton = ({
+  ...delegated
+}: RecordAddButtonProps): JSX.Element => {
   const [isOpenRecordAddModal, setIsOpenRecordAddModal] = useState(false);
 
   const onOpenRecordAddModal = () => setIsOpenRecordAddModal(true);
   const onCloseRecordAddModal = () => setIsOpenRecordAddModal(false);
   return (
-    <Component
+    <RecordAddButtonPresentation
       {...delegated}
       isOpenRecordAddModal={isOpenRecordAddModal}
       onOpenRecordAddModal={onOpenRecordAddModal}
@@ -55,6 +57,3 @@ const Container = ({ ...delegated }: ContainerProps): JSX.Element => {
     />
   );
 };
-
-export { Container as RecordAddButton };
-export type { ContainerProps as RecordAddButtonProps };

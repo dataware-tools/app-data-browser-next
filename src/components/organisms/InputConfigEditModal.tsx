@@ -25,8 +25,9 @@ import {
 } from "components/organisms/InputConfigList";
 import { useGetConfig, fetchMetaStore, isEditableColumnName } from "utils";
 
-type ConfigNameType = "record_add_editable_columns";
-type Props = {
+export type ConfigNameType = "record_add_editable_columns";
+
+export type InputConfigEditPresentationProps = {
   error?: ErrorMessageProps;
   isFetchComplete: boolean;
   inputColumns: InputConfigListProps["value"];
@@ -34,14 +35,15 @@ type Props = {
   onChangeInputColumns: InputConfigListProps["onChange"];
   isSaving: boolean;
   onSave: () => void;
-} & Omit<ContainerProps, "databaseId">;
-type ContainerProps = {
+} & Omit<InputConfigEditModalProps, "databaseId">;
+
+export type InputConfigEditModalProps = {
   open: boolean;
   onClose: () => void;
   databaseId: string;
 };
 
-const Component = ({
+export const InputConfigEditPresentation = ({
   open,
   onClose,
   error,
@@ -51,7 +53,7 @@ const Component = ({
   onChangeInputColumns,
   isSaving,
   onSave,
-}: Props) => {
+}: InputConfigEditPresentationProps): JSX.Element => {
   return (
     <Dialog open={open} maxWidth="xl" onClose={onClose}>
       <DialogWrapper>
@@ -87,11 +89,12 @@ const Component = ({
     </Dialog>
   );
 };
-const Container = ({
+
+export const InputConfigEditModal = ({
   open,
   onClose,
   databaseId,
-}: ContainerProps): JSX.Element => {
+}: InputConfigEditModalProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<ErrorMessageProps | undefined>(undefined);
@@ -217,7 +220,7 @@ const Container = ({
   }[];
 
   return (
-    <Component
+    <InputConfigEditPresentation
       error={error}
       inputColumns={inputColumns}
       isFetchComplete={isFetchComplete}
@@ -230,6 +233,3 @@ const Container = ({
     />
   );
 };
-
-export { Container as InputConfigEditModal };
-export type { ContainerProps as InputConfigEditModalProps, ConfigNameType };

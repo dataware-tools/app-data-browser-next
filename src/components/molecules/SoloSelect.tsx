@@ -5,9 +5,9 @@ import Select, { SelectProps } from "@material-ui/core/Select";
 import React from "react";
 
 type OptionsType = { label: string; value: string }[];
-type Props = ContainerProps;
+export type SoloSelectPresentationProps = SoloSelectProps;
 
-type ContainerProps = {
+export type SoloSelectProps = {
   label?: string;
   value?: string;
   onChange: (newValue: string) => void;
@@ -16,14 +16,14 @@ type ContainerProps = {
   menuItemProps?: Omit<MenuItemProps, "value">;
 };
 
-const Component = ({
+export const SoloSelectPresentation = ({
   value,
   onChange,
   options,
   selectProps,
   menuItemProps,
   label,
-}: Props): JSX.Element => {
+}: SoloSelectPresentationProps): JSX.Element => {
   return (
     <Box
       sx={{
@@ -64,11 +64,8 @@ const Component = ({
   );
 };
 
-const Container = React.memo(
-  ({ ...delegated }: ContainerProps): JSX.Element => {
-    return <Component {...delegated} />;
+export const SoloSelect = React.memo(
+  ({ ...delegated }: SoloSelectProps): JSX.Element => {
+    return <SoloSelectPresentation {...delegated} />;
   }
 );
-
-export { Container as SoloSelect };
-export type { ContainerProps as SoloSelectProps };

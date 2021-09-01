@@ -21,7 +21,7 @@ import {
   isEditableColumnName,
 } from "utils";
 
-type ContainerProps = {
+export type RecordEditModalProps = {
   open: boolean;
   onClose: () => void;
   recordId?: string;
@@ -30,14 +30,14 @@ type ContainerProps = {
   create?: boolean;
 };
 
-const Container = ({
+export const RecordEditModal = ({
   recordId,
   databaseId,
   onSubmitSucceeded,
   create,
   open,
   ...delegated
-}: ContainerProps): JSX.Element => {
+}: RecordEditModalProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const [error, setError] = useState<ErrorMessageProps | undefined>(undefined);
   const recordPaginateValue = useRecoilValue(recordPaginateState);
@@ -165,6 +165,3 @@ const Container = ({
     />
   );
 };
-
-export { Container as RecordEditModal };
-export type { ContainerProps as RecordEditModalProps };

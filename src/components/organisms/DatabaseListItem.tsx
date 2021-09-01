@@ -4,15 +4,17 @@ import ListItemIcon from "@material-ui/core/ListItemIcon";
 import ListItemText from "@material-ui/core/ListItemText";
 import StorageIcon from "@material-ui/icons/Storage";
 
-type DatabaseType = metaStore.DatabaseModel;
-type Props = ContainerProps;
+export type DatabaseType = metaStore.DatabaseModel;
 
-type ContainerProps = {
+export type DatabaseListItemProps = {
   database: DatabaseType;
   onClick: (database: DatabaseType) => void;
 };
 
-const Component = ({ database, onClick }: Props): JSX.Element => {
+export const DatabaseListItem = ({
+  database,
+  onClick,
+}: DatabaseListItemProps): JSX.Element => {
   return (
     <ListItem button onClick={() => onClick(database)}>
       <ListItemIcon>
@@ -27,10 +29,3 @@ const Component = ({ database, onClick }: Props): JSX.Element => {
     </ListItem>
   );
 };
-
-const Container = ({ database, ...delegated }: ContainerProps): JSX.Element => {
-  return <Component database={database} {...delegated} />;
-};
-
-export { Container as DatabaseListItem };
-export type { ContainerProps as DatabaseListItemProps, DatabaseType };

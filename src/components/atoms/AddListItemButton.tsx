@@ -1,13 +1,13 @@
 import Box from "@material-ui/core/Box";
 import AddIcon from "@material-ui/icons/Add";
 
-type Props = ContainerProps;
-
-type ContainerProps = {
+export type AddListItemButtonProps = {
   onClick: () => void;
 };
 
-const Component = ({ onClick }: Props): JSX.Element => {
+export const AddListItemButton = ({
+  onClick,
+}: AddListItemButtonProps): JSX.Element => {
   return (
     <Box
       onClick={onClick}
@@ -29,9 +29,3 @@ const Component = ({ onClick }: Props): JSX.Element => {
     </Box>
   );
 };
-const Container = ({ ...delegated }: ContainerProps): JSX.Element => {
-  return <Component {...delegated} />;
-};
-
-export { Container as AddListItemButton };
-export type { ContainerProps as AddListItemButtonProps };

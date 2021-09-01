@@ -1,21 +1,20 @@
-import Breadcrumbs from "@material-ui/core/Breadcrumbs";
+import MuiBreadcrumbs from "@material-ui/core/Breadcrumbs";
 import React from "react";
 
 import { BreadcrumbsItem, BreadcrumbsItemProps } from "./BreadcrumbsItem";
 
-type ComponentProps = {
+export type BreadcrumbsProps = {
   items: BreadcrumbsItemProps[];
 };
 
-const Component = ({ items }: ComponentProps): JSX.Element => {
+export const Breadcrumbs = ({ items }: BreadcrumbsProps): JSX.Element => {
   const breadcrumbItems: JSX.Element[] = items.map(
     (itemProps: BreadcrumbsItemProps, index: number) => (
       <BreadcrumbsItem key={index} {...itemProps} />
     )
   );
 
-  return <Breadcrumbs aria-label="breadcrumb">{breadcrumbItems}</Breadcrumbs>;
+  return (
+    <MuiBreadcrumbs aria-label="breadcrumb">{breadcrumbItems}</MuiBreadcrumbs>
+  );
 };
-
-export { Component as Breadcrumbs };
-export type { ComponentProps as BreadcrumbsProps };

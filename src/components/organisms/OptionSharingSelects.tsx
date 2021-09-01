@@ -1,6 +1,6 @@
 import { Spacer } from "@dataware-tools/app-common";
+import Box from "@material-ui/core/Box";
 import DragIndicatorIcon from "@material-ui/icons/DragIndicator";
-import { makeStyles } from "@material-ui/styles";
 import { produce } from "immer";
 import { useState } from "react";
 import {
@@ -19,8 +19,7 @@ import {
 type ValuesType = OptionSharingSelectsItemProps["value"][];
 type OptionType = OptionSharingSelectsItemProps["options"][number];
 
-type Props = {
-  classes: ReturnType<typeof useStyles>;
+export type OptionSharingSelectsPresentationProps = {
   onChange: (
     action: ActionType | "create",
     index: number,
@@ -29,9 +28,12 @@ type Props = {
   ) => void;
   restOptions: OptionSharingSelectsItemProps["options"];
   onDragEnd: DragDropContextProps["onDragEnd"];
-} & Omit<ContainerProps, "onChange" | "allowDuplicatedOption" | "sortOptions">;
+} & Omit<
+  OptionSharingSelectsProps,
+  "onChange" | "allowDuplicatedOption" | "sortOptions"
+>;
 
-type ContainerProps = {
+export type OptionSharingSelectsProps = {
   values: ValuesType;
   onChange: (newValues: ValuesType) => void;
   options: OptionType[];
@@ -45,8 +47,7 @@ type ContainerProps = {
   allowDuplicatedOption?: boolean;
 };
 
-const Component = ({
-  classes,
+export const OptionSharingSelectsPresentation = ({
   values,
   space,
   onChange,
@@ -54,9 +55,18 @@ const Component = ({
   onDragEnd,
   draggable,
   ...delegated
-}: Props): JSX.Element => {
+}: OptionSharingSelectsPresentationProps): JSX.Element => {
   return (
-    <div className={classes.root}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        maxHeight: "40vh",
+        minHeight: "0",
+        overflow: "auto",
+        padding: "10px 0",
+      }}
+    >
       <DragDropContext onDragEnd={onDragEnd}>
         <Droppable droppableId="droppable" isDropDisabled={!draggable}>
           {(provided) => (
@@ -71,7 +81,14 @@ const Component = ({
                   >
                     {(provided) => (
                       <div ref={provided.innerRef} {...provided.draggableProps}>
-                        <span className={classes.draggable}>
+                        <Box
+                          component="span"
+                          sx={{
+                            alignItems: "center",
+                            display: "flex",
+                            flexDirection: "row",
+                          }}
+                        >
                           {draggable ? (
                             <span {...provided.dragHandleProps}>
                               <DragIndicatorIcon />
@@ -83,7 +100,7 @@ const Component = ({
                             onChange={onChange}
                             {...delegated}
                           />
-                        </span>
+                        </Box>
                         {index < values.length - 1 ? (
                           <Spacer direction="vertical" size={space || "3vh"} />
                         ) : null}
@@ -103,35 +120,18 @@ const Component = ({
           <AddListItemButton onClick={() => onChange("create", 0, "", "")} />
         </>
       ) : null}
-    </div>
+    </Box>
   );
 };
 
-const useStyles = makeStyles({
-  root: {
-    display: "flex",
-    flexDirection: "column",
-    maxHeight: "40vh",
-    minHeight: "0",
-    overflow: "auto",
-    padding: "10px 0",
-  },
-  draggable: {
-    alignItems: "center",
-    display: "flex",
-    flexDirection: "row",
-  },
-});
-
-const Container = ({
+export const OptionSharingSelects = ({
   options,
   onChange: propsOnChange,
   values,
   allowDuplicatedOption,
   sortOptions: propsSortOptions,
   ...delegated
-}: ContainerProps): JSX.Element => {
-  const classes = useStyles();
+}: OptionSharingSelectsProps): JSX.Element => {
   const sortOptions =
     propsSortOptions ||
     ((a: OptionType, b: OptionType) => {
@@ -152,7 +152,12 @@ const Container = ({
           ?.sort(sortOptions)
   );
 
-  const onChange: Props["onChange"] = (action, index, newValue, oldValue) => {
+  const onChange: OptionSharingSelectsPresentationProps["onChange"] = (
+    action,
+    index,
+    newValue,
+    oldValue
+  ) => {
     if (action === "update") {
       const newValues = produce(values, (draft) => {
         draft[index] = newValue;
@@ -204,7 +209,9 @@ const Container = ({
     }
   };
 
-  const onDragEnd: Props["onDragEnd"] = (result) => {
+  const onDragEnd: OptionSharingSelectsPresentationProps["onDragEnd"] = (
+    result
+  ) => {
     if (result.destination) {
       const newValues = produce(values, (draft) => {
         const [removed] = draft.splice(result.source.index, 1);
@@ -216,17 +223,13 @@ const Container = ({
   };
 
   return (
-    <Component
+    <OptionSharingSelectsPresentation
       options={options}
       onChange={onChange}
       values={values}
       restOptions={restOptions}
       onDragEnd={onDragEnd}
       {...delegated}
-      classes={classes}
     />
   );
 };
-
-export { Container as OptionSharingSelects };
-export type { ContainerProps as OptionSharingSelectsProps, OptionType };

@@ -50,7 +50,7 @@ import {
   useGetDatabase,
 } from "utils";
 
-type Props = {
+export type RecordsPagePresentationProps = {
   error?: ErrorMessageProps;
   searchText: SearchFormProps["defaultValue"];
   perPageOptions: PerPageSelectProps["values"];
@@ -71,7 +71,7 @@ type Props = {
   onEndInitializeDatabase: DisplayConfigEditModalProps["onClose"];
 };
 
-const Component = ({
+export const RecordsPagePresentation = ({
   error,
   searchText,
   perPage,
@@ -90,7 +90,7 @@ const Component = ({
   onCloseRecordDetailModal,
   searchColumns,
   onEndInitializeDatabase,
-}: Props) => {
+}: RecordsPagePresentationProps): JSX.Element => {
   return (
     <>
       <PageContainer>
@@ -182,7 +182,7 @@ const Component = ({
 
 type ParamType = { databaseId: string };
 
-const Page = (): JSX.Element => {
+export const RecordsPage = (): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const { databaseId } = useParams<ParamType>();
   const [
@@ -265,22 +265,28 @@ const Page = (): JSX.Element => {
     }
   }, [listPermittedActionRes, setUserActions]);
 
-  const onAddRecordSucceeded: Props["onAddRecordSucceeded"] = (newRecord) => {
+  const onAddRecordSucceeded: RecordsPagePresentationProps["onAddRecordSucceeded"] = (
+    newRecord
+  ) => {
     serAddedRecordId(newRecord.record_id);
   };
   const onCloseRecordDetailModal = () => {
     serAddedRecordId(undefined);
     listRecordsMutate();
   };
-  const onChangePage: Props["onChangePage"] = (page) =>
+  const onChangePage: RecordsPagePresentationProps["onChangePage"] = (page) =>
     setRecordPaginateState((prev) => ({ ...prev, page }));
-  const onChangePerPage: Props["onChangePerPage"] = (perPage) => {
+  const onChangePerPage: RecordsPagePresentationProps["onChangePerPage"] = (
+    perPage
+  ) => {
     setRecordPaginateState((prev) => ({ ...prev, perPage }));
   };
-  const onChangeSearchText: Props["onChangeSearchText"] = (searchText) => {
+  const onChangeSearchText: RecordsPagePresentationProps["onChangeSearchText"] = (
+    searchText
+  ) => {
     setRecordPaginateState((prev) => ({ ...prev, search: searchText }));
   };
-  const onEndInitializeDatabase: Props["onEndInitializeDatabase"] = () => {
+  const onEndInitializeDatabase: RecordsPagePresentationProps["onEndInitializeDatabase"] = () => {
     setIsNewDatabase(false);
     deleteQueryString("new", "replace");
   };
@@ -294,7 +300,7 @@ const Page = (): JSX.Element => {
   const databaseName = getDatabaseRes?.name;
 
   return (
-    <Component
+    <RecordsPagePresentation
       error={error}
       databaseId={databaseId}
       databaseName={databaseName}
@@ -316,5 +322,3 @@ const Page = (): JSX.Element => {
     />
   );
 };
-
-export { Page as RecordsPage };

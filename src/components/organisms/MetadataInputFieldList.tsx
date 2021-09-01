@@ -1,6 +1,6 @@
 import { Spacer } from "@dataware-tools/app-common";
+import Box from "@material-ui/core/Box";
 import TextField from "@material-ui/core/TextField";
-import { makeStyles } from "@material-ui/styles";
 import { DatabaseColumnsConfigType } from "utils";
 
 type MetadataType = Record<string, unknown>;
@@ -10,35 +10,21 @@ type FieldType = Pick<
   "display_name" | "name" | "necessity"
 >;
 
-type ComponentProps = {
+export type MetadataInputFieldListProps = {
   currentMetadata?: MetadataType;
   fields: FieldType[];
   nonFilledRequiredFieldNames: string[];
   prefixInputElementId: string;
 };
 
-const useStyles = makeStyles({
-  root: {
-    display: "flex",
-    flexDirection: "column",
-  },
-  label: {
-    fontSize: "1.5rem",
-  },
-  inputContainer: {
-    padding: "0 3vw",
-  },
-});
-
-const Component = ({
+export const MetadataInputFieldList = ({
   currentMetadata,
   fields,
   nonFilledRequiredFieldNames,
   prefixInputElementId,
-}: ComponentProps): JSX.Element => {
-  const classes = useStyles();
+}: MetadataInputFieldListProps): JSX.Element => {
   return (
-    <div className={classes.root}>
+    <Box sx={{ display: "flex", flexDirection: "column" }}>
       {fields.map((field) => {
         const name = field.name;
         const displayName = field.display_name;
@@ -48,14 +34,17 @@ const Component = ({
         const id = `${prefixInputElementId}_${name.replace(/\s+/g, "")}`;
         return (
           <div key={name}>
-            <label
+            <Box
+              component="label"
               htmlFor={id}
-              className={classes.label}
-              style={required ? { fontWeight: "bold" } : undefined}
+              sx={{
+                fontSize: "1.5rem",
+                fontWeight: required ? "bold" : undefined,
+              }}
             >
               {displayName}
-            </label>
-            <div className={classes.inputContainer}>
+            </Box>
+            <Box sx={{ padding: "0 3vw" }}>
               <TextField
                 fullWidth
                 key={field.name}
@@ -66,13 +55,11 @@ const Component = ({
                   required || recommended ? `This is ${necessity}` : undefined
                 }
               />
-            </div>
+            </Box>
             <Spacer direction="vertical" size="3vh" />
           </div>
         );
       })}
-    </div>
+    </Box>
   );
 };
-export { Component as MetadataInputFieldList };
-export type { ComponentProps as MetadataInputFieldListProps };

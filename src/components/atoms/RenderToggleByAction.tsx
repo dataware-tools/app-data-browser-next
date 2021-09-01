@@ -2,18 +2,15 @@ import { ReactNode } from "react";
 import { useIsActionPermitted } from "globalStates";
 import { UserActionType } from "utils";
 
-type ContainerProps = {
+export type RenderToggleByActionProps = {
   required: UserActionType;
   children: ReactNode;
 };
 
-const Container = ({
+export const RenderToggleByAction = ({
   required,
   children,
-}: ContainerProps): JSX.Element | null => {
+}: RenderToggleByActionProps): JSX.Element | null => {
   const isPermitted = useIsActionPermitted(required || "__noAction");
   return isPermitted ? <>{children}</> : null;
 };
-
-export { Container as RenderToggleByAction };
-export type { ContainerProps as RenderToggleByActionProps };

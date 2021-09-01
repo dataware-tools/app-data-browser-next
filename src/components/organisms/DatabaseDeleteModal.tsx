@@ -44,20 +44,16 @@ export type DatabaseDeleteModalProps = {
   onClose: () => void;
 };
 
-export const DatabaseDeleteModalPresentation = (
-  props: DatabaseDeleteModalPresentationProps
-): JSX.Element => {
-  const {
-    error,
-    databaseId,
-    onClose,
-    formControl,
-    validateRules,
-    validateErrors,
-    validateErrorMessages,
-    ...dialogProps
-  } = props;
-
+export const DatabaseDeleteModalPresentation = ({
+  error,
+  databaseId,
+  onClose,
+  formControl,
+  validateRules,
+  validateErrors,
+  validateErrorMessages,
+  ...dialogProps
+}: DatabaseDeleteModalPresentationProps): JSX.Element => {
   return (
     <ConfirmModal
       onClose={onClose}
@@ -100,10 +96,10 @@ export const DatabaseDeleteModalPresentation = (
   );
 };
 
-export const DatabaseDeleteModal = (
-  props: DatabaseDeleteModalProps
-): JSX.Element => {
-  const { databaseId } = props;
+export const DatabaseDeleteModal = ({
+  databaseId,
+  onClose: propsOnClose,
+}: DatabaseDeleteModalProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const history = useHistory();
   const { page, perPage, search } = useRecoilValue(databasePaginateState);
@@ -140,7 +136,7 @@ export const DatabaseDeleteModal = (
     isConfirmed
   ) => {
     if (!isConfirmed) {
-      props.onClose();
+      propsOnClose();
       return {};
     }
 
@@ -176,7 +172,7 @@ export const DatabaseDeleteModal = (
 
     console.log(cancelCloseModal);
     if (!cancelCloseModal) {
-      props.onClose();
+      propsOnClose();
     }
     return { cancelCloseModal };
   };

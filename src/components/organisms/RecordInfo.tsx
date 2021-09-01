@@ -11,25 +11,27 @@ import FormControlLabel from "@material-ui/core/FormControlLabel";
 import Switch from "@material-ui/core/Switch";
 import dynamic from "next/dynamic";
 import { useState } from "react";
-import { RecordInfoTable } from "./RecordInfoTable";
+import { RecordInfoTable } from "components/organisms/RecordInfoTable";
 import { useGetRecord } from "utils";
 const ReactJson = dynamic(import("react-json-view"), { ssr: false });
 
-type Props = {
+export type RecordInfoPresentationProps = {
   record: metaStore.RecordModel;
   error?: ErrorMessageProps;
   isFetchComplete: boolean;
   isJsonView: boolean;
   onToggleIsJsonView: () => void;
 };
-type ContainerProps = { databaseId: string; recordId: string };
-const Component = ({
+
+export type RecordInfoProps = { databaseId: string; recordId: string };
+
+export const RecordInfoPresentation = ({
   record,
   error,
   isFetchComplete,
   isJsonView,
   onToggleIsJsonView,
-}: Props): JSX.Element => {
+}: RecordInfoPresentationProps): JSX.Element => {
   return (
     <>
       {error ? (
@@ -67,7 +69,10 @@ const Component = ({
   );
 };
 
-const Container = ({ databaseId, recordId }: ContainerProps): JSX.Element => {
+export const RecordInfo = ({
+  databaseId,
+  recordId,
+}: RecordInfoProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const { data: getRecordRes, error: getRecordError } = useGetRecord(
     getAccessToken,
@@ -88,7 +93,7 @@ const Container = ({ databaseId, recordId }: ContainerProps): JSX.Element => {
     );
   }
 
-  const error: Props["error"] = getRecordError
+  const error: RecordInfoPresentationProps["error"] = getRecordError
     ? extractErrorMessageFromFetchError(getRecordError)
     : undefined;
   const isFetchComplete = Boolean(!error && getRecordRes);
@@ -102,7 +107,7 @@ const Container = ({ databaseId, recordId }: ContainerProps): JSX.Element => {
   };
 
   return (
-    <Component
+    <RecordInfoPresentation
       record={record}
       error={error}
       isFetchComplete={isFetchComplete}
@@ -111,6 +116,3 @@ const Container = ({ databaseId, recordId }: ContainerProps): JSX.Element => {
     />
   );
 };
-
-export { Container as RecordInfo };
-export type { ContainerProps as RecordInfoProps };

@@ -6,9 +6,9 @@ import PageviewIcon from "@material-ui/icons/Pageview";
 import { FileMenuItem, FileMenuItemProps } from "components/atoms/FileMenuItem";
 import { RenderToggleByAction } from "components/atoms/RenderToggleByAction";
 
-type Props = ContainerProps;
+export type FileMenuPresentationProps = FileMenuProps;
 
-type ContainerProps = {
+export type FileMenuProps = {
   onPreview?: FileMenuItemProps["onClick"];
   onEdit?: FileMenuItemProps["onClick"];
   onDelete?: FileMenuItemProps["onClick"];
@@ -18,7 +18,7 @@ type ContainerProps = {
   anchorEl: HTMLElement | null;
 };
 
-const Component = ({
+export const FileMenuPresentation = ({
   onPreview,
   onEdit,
   onDelete,
@@ -26,7 +26,7 @@ const Component = ({
   onClose,
   open,
   anchorEl,
-}: Props): JSX.Element => {
+}: FileMenuPresentationProps): JSX.Element => {
   return (
     <Menu
       open={open}
@@ -76,14 +76,14 @@ const Component = ({
   );
 };
 
-const Container = ({
+export const FileMenu = ({
   onPreview,
   onEdit,
   onDelete,
   onDownload,
   onClose,
   ...delegate
-}: ContainerProps): JSX.Element => {
+}: FileMenuProps): JSX.Element => {
   const wrapClickHandler = (func: undefined | (() => void)) => {
     if (!func) {
       return undefined;
@@ -99,7 +99,7 @@ const Container = ({
   const _onDelete = wrapClickHandler(onDelete);
   const _onDownload = wrapClickHandler(onDownload);
   return (
-    <Component
+    <FileMenuPresentation
       {...delegate}
       onClose={onClose}
       onPreview={_onPreview}
@@ -109,5 +109,3 @@ const Container = ({
     />
   );
 };
-export { Container as FileMenu };
-export type { ContainerProps as FileMenuProps };

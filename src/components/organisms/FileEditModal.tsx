@@ -19,7 +19,7 @@ import {
   isEditableColumnName,
 } from "utils";
 
-type ContainerProps = {
+export type FileEditModalProps = {
   open: boolean;
   onClose: () => void;
   recordId: string;
@@ -28,14 +28,14 @@ type ContainerProps = {
   onSubmitSucceeded?: (newFile: metaStore.FileModel) => void;
 };
 
-const Container = ({
+export const FileEditModal = ({
   uuid,
   recordId,
   databaseId,
   onSubmitSucceeded,
   open,
   ...delegated
-}: ContainerProps): JSX.Element => {
+}: FileEditModalProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const [error, setError] = useState<ErrorMessageProps | undefined>(undefined);
 
@@ -135,6 +135,3 @@ const Container = ({
     />
   );
 };
-
-export { Container as FileEditModal };
-export type { ContainerProps as FileEditModalProps };
