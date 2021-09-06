@@ -13,13 +13,13 @@ const SwrOptions = {
 };
 
 const authConfig = {
-  domain: process.env.REACT_APP_AUTH0_DOMAIN || AUTH_CONFIG.domain,
-  clientId: process.env.REACT_APP_AUTH0_CLIENT_ID || AUTH_CONFIG.clientId,
-  apiUrl: process.env.REACT_APP_AUTH0_API_URL || AUTH_CONFIG.apiUrl,
+  domain: AUTH_CONFIG.domain,
+  clientId: AUTH_CONFIG.clientId,
+  apiUrl: AUTH_CONFIG.apiUrl,
 };
 
 const redirectUri =
-  typeof window === "undefined" ? null : window.location.origin;
+  typeof window === "undefined" ? null : `${window.location.origin}/callback`;
 
 const pydtkSystemColumns = [
   "database_id",

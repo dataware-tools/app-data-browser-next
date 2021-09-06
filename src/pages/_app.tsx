@@ -20,13 +20,16 @@ const App = ({ Component, pageProps }: AppProps): JSX.Element => {
   }, []);
 
   const onRedirectCallback = (appState: AppState): void => {
-    const nonQueryParamURL =
-      appState && appState.returnTo
-        ? appState.returnTo
-        : typeof window === "undefined"
-        ? null
-        : window.location.origin;
-    history.replaceState(null, "", nonQueryParamURL);
+    if (appState?.returnTo) {
+      window.location.href = appState.returnTo;
+    } else {
+      // Remove the code and state parameters from the url
+      history.replaceState(
+        null,
+        "",
+        ` ${window.location.origin}${window.location.pathname} `
+      );
+    }
   };
 
   return (
