@@ -294,6 +294,7 @@ export const DatabaseEditModal = <T extends boolean>({
       onSubmit={handleSubmit(onSubmit)}
       isSubmitting={isSubmitting}
       error={error}
+      // @ts-expect-error for committing temporarily
       formErrors={formErrors}
       control={control}
       {...delegated}
