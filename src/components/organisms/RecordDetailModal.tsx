@@ -188,6 +188,8 @@ export const RecordDetailModal = ({
   const tabNames = ["Info", "Files"];
 
   const onAddFile: FileUploadButtonProps["onFileChange"] = async (files) => {
+    if (!user || !user.sub) return;
+
     if (!files || !files[0]) {
       return;
     }
@@ -205,9 +207,12 @@ export const RecordDetailModal = ({
     requestBody.append("file", files[0]);
     requestBody.append(
       "metadata",
-      new Blob([JSON.stringify(createSystemMetadata("add", user))], {
-        type: "application/json",
-      })
+      new Blob(
+        [JSON.stringify(createSystemMetadata("add", { sub: user.sub }))],
+        {
+          type: "application/json",
+        }
+      )
     );
 
     const [createFileRes, createFileError] = await uploadFileToFileProvider(
