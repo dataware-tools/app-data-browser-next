@@ -286,7 +286,7 @@ export const RecordsPage = (): JSX.Element => {
   ) => {
     setRecordPaginateState((prev) => ({
       ...prev,
-      search: searchText as string,
+      search: searchText || "",
     }));
   };
   const onEndInitializeDatabase: RecordsPagePresentationProps["onEndInitializeDatabase"] = () => {
