@@ -74,6 +74,7 @@ export const FileListPresentation = ({
           </List>
           {previewingFile ? (
             <FilePreviewModal
+              databaseId={databaseId}
               fileList={files}
               open={Boolean(previewingFile)}
               onClose={onCloseFilePreviewModal}
@@ -142,7 +143,8 @@ export const FileList = ({
       getAccessToken,
       fileProvider.DeleteService.deleteFile,
       {
-        path: file.path,
+        databaseId: databaseId,
+        fileUuid: file.uuid,
       }
     );
 
@@ -186,7 +188,8 @@ export const FileList = ({
       fileProvider.OpenAPI.BASE = API_ROUTE.FILE.BASE;
       fileProvider.DownloadService.createJwtToDownloadFile({
         requestBody: {
-          path: file.path,
+          database_id: databaseId,
+          file_uuid: file.uuid,
           content_type: file["content-type"],
         },
       })

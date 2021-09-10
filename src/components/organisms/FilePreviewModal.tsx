@@ -23,12 +23,14 @@ export type FilePreviewModalPresentationProps = {
 } & Omit<FilePreviewModalProps, "fileList">;
 
 export type FilePreviewModalProps = DialogProps & {
+  databaseId: string;
   file: FileType;
   fileList: FileType[];
   height?: string;
 };
 
 export const FilePreviewModalPresentation = ({
+  databaseId,
   file,
   height,
   goPrevFile,
@@ -65,7 +67,7 @@ export const FilePreviewModalPresentation = ({
         <DialogContainer height={height}>
           <DialogBody>
             <DialogMain>
-              <FilePreviewer file={file} />
+              <FilePreviewer databaseId={databaseId} file={file} />
             </DialogMain>
           </DialogBody>
         </DialogContainer>
@@ -75,6 +77,7 @@ export const FilePreviewModalPresentation = ({
 };
 
 export const FilePreviewModal = ({
+  databaseId,
   fileList,
   open,
   file: initFile,
@@ -118,6 +121,7 @@ export const FilePreviewModal = ({
   return (
     <FilePreviewModalPresentation
       open={open}
+      databaseId={databaseId}
       file={currentFile}
       fileNames={fileNames}
       goNextFile={goNextFile}

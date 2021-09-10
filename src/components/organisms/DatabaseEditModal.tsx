@@ -24,8 +24,7 @@ import {
   Controller,
   SubmitHandler,
   Control,
-  DeepMap,
-  FieldError,
+  FieldErrors,
 } from "react-hook-form";
 import { useRecoilValue } from "recoil";
 import { databasePaginateState } from "globalStates";
@@ -39,7 +38,7 @@ export type DatabaseEditModalPresentationProps<T extends boolean> = {
   onSubmit: () => Promise<void>;
   isSubmitting: boolean;
   error?: ErrorMessageProps;
-  formErrors: DeepMap<FormInput, FieldError>;
+  formErrors: FieldErrors<FormInput>;
   control: Control<FormInput>;
 } & Omit<
   DatabaseEditModalProps<T>,
