@@ -153,7 +153,7 @@ export const DatabasesPage = (): JSX.Element => {
   ) => {
     setDatabasePaginateState((prev) => ({
       ...prev,
-      search: searchText,
+      search: searchText || "",
       page: 1,
     }));
   };

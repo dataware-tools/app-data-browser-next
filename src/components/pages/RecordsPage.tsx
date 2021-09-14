@@ -286,7 +286,7 @@ export const RecordsPage = (): JSX.Element => {
   ) => {
     setRecordPaginateState((prev) => ({
       ...prev,
-      search: searchText,
+      search: searchText || "",
       page: 1,
     }));
   };

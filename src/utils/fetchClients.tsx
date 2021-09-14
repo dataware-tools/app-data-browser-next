@@ -386,7 +386,7 @@ const useCreateJwtToDownloadFile: UseAPIWithoutCache<
     [
       token,
       shouldFetch,
-      requestBody?.path,
+      requestBody?.file_uuid,
       requestBody?.content_type,
       requestBody?.database_id,
       requestBody?.record_id,
