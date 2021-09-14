@@ -1,18 +1,15 @@
 import { Story } from "@storybook/react";
-import {
-  SecretConfigEditModal,
-  SecretConfigEditModalProps,
-} from "./SecretConfigEditModal";
+import { DatabaseConfigModal, DatabaseConfigModalProps } from "./";
 import { CONST_STORY_BOOK, TestAuthProvider } from "test-utils";
 
 export default {
-  component: SecretConfigEditModal,
-  title: "SecretConfigEditModal",
+  component: DatabaseConfigModal,
+  title: "DatabaseConfigModal/Default",
 };
 
-const Template: Story<SecretConfigEditModalProps> = (args) => (
+const Template: Story<DatabaseConfigModalProps> = (args) => (
   <TestAuthProvider>
-    <SecretConfigEditModal {...args} />
+    <DatabaseConfigModal {...args} />
   </TestAuthProvider>
 );
 

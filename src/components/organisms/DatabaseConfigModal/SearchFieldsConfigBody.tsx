@@ -2,20 +2,13 @@ import { useAuth0 } from "@auth0/auth0-react";
 import {
   ErrorMessage,
   metaStore,
-  DialogCloseButton,
-  DialogTitle,
   DialogBody,
-  DialogContainer,
   DialogToolBar,
-  DialogWrapper,
   DialogMain,
-  usePrevious,
-  NoticeableLetters,
   LoadingIndicator,
   ErrorMessageProps,
   extractErrorMessageFromFetchError,
 } from "@dataware-tools/app-common";
-import Dialog from "@material-ui/core/Dialog";
 import LoadingButton from "@material-ui/lab/LoadingButton";
 import { produce } from "immer";
 import { useState, useEffect } from "react";
@@ -28,7 +21,7 @@ import { useGetConfig, fetchMetaStore } from "utils";
 
 export type ConfigNameType = "record_search_target_columns";
 
-export type SearchConfigEditModalPresentationProps = {
+export type SearchFieldsConfigBodyPresentationProps = {
   error?: ErrorMessageProps;
   isFetchComplete: boolean;
   onChangeSearchTargetColumns: OptionSharingSelectsProps["onChange"];
@@ -37,17 +30,13 @@ export type SearchConfigEditModalPresentationProps = {
   isDisableSaveButton: boolean;
   isSaving: boolean;
   onSave: () => void;
-} & Omit<SearchConfigEditModalProps, "databaseId">;
+} & Omit<SearchFieldsConfigBodyProps, "databaseId">;
 
-export type SearchConfigEditModalProps = {
-  open: boolean;
+export type SearchFieldsConfigBodyProps = {
   databaseId: string;
-  onClose: () => void;
 };
 
-export const SearchConfigEditModalPresentation = ({
-  open,
-  onClose,
+export const SearchFieldsConfigBodyPresentation = ({
   error,
   isFetchComplete,
   onChangeSearchTargetColumns,
@@ -56,54 +45,40 @@ export const SearchConfigEditModalPresentation = ({
   isDisableSaveButton,
   isSaving,
   onSave,
-}: SearchConfigEditModalPresentationProps): JSX.Element => {
-  return (
-    <Dialog open={open} maxWidth="xl" onClose={onClose}>
-      <DialogWrapper>
-        <DialogCloseButton onClick={onClose} />
-        <DialogTitle>
-          <NoticeableLetters>Search target columns</NoticeableLetters>
-        </DialogTitle>
-        <DialogContainer padding="0 0 20px">
-          {error ? (
-            <ErrorMessage {...error} />
-          ) : isFetchComplete ? (
-            <DialogBody>
-              <DialogMain>
-                <OptionSharingSelects
-                  onChange={onChangeSearchTargetColumns}
-                  options={searchTargetColumnsOptions}
-                  values={searchTargetColumns}
-                  creatable
-                  deletable
-                />
-              </DialogMain>
-              <DialogToolBar
-                right={
-                  <LoadingButton
-                    disabled={isDisableSaveButton}
-                    loading={isSaving}
-                    onClick={onSave}
-                  >
-                    Save
-                  </LoadingButton>
-                }
-              />
-            </DialogBody>
-          ) : (
-            <LoadingIndicator />
-          )}
-        </DialogContainer>
-      </DialogWrapper>
-    </Dialog>
+}: SearchFieldsConfigBodyPresentationProps): JSX.Element => {
+  return error ? (
+    <ErrorMessage {...error} />
+  ) : isFetchComplete ? (
+    <DialogBody>
+      <DialogMain>
+        <OptionSharingSelects
+          onChange={onChangeSearchTargetColumns}
+          options={searchTargetColumnsOptions}
+          values={searchTargetColumns}
+          creatable
+          deletable
+        />
+      </DialogMain>
+      <DialogToolBar
+        right={
+          <LoadingButton
+            disabled={isDisableSaveButton}
+            loading={isSaving}
+            onClick={onSave}
+          >
+            Save
+          </LoadingButton>
+        }
+      />
+    </DialogBody>
+  ) : (
+    <LoadingIndicator />
   );
 };
 
-export const SearchConfigEditModal = ({
-  open,
-  onClose,
+export const SearchFieldsConfigBody = ({
   databaseId,
-}: SearchConfigEditModalProps): JSX.Element => {
+}: SearchFieldsConfigBodyProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const [isSaving, setIsSaving] = useState(false);
   const [searchTargetColumns, setSearchTargetColumns] = useState<string[]>([]);
@@ -116,16 +91,6 @@ export const SearchConfigEditModal = ({
   } = useGetConfig(getAccessToken, {
     databaseId,
   });
-
-  const initializeState = () => {
-    setIsSaving(false);
-  };
-  const prevOpen = usePrevious(open);
-  useEffect(() => {
-    if (open && !prevOpen) {
-      initializeState();
-    }
-  }, [open, prevOpen]);
 
   const fetchError = getConfigError;
   useEffect(() => {
@@ -185,7 +150,6 @@ export const SearchConfigEditModal = ({
 
       setIsSaving(false);
     }
-    onClose();
   };
 
   const searchTargetColumnsOptions =
@@ -198,14 +162,12 @@ export const SearchConfigEditModal = ({
     searchTargetColumns.length <= 0 || searchTargetColumns.includes("");
 
   return (
-    <SearchConfigEditModalPresentation
+    <SearchFieldsConfigBodyPresentation
       isDisableSaveButton={isDisableSaveButton}
       isFetchComplete={isFetchComplete}
       isSaving={isSaving}
       onChangeSearchTargetColumns={setSearchTargetColumns}
-      onClose={onClose}
       onSave={onSave}
-      open={open}
       searchTargetColumns={searchTargetColumns}
       searchTargetColumnsOptions={searchTargetColumnsOptions}
       error={error}

@@ -1,34 +1,25 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import { metaStore } from "@dataware-tools/app-common";
 import { useState } from "react";
+import { DatabaseConfigModal } from "./DatabaseConfigModal";
 import { DatabaseDeleteModal } from "./DatabaseDeleteModal";
 import { DatabaseEditModal } from "./DatabaseEditModal";
 import {
   DatabaseMenuButton,
   DatabaseMenuButtonProps,
 } from "components/molecules/DatabaseMenuButton";
-import { DisplayConfigEditModal } from "components/organisms/DisplayConfigEditModal";
 import { ExportMetadataModal } from "components/organisms/ExportMetadataModal";
-import { InputConfigEditModal } from "components/organisms/InputConfigEditModal";
-import { SearchConfigEditModal } from "components/organisms/SearchConfigEditModal";
-import { SecretConfigEditModal } from "components/organisms/SecretConfigEditModal";
 import { useIsActionPermitted } from "globalStates";
 import { useGetDatabase } from "utils";
 
 export type ControlledDatabaseMenuButtonPresentationProps = {
   menu: DatabaseMenuButtonProps["menu"];
-  isOpenDisplayConfigModal: boolean;
-  isOpenInputConfigEditModal: boolean;
-  isOpenSearchConfigEditModal: boolean;
-  isOpenSecretConfigEditModal: boolean;
+  isOpenDatabaseConfigModal: boolean;
   isOpenDatabaseEditModal: boolean;
   isOpenDatabaseDeleteModal: boolean;
   isOpenExportMetadataModal: boolean;
   onSelectMenu: DatabaseMenuButtonProps["onMenuSelect"];
-  onCloseDisplayConfigModal: () => void;
-  onCloseInputConfigEditModal: () => void;
-  onCloseSearchConfigEditModal: () => void;
-  onCloseSecretConfigEditModal: () => void;
+  onCloseDatabaseConfigModal: () => void;
   onCloseDatabaseEditModal: () => void;
   onCloseDatabaseDeleteModal: () => void;
   onCloseExportMetadataModal: () => void;
@@ -43,14 +34,8 @@ export const ControlledDatabaseMenuButtonPresentation = ({
   databaseId,
   onSelectMenu,
   menu,
-  isOpenDisplayConfigModal,
-  onCloseDisplayConfigModal,
-  isOpenInputConfigEditModal,
-  onCloseInputConfigEditModal,
-  isOpenSearchConfigEditModal,
-  onCloseSearchConfigEditModal,
-  isOpenSecretConfigEditModal,
-  onCloseSecretConfigEditModal,
+  isOpenDatabaseConfigModal,
+  onCloseDatabaseConfigModal,
   isOpenExportMetadataModal,
   onCloseExportMetadataModal,
   isOpenDatabaseEditModal,
@@ -62,25 +47,10 @@ export const ControlledDatabaseMenuButtonPresentation = ({
   return (
     <>
       <DatabaseMenuButton onMenuSelect={onSelectMenu} menu={menu} />
-      <DisplayConfigEditModal
+      <DatabaseConfigModal
         databaseId={databaseId}
-        open={isOpenDisplayConfigModal}
-        onClose={onCloseDisplayConfigModal}
-      />
-      <InputConfigEditModal
-        databaseId={databaseId}
-        open={isOpenInputConfigEditModal}
-        onClose={onCloseInputConfigEditModal}
-      />
-      <SearchConfigEditModal
-        databaseId={databaseId}
-        open={isOpenSearchConfigEditModal}
-        onClose={onCloseSearchConfigEditModal}
-      />
-      <SecretConfigEditModal
-        databaseId={databaseId}
-        open={isOpenSecretConfigEditModal}
-        onClose={onCloseSecretConfigEditModal}
+        open={isOpenDatabaseConfigModal}
+        onClose={onCloseDatabaseConfigModal}
       />
       <DatabaseEditModal
         databaseId={databaseId}
@@ -114,12 +84,9 @@ export const ControlledDatabaseMenuButton = ({
   const isPermittedDeleteDatabase = useIsActionPermitted(
     "databases:write:delete"
   );
-  const [isOpenDisplayConfigModal, setIsOpenDisplayConfigModal] = useState(
+  const [isOpenDatabaseConfigModal, setIsOpenDatabaseConfigModal] = useState(
     false
   );
-  const [isOpenInputConfigModal, setIsOpenInputConfigModal] = useState(false);
-  const [isOpenSearchConfigModal, setIsOpenSearchConfigModal] = useState(false);
-  const [isOpenSecretConfigModal, setIsOpenSecretConfigModal] = useState(false);
   const [isOpenDatabaseEditModal, setIsOpenDatabaseEditModal] = useState(false);
   const [isOpenExportMetadataModal, setIsOpenExportMetadataModal] = useState(
     false
@@ -132,18 +99,7 @@ export const ControlledDatabaseMenuButton = ({
   });
 
   const menu: ControlledDatabaseMenuButtonPresentationProps["menu"] = [
-    isPermittedConfigureDatabase
-      ? { value: "Configure display columns" }
-      : undefined,
-    isPermittedConfigureDatabase
-      ? { value: "Configure input columns" }
-      : undefined,
-    isPermittedConfigureDatabase
-      ? { value: "Configure search target columns" }
-      : undefined,
-    isPermittedConfigureDatabase
-      ? { value: "Configure secret columns" }
-      : undefined,
+    isPermittedConfigureDatabase ? { value: "Configure database" } : undefined,
     isPermittedConfigureDatabase
       ? { value: "Update database info" }
       : undefined,
@@ -158,24 +114,15 @@ export const ControlledDatabaseMenuButton = ({
   ) => {
     switch (targetName) {
       case menu[0]?.value:
-        setIsOpenDisplayConfigModal(true);
+        setIsOpenDatabaseConfigModal(true);
         break;
       case menu[1]?.value:
-        setIsOpenInputConfigModal(true);
-        break;
-      case menu[2]?.value:
-        setIsOpenSearchConfigModal(true);
-        break;
-      case menu[3]?.value:
-        setIsOpenSecretConfigModal(true);
-        break;
-      case menu[4]?.value:
         setIsOpenDatabaseEditModal(true);
         break;
-      case menu[5]?.value:
+      case menu[2]?.value:
         setIsOpenExportMetadataModal(true);
         break;
-      case menu[6]?.value:
+      case menu[3]?.value:
         setIsOpenDatabaseDeleteModal(true);
         break;
     }
@@ -186,19 +133,13 @@ export const ControlledDatabaseMenuButton = ({
       {...delegated}
       databaseInfo={getDatabaseRes}
       databaseId={databaseId}
-      isOpenDisplayConfigModal={isOpenDisplayConfigModal}
-      isOpenInputConfigEditModal={isOpenInputConfigModal}
-      isOpenSearchConfigEditModal={isOpenSearchConfigModal}
-      isOpenSecretConfigEditModal={isOpenSecretConfigModal}
+      isOpenDatabaseConfigModal={isOpenDatabaseConfigModal}
       isOpenExportMetadataModal={isOpenExportMetadataModal}
       isOpenDatabaseEditModal={isOpenDatabaseEditModal}
       isOpenDatabaseDeleteModal={isOpenDatabaseDeleteModal}
       menu={menu}
       onSelectMenu={onSelectMenu}
-      onCloseDisplayConfigModal={() => setIsOpenDisplayConfigModal(false)}
-      onCloseInputConfigEditModal={() => setIsOpenInputConfigModal(false)}
-      onCloseSearchConfigEditModal={() => setIsOpenSearchConfigModal(false)}
-      onCloseSecretConfigEditModal={() => setIsOpenSecretConfigModal(false)}
+      onCloseDatabaseConfigModal={() => setIsOpenDatabaseConfigModal(false)}
       onCloseDatabaseEditModal={() => setIsOpenDatabaseEditModal(false)}
       onCloseExportMetadataModal={() => setIsOpenExportMetadataModal(false)}
       onCloseDatabaseDeleteModal={() => setIsOpenDatabaseDeleteModal(false)}

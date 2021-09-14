@@ -23,14 +23,14 @@ import StorageIcon from "@material-ui/icons/Storage";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { useRecoilState, useSetRecoilState } from "recoil";
+import {
+  DatabaseConfigModal,
+  DatabaseConfigModalProps,
+} from "../organisms/DatabaseConfigModal/index";
 import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
 import { RenderToggleByAction } from "components/atoms/RenderToggleByAction";
 import { Breadcrumbs } from "components/molecules/Breadcrumbs";
 import { ControlledDatabaseMenuButton } from "components/organisms/ControlledDatabaseMenuButton";
-import {
-  DisplayConfigEditModal,
-  DisplayConfigEditModalProps,
-} from "components/organisms/DisplayConfigEditModal";
 import {
   RecordAddButton,
   RecordAddButtonProps,
@@ -68,7 +68,7 @@ export type RecordsPagePresentationProps = {
   onChangePage: (newPage: number) => void;
   onAddRecordSucceeded: RecordAddButtonProps["onAddRecordSucceeded"];
   onCloseRecordDetailModal: RecordDetailModalProps["onClose"];
-  onEndInitializeDatabase: DisplayConfigEditModalProps["onClose"];
+  onEndInitializeDatabase: DatabaseConfigModalProps["onClose"];
 };
 
 export const RecordsPagePresentation = ({
@@ -170,7 +170,7 @@ export const RecordsPagePresentation = ({
         />
       ) : null}
       {isNewDatabase ? (
-        <DisplayConfigEditModal
+        <DatabaseConfigModal
           open
           databaseId={databaseId}
           onClose={onEndInitializeDatabase}

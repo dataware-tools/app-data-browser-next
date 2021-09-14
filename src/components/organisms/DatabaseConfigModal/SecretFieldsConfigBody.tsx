@@ -2,20 +2,13 @@ import { useAuth0 } from "@auth0/auth0-react";
 import {
   ErrorMessage,
   metaStore,
-  DialogCloseButton,
-  DialogTitle,
   DialogBody,
-  DialogContainer,
   DialogToolBar,
-  DialogWrapper,
   DialogMain,
   ErrorMessageProps,
-  usePrevious,
-  NoticeableLetters,
   LoadingIndicator,
   extractErrorMessageFromFetchError,
 } from "@dataware-tools/app-common";
-import Dialog from "@material-ui/core/Dialog";
 import LoadingButton from "@material-ui/lab/LoadingButton";
 import { produce } from "immer";
 import { useState, useEffect } from "react";
@@ -28,7 +21,7 @@ import { useGetConfig, fetchMetaStore } from "utils";
 
 export type ConfigNameType = "secret_columns";
 
-export type SecretConfigEditModalPresentationProps = {
+export type SecretFieldsConfigBodyPresentationProps = {
   error?: ErrorMessageProps;
   isFetchComplete: boolean;
   onChangeSecretColumns: OptionSharingSelectsProps["onChange"];
@@ -37,17 +30,13 @@ export type SecretConfigEditModalPresentationProps = {
   isDisableSaveButton: boolean;
   isSaving: boolean;
   onSave: () => void;
-} & Omit<SecretConfigEditModalProps, "databaseId">;
+} & Omit<SecretFieldsConfigBodyProps, "databaseId">;
 
-export type SecretConfigEditModalProps = {
-  open: boolean;
+export type SecretFieldsConfigBodyProps = {
   databaseId: string;
-  onClose: () => void;
 };
 
-export const SecretConfigEditModalPresentation = ({
-  open,
-  onClose,
+export const SecretFieldsConfigBodyPresentation = ({
   error,
   isFetchComplete,
   onChangeSecretColumns,
@@ -56,54 +45,40 @@ export const SecretConfigEditModalPresentation = ({
   isDisableSaveButton,
   isSaving,
   onSave,
-}: SecretConfigEditModalPresentationProps): JSX.Element => {
-  return (
-    <Dialog open={open} maxWidth="xl" onClose={onClose}>
-      <DialogWrapper>
-        <DialogCloseButton onClick={onClose} />
-        <DialogTitle>
-          <NoticeableLetters>Search target columns</NoticeableLetters>
-        </DialogTitle>
-        <DialogContainer padding="0 0 20px">
-          {error ? (
-            <ErrorMessage {...error} />
-          ) : isFetchComplete ? (
-            <DialogBody>
-              <DialogMain>
-                <OptionSharingSelects
-                  onChange={onChangeSecretColumns}
-                  options={secretColumnsOptions}
-                  values={secretColumns}
-                  creatable
-                  deletable
-                />
-              </DialogMain>
-              <DialogToolBar
-                right={
-                  <LoadingButton
-                    disabled={isDisableSaveButton}
-                    loading={isSaving}
-                    onClick={onSave}
-                  >
-                    Save
-                  </LoadingButton>
-                }
-              />
-            </DialogBody>
-          ) : (
-            <LoadingIndicator />
-          )}
-        </DialogContainer>
-      </DialogWrapper>
-    </Dialog>
+}: SecretFieldsConfigBodyPresentationProps): JSX.Element => {
+  return error ? (
+    <ErrorMessage {...error} />
+  ) : isFetchComplete ? (
+    <DialogBody>
+      <DialogMain>
+        <OptionSharingSelects
+          onChange={onChangeSecretColumns}
+          options={secretColumnsOptions}
+          values={secretColumns}
+          creatable
+          deletable
+        />
+      </DialogMain>
+      <DialogToolBar
+        right={
+          <LoadingButton
+            disabled={isDisableSaveButton}
+            loading={isSaving}
+            onClick={onSave}
+          >
+            Save
+          </LoadingButton>
+        }
+      />
+    </DialogBody>
+  ) : (
+    <LoadingIndicator />
   );
 };
 
-export const SecretConfigEditModal = ({
-  open,
-  onClose,
+export const SecretFieldsConfigBody = ({
   databaseId,
-}: SecretConfigEditModalProps): JSX.Element => {
+}: SecretFieldsConfigBodyProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const [isSaving, setIsSaving] = useState(false);
   const [secretColumns, setSecretColumns] = useState<string[]>([]);
@@ -116,16 +91,6 @@ export const SecretConfigEditModal = ({
   } = useGetConfig(getAccessToken, {
     databaseId,
   });
-
-  const initializeState = () => {
-    setIsSaving(false);
-  };
-  const prevOpen = usePrevious(open);
-  useEffect(() => {
-    if (open && !prevOpen) {
-      initializeState();
-    }
-  }, [open, prevOpen]);
 
   const fetchError = getConfigError;
   useEffect(() => {
@@ -184,7 +149,6 @@ export const SecretConfigEditModal = ({
 
       setIsSaving(false);
     }
-    onClose();
   };
 
   const secretColumnsOptions =
@@ -196,14 +160,12 @@ export const SecretConfigEditModal = ({
   const isDisableSaveButton = secretColumns.includes("");
 
   return (
-    <SecretConfigEditModalPresentation
+    <SecretFieldsConfigBodyPresentation
       isDisableSaveButton={isDisableSaveButton}
       isFetchComplete={isFetchComplete}
       isSaving={isSaving}
       onChangeSecretColumns={setSecretColumns}
-      onClose={onClose}
       onSave={onSave}
-      open={open}
       secretColumns={secretColumns}
       secretColumnsOptions={secretColumnsOptions}
       error={error}

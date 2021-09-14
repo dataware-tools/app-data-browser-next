@@ -2,20 +2,13 @@ import { useAuth0 } from "@auth0/auth0-react";
 import {
   ErrorMessage,
   metaStore,
-  DialogCloseButton,
   DialogToolBar,
   DialogBody,
-  DialogTitle,
-  DialogContainer,
-  DialogWrapper,
   DialogMain,
-  usePrevious,
-  NoticeableLetters,
   LoadingIndicator,
   ErrorMessageProps,
   extractErrorMessageFromFetchError,
 } from "@dataware-tools/app-common";
-import Dialog from "@material-ui/core/Dialog";
 import LoadingButton from "@material-ui/lab/LoadingButton";
 import { produce } from "immer";
 import { useState, useEffect } from "react";
@@ -27,7 +20,7 @@ import { useGetConfig, fetchMetaStore, isEditableColumnName } from "utils";
 
 export type ConfigNameType = "record_add_editable_columns";
 
-export type InputConfigEditPresentationProps = {
+export type InputFieldsConfigBodyPresentationProps = {
   error?: ErrorMessageProps;
   isFetchComplete: boolean;
   inputColumns: InputConfigListProps["value"];
@@ -35,17 +28,13 @@ export type InputConfigEditPresentationProps = {
   onChangeInputColumns: InputConfigListProps["onChange"];
   isSaving: boolean;
   onSave: () => void;
-} & Omit<InputConfigEditModalProps, "databaseId">;
+} & Omit<InputFieldsConfigBodyProps, "databaseId">;
 
-export type InputConfigEditModalProps = {
-  open: boolean;
-  onClose: () => void;
+export type InputFieldsConfigBodyProps = {
   databaseId: string;
 };
 
-export const InputConfigEditPresentation = ({
-  open,
-  onClose,
+export const InputFieldsConfigBodyPresentation = ({
   error,
   isFetchComplete,
   inputColumns,
@@ -53,48 +42,34 @@ export const InputConfigEditPresentation = ({
   onChangeInputColumns,
   isSaving,
   onSave,
-}: InputConfigEditPresentationProps): JSX.Element => {
-  return (
-    <Dialog open={open} maxWidth="xl" onClose={onClose}>
-      <DialogWrapper>
-        <DialogCloseButton onClick={onClose} />
-        <DialogTitle>
-          <NoticeableLetters>Input columns</NoticeableLetters>
-        </DialogTitle>
-        <DialogContainer padding="0 0 20px">
-          {error ? (
-            <ErrorMessage {...error} />
-          ) : isFetchComplete ? (
-            <DialogBody>
-              <DialogMain>
-                <InputConfigList
-                  value={inputColumns}
-                  onChange={onChangeInputColumns}
-                  restColumns={nonInputColumns}
-                />
-              </DialogMain>
-              <DialogToolBar
-                right={
-                  <LoadingButton loading={isSaving} onClick={onSave}>
-                    Save
-                  </LoadingButton>
-                }
-              />
-            </DialogBody>
-          ) : (
-            <LoadingIndicator />
-          )}
-        </DialogContainer>
-      </DialogWrapper>
-    </Dialog>
+}: InputFieldsConfigBodyPresentationProps): JSX.Element => {
+  return error ? (
+    <ErrorMessage {...error} />
+  ) : isFetchComplete ? (
+    <DialogBody>
+      <DialogMain>
+        <InputConfigList
+          value={inputColumns}
+          onChange={onChangeInputColumns}
+          restColumns={nonInputColumns}
+        />
+      </DialogMain>
+      <DialogToolBar
+        right={
+          <LoadingButton loading={isSaving} onClick={onSave}>
+            Save
+          </LoadingButton>
+        }
+      />
+    </DialogBody>
+  ) : (
+    <LoadingIndicator />
   );
 };
 
-export const InputConfigEditModal = ({
-  open,
-  onClose,
+export const InputFieldsConfigBody = ({
   databaseId,
-}: InputConfigEditModalProps): JSX.Element => {
+}: InputFieldsConfigBodyProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<ErrorMessageProps | undefined>(undefined);
@@ -137,17 +112,6 @@ export const InputConfigEditModal = ({
   useEffect(() => {
     initializeInputColumns(getConfigRes);
   }, [getConfigRes]);
-
-  const initializeState = () => {
-    initializeInputColumns(getConfigRes);
-    setIsSaving(false);
-  };
-  const prevOpen = usePrevious(open);
-  useEffect(() => {
-    if (open && !prevOpen) {
-      initializeState();
-    }
-  }, [open, prevOpen]);
 
   const onSave = async () => {
     if (getConfigRes && inputColumns) {
@@ -201,7 +165,6 @@ export const InputConfigEditModal = ({
 
       setIsSaving(false);
     }
-    onClose();
   };
 
   const isFetchComplete = Boolean(!fetchError && getConfigRes);
@@ -220,16 +183,14 @@ export const InputConfigEditModal = ({
   }[];
 
   return (
-    <InputConfigEditPresentation
+    <InputFieldsConfigBodyPresentation
       error={error}
       inputColumns={inputColumns}
       isFetchComplete={isFetchComplete}
       isSaving={isSaving}
       nonInputColumns={nonInputColumns}
       onChangeInputColumns={setInputColumns}
-      onClose={onClose}
       onSave={onSave}
-      open={open}
     />
   );
 };

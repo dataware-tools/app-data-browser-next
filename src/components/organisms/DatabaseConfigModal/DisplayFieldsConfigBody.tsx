@@ -2,20 +2,13 @@ import { useAuth0 } from "@auth0/auth0-react";
 import {
   ErrorMessage,
   metaStore,
-  DialogWrapper,
-  DialogContainer,
   DialogBody,
   DialogMain,
-  DialogTitle,
   DialogToolBar,
-  DialogCloseButton,
   DialogSubTitle,
-  NoticeableLetters,
-  usePrevious,
   ErrorMessageProps,
   extractErrorMessageFromFetchError,
 } from "@dataware-tools/app-common";
-import Dialog from "@material-ui/core/Dialog";
 import LoadingButton, {
   LoadingButtonProps,
 } from "@material-ui/lab/LoadingButton";
@@ -31,7 +24,7 @@ import { useGetConfig, fetchMetaStore, compStr } from "utils";
 
 export type ConfigNameType = "record_list_display_columns";
 
-export type DisplayConfigEditModalPresentationProps = {
+export type DisplayFieldsConfigBodyPresentationProps = {
   error?: ErrorMessageProps;
   displayColumns: OptionSharingSelectsProps["values"];
   displayColumnsOptions: OptionSharingSelectsProps["options"];
@@ -43,16 +36,13 @@ export type DisplayConfigEditModalPresentationProps = {
   onChangeDisplayColumns: OptionSharingSelectsProps["onChange"];
   onChangeRecordTitleColumn: SoloSelectProps["onChange"];
   onSave: LoadingButtonProps["onClick"];
-} & DisplayConfigEditModalProps;
+} & Omit<DisplayFieldsConfigBodyProps, "databaseId">;
 
-export type DisplayConfigEditModalProps = {
-  open: boolean;
+export type DisplayFieldsConfigBodyProps = {
   databaseId: string;
-  onClose: () => void;
 };
 
-export const DisplayConfigEditModalPresentation = ({
-  open,
+export const DisplayFieldsConfigBodyPresentation = ({
   error,
   displayColumnsOptions,
   displayColumns,
@@ -61,66 +51,53 @@ export const DisplayConfigEditModalPresentation = ({
   recordTitleColumnOptions,
   isDisableSaveButton,
   isSaving,
-  onClose,
   onChangeDisplayColumns,
   onChangeRecordTitleColumn,
   onSave,
-}: DisplayConfigEditModalPresentationProps): JSX.Element => {
+}: DisplayFieldsConfigBodyPresentationProps): JSX.Element => {
   return (
-    <Dialog open={open} maxWidth="xl" onClose={onClose}>
-      <DialogWrapper>
-        <DialogCloseButton onClick={onClose} />
-        <DialogTitle>
-          <NoticeableLetters>Display config</NoticeableLetters>
-        </DialogTitle>
-        <DialogContainer padding="0 0 20px">
-          <DialogBody>
-            {error ? (
-              <ErrorMessage {...error} />
-            ) : isFetchComplete ? (
-              <>
-                <DialogMain>
-                  <DialogSubTitle>Record table columns</DialogSubTitle>
-                  <OptionSharingSelects
-                    onChange={onChangeDisplayColumns}
-                    options={displayColumnsOptions}
-                    values={displayColumns}
-                    creatable
-                    deletable
-                    draggable
-                  />
-                  <DialogSubTitle>Record title</DialogSubTitle>
-                  <SoloSelect
-                    options={recordTitleColumnOptions}
-                    onChange={onChangeRecordTitleColumn}
-                    value={recordTitleColumn}
-                  />
-                </DialogMain>
-                <DialogToolBar
-                  right={
-                    <LoadingButton
-                      disabled={isDisableSaveButton}
-                      loading={isSaving}
-                      onClick={onSave}
-                    >
-                      Save
-                    </LoadingButton>
-                  }
-                />
-              </>
-            ) : null}
-          </DialogBody>
-        </DialogContainer>
-      </DialogWrapper>
-    </Dialog>
+    <DialogBody>
+      {error ? (
+        <ErrorMessage {...error} />
+      ) : isFetchComplete ? (
+        <>
+          <DialogMain>
+            <DialogSubTitle>Record table columns</DialogSubTitle>
+            <OptionSharingSelects
+              onChange={onChangeDisplayColumns}
+              options={displayColumnsOptions}
+              values={displayColumns}
+              creatable
+              deletable
+              draggable
+            />
+            <DialogSubTitle>Record title</DialogSubTitle>
+            <SoloSelect
+              options={recordTitleColumnOptions}
+              onChange={onChangeRecordTitleColumn}
+              value={recordTitleColumn}
+            />
+          </DialogMain>
+          <DialogToolBar
+            right={
+              <LoadingButton
+                disabled={isDisableSaveButton}
+                loading={isSaving}
+                onClick={onSave}
+              >
+                Save
+              </LoadingButton>
+            }
+          />
+        </>
+      ) : null}
+    </DialogBody>
   );
 };
 
-export const DisplayConfigEditModal = ({
-  open,
-  onClose,
+export const DisplayFieldsConfigBody = ({
   databaseId,
-}: DisplayConfigEditModalProps): JSX.Element => {
+}: DisplayFieldsConfigBodyProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const [isSaving, setIsSaving] = useState(false);
   const [displayColumns, setDisplayColumns] = useState<string[]>([]);
@@ -134,16 +111,6 @@ export const DisplayConfigEditModal = ({
   } = useGetConfig(getAccessToken, {
     databaseId,
   });
-
-  const initializeState = () => {
-    setIsSaving(false);
-  };
-  const prevOpen = usePrevious(open);
-  useEffect(() => {
-    if (open && !prevOpen) {
-      initializeState();
-    }
-  }, [open, prevOpen]);
 
   const fetchError = getConfigError;
   useEffect(() => {
@@ -223,7 +190,6 @@ export const DisplayConfigEditModal = ({
 
       setIsSaving(false);
     }
-    onClose();
   };
 
   const columnOptions =
@@ -236,8 +202,7 @@ export const DisplayConfigEditModal = ({
     displayColumns.length <= 0 || displayColumns.includes("");
 
   return (
-    <DisplayConfigEditModalPresentation
-      databaseId={databaseId}
+    <DisplayFieldsConfigBodyPresentation
       displayColumns={displayColumns}
       displayColumnsOptions={columnOptions}
       error={error}
@@ -246,9 +211,7 @@ export const DisplayConfigEditModal = ({
       isSaving={isSaving}
       onChangeDisplayColumns={setDisplayColumns}
       onChangeRecordTitleColumn={setRecordTitleColumn}
-      onClose={onClose}
       onSave={onSave}
-      open={open}
       recordTitleColumn={recordTitleColumn}
       recordTitleColumnOptions={columnOptions}
     />
