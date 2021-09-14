@@ -252,7 +252,7 @@ export const RecordsPage = (): JSX.Element => {
       ...prev,
       page: Number(getQueryString("page")) || 1,
       perPage: Number(getQueryString("perPage")) || 20,
-      search: getQueryString("searchText") || "",
+      search: getQueryString("search") || "",
       searchKey: getConfigRes?.columns
         .filter((column) => column.is_search_target)
         .map((column) => column.name) || ["record_id"],

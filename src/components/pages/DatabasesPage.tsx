@@ -132,7 +132,7 @@ export const DatabasesPage = (): JSX.Element => {
     setDatabasePaginateState({
       page: Number(getQueryString("page")) || 1,
       perPage: Number(getQueryString("perPage")) || 20,
-      search: getQueryString("searchText") || "",
+      search: getQueryString("search") || "",
       searchKey: [],
     });
   }, []);
