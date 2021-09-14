@@ -17,10 +17,12 @@ export const BreadcrumbsItem = ({
 }: BreadcrumbsItemProps): JSX.Element => {
   const history = useHistory();
 
-  function handleClick(event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) {
+  const handleClick = (
+    event: React.MouseEvent<HTMLAnchorElement, MouseEvent>
+  ) => {
     event.preventDefault();
     if (link) history.push(link);
-  }
+  };
 
   const Body = ({ icon, text }: { icon?: JSX.Element; text: string }) => (
     <Box component="span" sx={{ display: "flex" }}>

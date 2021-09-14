@@ -151,7 +151,10 @@ export const DatabasesPage = (): JSX.Element => {
   const onChangeSearchText: DatabasesPagePresentationProps["onChangeSearchText"] = (
     searchText
   ) => {
-    setDatabasePaginateState((prev) => ({ ...prev, search: searchText }));
+    setDatabasePaginateState((prev) => ({
+      ...prev,
+      search: searchText || "",
+    }));
   };
 
   const onAddDatabaseSucceeded: DatabasesPagePresentationProps["onAddDatabaseSucceeded"] = (

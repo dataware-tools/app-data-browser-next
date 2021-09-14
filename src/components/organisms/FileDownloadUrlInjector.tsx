@@ -9,23 +9,30 @@ import { useCreateJwtToDownloadFile } from "utils";
 type FileType = metaStore.FileModel;
 
 export type FileDownloadUrlInjectorProps = {
+  databaseId: string;
   file: FileType;
   render: (file: FileType, downloadURL: string) => JSX.Element;
 };
 
 export const FileDownloadUrlInjector = ({
+  databaseId,
   file,
   render,
 }: FileDownloadUrlInjectorProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
-
   const {
     data: createJwtRes,
     error: createJwtError,
   } = useCreateJwtToDownloadFile(
     getAccessToken,
-    { requestBody: { path: file.path, content_type: file["content-type"] } },
-    Boolean(file.path)
+    {
+      requestBody: {
+        database_id: databaseId,
+        file_uuid: file.uuid,
+        content_type: file["content-type"],
+      },
+    },
+    Boolean(file.uuid)
   );
 
   const downloadURL = createJwtRes

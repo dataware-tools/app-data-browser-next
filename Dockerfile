@@ -3,10 +3,23 @@
 FROM node:14 AS deps
 WORKDIR /app
 RUN wget -O /bin/jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 && chmod +x /bin/jq
-COPY ./package.json ./package-lock.json  ./.npm* ./
+COPY . .
 RUN mkdir -p -m 0600 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
 RUN npm -g config set user root && npm -g config set unsafe-perm true
 RUN --mount=type=ssh --mount=type=secret,id=npmrc,target=/root/.npmrc npm install
+
+FROM docker:20.10.8-dind AS test
+RUN apk update && apk add \
+  bash \
+  git \
+  jq \
+  nodejs \
+  npm
+WORKDIR /app
+COPY --from=deps /app .
+# Update loki config for dind
+# See: https://github.com/oblador/loki/issues/9#issuecomment-803197847
+RUN rm ./.lokirc.json && mv ./.lokirc-ci.json ./.lokirc.json
 
 # Rebuild the source code only when needed
 FROM node:14-alpine AS builder
@@ -16,7 +29,7 @@ COPY --from=deps /app/node_modules ./node_modules
 RUN npm run build
 
 # Production image, copy all the files and run next
-FROM node:14-alpine AS runner
+FROM node:14-alpine AS production
 WORKDIR /app
 
 ENV NODE_ENV production

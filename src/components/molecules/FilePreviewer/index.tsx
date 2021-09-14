@@ -22,14 +22,15 @@ type FilePreviewerContentWithSpec = {
     extensions: string[];
     contentTypes: string[];
   };
-  render: (file: FileType) => JSX.Element;
+  render: (databaseId: string, file: FileType) => JSX.Element;
 };
 
 const filePreviewerCandidates: Record<string, FilePreviewerContentWithSpec> = {
   default: {
     spec: { extensions: [".*"], contentTypes: [".*"] },
-    render: (file) => (
+    render: (databaseId, file) => (
       <FileDownloadUrlInjector
+        databaseId={databaseId}
         file={file}
         render={() => <DefaultPreviewer />}
       />
@@ -37,8 +38,9 @@ const filePreviewerCandidates: Record<string, FilePreviewerContentWithSpec> = {
   },
   text: {
     spec: { extensions: [".txt"], contentTypes: ["text/.*"] },
-    render: (file) => (
+    render: (databaseId, file) => (
       <FileDownloadUrlInjector
+        databaseId={databaseId}
         file={file}
         render={(_, url) => <TextPreviewer url={url} />}
       />
@@ -46,8 +48,9 @@ const filePreviewerCandidates: Record<string, FilePreviewerContentWithSpec> = {
   },
   markdown: {
     spec: { extensions: [".md"], contentTypes: ["text/.*"] },
-    render: (file) => (
+    render: (databaseId, file) => (
       <FileDownloadUrlInjector
+        databaseId={databaseId}
         file={file}
         render={(_, url) => <MarkdownPreviewer url={url} />}
       />
@@ -55,8 +58,9 @@ const filePreviewerCandidates: Record<string, FilePreviewerContentWithSpec> = {
   },
   csv: {
     spec: { extensions: [".csv"], contentTypes: ["csv/.*"] },
-    render: (file) => (
+    render: (databaseId, file) => (
       <FileDownloadUrlInjector
+        databaseId={databaseId}
         file={file}
         render={(_, url) => <CsvPreviewer url={url} />}
       />
@@ -64,8 +68,9 @@ const filePreviewerCandidates: Record<string, FilePreviewerContentWithSpec> = {
   },
   video: {
     spec: { extensions: [".mp4"], contentTypes: ["video/.*"] },
-    render: (file) => (
+    render: (databaseId, file) => (
       <FileDownloadUrlInjector
+        databaseId={databaseId}
         file={file}
         render={(_, url) => <VideoPreviewer url={url} />}
       />
@@ -76,8 +81,9 @@ const filePreviewerCandidates: Record<string, FilePreviewerContentWithSpec> = {
       extensions: sourceCodeExtensions,
       contentTypes: ["text/.*"],
     },
-    render: (file) => (
+    render: (databaseId, file) => (
       <FileDownloadUrlInjector
+        databaseId={databaseId}
         file={file}
         render={(file, url) => <SourceCodePreviewer file={file} url={url} />}
       />
@@ -88,8 +94,9 @@ const filePreviewerCandidates: Record<string, FilePreviewerContentWithSpec> = {
       extensions: [".jpg", ".jpeg", ".png", ".gif"],
       contentTypes: ["image/.*"],
     },
-    render: (file) => (
+    render: (databaseId, file) => (
       <FileDownloadUrlInjector
+        databaseId={databaseId}
         file={file}
         render={(_, url) => <ImagePreviewer url={url} />}
       />
@@ -97,12 +104,13 @@ const filePreviewerCandidates: Record<string, FilePreviewerContentWithSpec> = {
   },
   rosbag: {
     spec: { extensions: ["bag"], contentTypes: ["application/rosbag"] },
-    render: (file) => <RosbagPreviewer filePath={file.path} />,
+    render: (_, file) => <RosbagPreviewer filePath={file.path} />,
   },
   audio: {
     spec: { extensions: [".wav", ".mp3"], contentTypes: ["audio/.*"] },
-    render: (file) => (
+    render: (databaseId, file) => (
       <FileDownloadUrlInjector
+        databaseId={databaseId}
         file={file}
         render={(_, url) => <AudioPreviewer url={url} />}
       />
@@ -135,9 +143,12 @@ const isContentTypeSupported = (
     : false;
 };
 
-export type FilePreviewerProps = { file: FileType };
+export type FilePreviewerProps = { databaseId: string; file: FileType };
 
-export const FilePreviewer = ({ file }: FilePreviewerProps): JSX.Element => {
+export const FilePreviewer = ({
+  databaseId,
+  file,
+}: FilePreviewerProps): JSX.Element => {
   const [, previewer] = Object.entries(filePreviewerCandidates).find(
     ([, candidate]) => {
       return (
@@ -148,6 +159,6 @@ export const FilePreviewer = ({ file }: FilePreviewerProps): JSX.Element => {
   ) || [undefined, undefined];
 
   return previewer
-    ? previewer.render(file)
-    : filePreviewerCandidates.default.render(file);
+    ? previewer.render(databaseId, file)
+    : filePreviewerCandidates.default.render(databaseId, file);
 };
