@@ -279,7 +279,7 @@ export const RecordsPage = (): JSX.Element => {
   const onChangePerPage: RecordsPagePresentationProps["onChangePerPage"] = (
     perPage
   ) => {
-    setRecordPaginateState((prev) => ({ ...prev, perPage }));
+    setRecordPaginateState((prev) => ({ ...prev, perPage, page: 1 }));
   };
   const onChangeSearchText: RecordsPagePresentationProps["onChangeSearchText"] = (
     searchText
@@ -287,6 +287,7 @@ export const RecordsPage = (): JSX.Element => {
     setRecordPaginateState((prev) => ({
       ...prev,
       search: searchText || "",
+      page: 1,
     }));
   };
   const onEndInitializeDatabase: RecordsPagePresentationProps["onEndInitializeDatabase"] = () => {
