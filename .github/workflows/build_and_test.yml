@@ -10,20 +10,15 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Setup ssh-agent
-        uses: webfactory/ssh-agent@v0.5.3
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
       - name: Build test image
         env:
           NPM_REGISTRY: https://npm.pkg.github.com
-          NPM_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
+          NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           export DOCKER_BUILDKIT=1
           [[ -n "${NPM_TOKEN}" ]] && echo "//${NPM_REGISTRY##*://}/:_authToken=${NPM_TOKEN}" > /tmp/.npmrc
           cat /tmp/.npmrc
-          docker build --target test -t app:test --ssh default --secret id=npmrc,src=/tmp/.npmrc .
+          docker build --target test -t app:test --secret id=npmrc,src=/tmp/.npmrc .
 
       - name: Run test container
         run: (docker run --privileged --name app-test app:test) &
@@ -37,11 +32,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-
-      - name: Setup ssh-agent
-        uses: webfactory/ssh-agent@v0.5.3
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
       - name: Install Trivy
         run: |
@@ -59,12 +49,12 @@ jobs:
       - name: Build production image
         env:
           NPM_REGISTRY: https://npm.pkg.github.com
-          NPM_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
+          NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           export DOCKER_BUILDKIT=1
           [[ -n "${NPM_TOKEN}" ]] && echo "//${NPM_REGISTRY##*://}/:_authToken=${NPM_TOKEN}" > /tmp/.npmrc
           cat /tmp/.npmrc
-          docker build --target production -t app:production --ssh default --secret id=npmrc,src=/tmp/.npmrc .
+          docker build --target production -t app:production --secret id=npmrc,src=/tmp/.npmrc .
 
       - name: Scan production image
         run: trivy --exit-code 0 --no-progress app:production
