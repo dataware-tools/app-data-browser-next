@@ -4,9 +4,8 @@ FROM node:14 AS deps
 WORKDIR /app
 RUN wget -O /bin/jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 && chmod +x /bin/jq
 COPY . .
-RUN mkdir -p -m 0600 ~/.ssh && ssh-keyscan github.com >> ~/.ssh/known_hosts
 RUN npm -g config set user root && npm -g config set unsafe-perm true
-RUN --mount=type=ssh --mount=type=secret,id=npmrc,target=/root/.npmrc npm install
+RUN --mount=type=secret,id=npmrc,target=/root/.npmrc npm install
 
 FROM docker:20.10.8-dind AS test
 RUN apk update && apk add \
