@@ -110,7 +110,7 @@
     "stylelint-processor-styled-components": "^1.10.0",
     "ts-jest": "^26.5.5",
     "tsconfig-paths-webpack-plugin": "^3.5.1",
-    "typescript": "^4.3.5"
+    "typescript": "^4.4.3"
   },
   "browserslist": [
     "last 2 Android versions",
