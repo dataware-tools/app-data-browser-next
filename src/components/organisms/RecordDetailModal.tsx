@@ -19,10 +19,10 @@ import {
   alert,
   extractErrorMessageFromFetchError,
 } from "@dataware-tools/app-common";
-import Button from "@material-ui/core/Button";
-import Dialog from "@material-ui/core/Dialog";
-import EditIcon from "@material-ui/icons/Edit";
-import UploadIcon from "@material-ui/icons/Upload";
+import EditIcon from "@mui/icons-material/Edit";
+import UploadIcon from "@mui/icons-material/Upload";
+import Button from "@mui/material/Button";
+import Dialog from "@mui/material/Dialog";
 import { produce } from "immer";
 import { useState, useEffect } from "react";
 import { RenderToggleByAction } from "components/atoms/RenderToggleByAction";

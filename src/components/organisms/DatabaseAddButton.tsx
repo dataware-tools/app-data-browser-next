@@ -1,6 +1,6 @@
 import { TextCenteringSpan } from "@dataware-tools/app-common";
-import Button from "@material-ui/core/Button";
-import AddCircle from "@material-ui/icons/AddCircle";
+import AddCircle from "@mui/icons-material/AddCircle";
+import Button from "@mui/material/Button";
 import { useState } from "react";
 import {
   DatabaseEditModal,

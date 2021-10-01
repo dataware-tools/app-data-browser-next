@@ -1,9 +1,9 @@
 import { metaStore, theme as themeInstance } from "@dataware-tools/app-common";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction";
-import ListItemText from "@material-ui/core/ListItemText";
-import DescriptionIcon from "@material-ui/icons/Description";
+import DescriptionIcon from "@mui/icons-material/Description";
+import ListItem from "@mui/material/ListItem";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemSecondaryAction from "@mui/material/ListItemSecondaryAction";
+import ListItemText from "@mui/material/ListItemText";
 import { MouseEvent, useState } from "react";
 import { FileMenu } from "components/molecules/FileMenu";
 import { getFileName } from "utils";

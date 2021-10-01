@@ -1,9 +1,9 @@
 import { Spacer } from "@dataware-tools/app-common";
-import Box from "@material-ui/core/Box";
-import IconButton from "@material-ui/core/IconButton";
-import MenuItem from "@material-ui/core/MenuItem";
-import Select from "@material-ui/core/Select";
-import DeleteIcon from "@material-ui/icons/Delete";
+import DeleteIcon from "@mui/icons-material/Delete";
+import Box from "@mui/material/Box";
+import IconButton from "@mui/material/IconButton";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
 import React, { ReactNode } from "react";
 import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
 import { DatabaseColumnsConfigType } from "utils";

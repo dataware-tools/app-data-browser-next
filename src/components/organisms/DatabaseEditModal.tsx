@@ -14,10 +14,10 @@ import {
   usePrevious,
   extractErrorMessageFromFetchError,
 } from "@dataware-tools/app-common";
-import Box from "@material-ui/core/Box";
-import Dialog, { DialogProps } from "@material-ui/core/Dialog";
-import TextField from "@material-ui/core/TextField";
-import LoadingButton from "@material-ui/lab/LoadingButton";
+import LoadingButton from "@mui/lab/LoadingButton";
+import Box from "@mui/material/Box";
+import Dialog, { DialogProps } from "@mui/material/Dialog";
+import TextField from "@mui/material/TextField";
 import { useEffect, useState } from "react";
 import {
   useForm,

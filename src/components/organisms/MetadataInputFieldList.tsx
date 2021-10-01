@@ -1,6 +1,6 @@
 import { Spacer } from "@dataware-tools/app-common";
-import Box from "@material-ui/core/Box";
-import TextField from "@material-ui/core/TextField";
+import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
 import { DatabaseColumnsConfigType } from "utils";
 
 type MetadataType = Record<string, unknown>;

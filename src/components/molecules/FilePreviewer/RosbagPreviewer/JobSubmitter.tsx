@@ -1,5 +1,5 @@
 import { jobStore } from "@dataware-tools/app-common";
-import Button from "@material-ui/core/Button";
+import Button from "@mui/material/Button";
 import { JobTemplateInfo } from "./JobTemplateInfo";
 import { SoloSelect } from "components/molecules/SoloSelect";
 

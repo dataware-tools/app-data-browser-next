@@ -6,14 +6,14 @@ import {
   extractErrorMessageFromFetchError,
   metaStore,
 } from "@dataware-tools/app-common";
-import IconButton from "@material-ui/core/IconButton";
 import {
   DataGrid,
   DataGridProps,
   GridCellParams,
   GridColumns,
 } from "@material-ui/data-grid";
-import DeleteIcon from "@material-ui/icons/Delete";
+import DeleteIcon from "@mui/icons-material/Delete";
+import IconButton from "@mui/material/IconButton";
 import { produce } from "immer";
 import { useEffect, useState } from "react";
 import { useRecoilState } from "recoil";

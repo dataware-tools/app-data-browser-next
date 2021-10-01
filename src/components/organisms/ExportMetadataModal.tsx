@@ -14,13 +14,13 @@ import {
   alert,
   extractErrorMessageFromFetchError,
 } from "@dataware-tools/app-common";
-import Box from "@material-ui/core/Box";
-import Dialog from "@material-ui/core/Dialog";
-import FormControl from "@material-ui/core/FormControl";
-import InputLabel from "@material-ui/core/InputLabel";
-import MenuItem from "@material-ui/core/MenuItem";
-import Select from "@material-ui/core/Select";
-import LoadingButton from "@material-ui/lab/LoadingButton";
+import LoadingButton from "@mui/lab/LoadingButton";
+import Box from "@mui/material/Box";
+import Dialog from "@mui/material/Dialog";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
+import MenuItem from "@mui/material/MenuItem";
+import Select from "@mui/material/Select";
 import { useState, useEffect } from "react";
 
 // See: https://github.com/dolezel/react-csv-downloader#get-csv-contents

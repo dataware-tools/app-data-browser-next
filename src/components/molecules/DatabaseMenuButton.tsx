@@ -1,5 +1,5 @@
 import { SquareIconButton } from "@dataware-tools/app-common";
-import { MoreHoriz as MoreIcon } from "@material-ui/icons";
+import { MoreHoriz as MoreIcon } from "@mui/icons-material";
 import { MouseEvent, useState } from "react";
 import {
   DatabaseMenu,

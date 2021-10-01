@@ -1,8 +1,8 @@
-import Box from "@material-ui/core/Box";
-import IconButton from "@material-ui/core/IconButton";
-import MenuItem, { MenuItemProps } from "@material-ui/core/MenuItem";
-import Select, { SelectProps } from "@material-ui/core/Select";
-import DeleteIcon from "@material-ui/icons/Delete";
+import DeleteIcon from "@mui/icons-material/Delete";
+import Box from "@mui/material/Box";
+import IconButton from "@mui/material/IconButton";
+import MenuItem, { MenuItemProps } from "@mui/material/MenuItem";
+import Select, { SelectProps } from "@mui/material/Select";
 import React from "react";
 import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
 

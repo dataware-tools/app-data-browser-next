@@ -9,7 +9,7 @@ import {
   ErrorMessageProps,
   extractErrorMessageFromFetchError,
 } from "@dataware-tools/app-common";
-import LoadingButton from "@material-ui/lab/LoadingButton";
+import LoadingButton from "@mui/lab/LoadingButton";
 import { produce } from "immer";
 import { useState, useEffect } from "react";
 

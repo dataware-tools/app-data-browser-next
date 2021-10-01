@@ -3,10 +3,10 @@ import {
   jobStore,
   ErrorMessageProps,
 } from "@dataware-tools/app-common";
-import Alert from "@material-ui/core/Alert";
-import AlertTitle from "@material-ui/core/AlertTitle";
-import Button from "@material-ui/core/Button";
-import Popover from "@material-ui/core/Popover";
+import Alert from "@mui/material/Alert";
+import AlertTitle from "@mui/material/AlertTitle";
+import Button from "@mui/material/Button";
+import Popover from "@mui/material/Popover";
 import { MouseEvent, useState } from "react";
 
 type JobViewerPresentationProps = {

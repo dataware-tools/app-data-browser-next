@@ -1,7 +1,7 @@
 import { Spacer } from "@dataware-tools/app-common";
-import Box from "@material-ui/core/Box";
-import MenuItem, { MenuItemProps } from "@material-ui/core/MenuItem";
-import Select, { SelectProps } from "@material-ui/core/Select";
+import Box from "@mui/material/Box";
+import MenuItem, { MenuItemProps } from "@mui/material/MenuItem";
+import Select, { SelectProps } from "@mui/material/Select";
 import React from "react";
 
 type OptionsType = { label: string; value: string }[];
