@@ -1,5 +1,5 @@
-import HomeIcon from "@material-ui/icons/Home";
-import WhatshotIcon from "@material-ui/icons/Whatshot";
+import HomeIcon from "@mui/icons-material/Home";
+import WhatshotIcon from "@mui/icons-material/Whatshot";
 import { Story } from "@storybook/react";
 import { Breadcrumbs, BreadcrumbsProps } from ".";
 

@@ -10,7 +10,7 @@ import {
   LoadingIndicator,
   metaStore,
 } from "@dataware-tools/app-common";
-import List from "@material-ui/core/List";
+import List from "@mui/material/List";
 import { useState, useMemo } from "react";
 import { FileEditModal, FileEditModalProps } from "./FileEditModal";
 import {

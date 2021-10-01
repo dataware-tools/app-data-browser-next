@@ -1,5 +1,5 @@
 import { ToolBar } from "@dataware-tools/app-common";
-import Button from "@material-ui/core/Button";
+import Button from "@mui/material/Button";
 import { useEffect, useRef, useState } from "react";
 import WaveSurfer from "wavesurfer.js";
 // @ts-expect-error Type-definitions are missing

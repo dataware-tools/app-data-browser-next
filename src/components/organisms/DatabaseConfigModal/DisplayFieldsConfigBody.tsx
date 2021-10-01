@@ -9,9 +9,7 @@ import {
   ErrorMessageProps,
   extractErrorMessageFromFetchError,
 } from "@dataware-tools/app-common";
-import LoadingButton, {
-  LoadingButtonProps,
-} from "@material-ui/lab/LoadingButton";
+import LoadingButton, { LoadingButtonProps } from "@mui/lab/LoadingButton";
 import { produce } from "immer";
 import { useState, useEffect } from "react";
 import { SoloSelect, SoloSelectProps } from "components/molecules/SoloSelect";

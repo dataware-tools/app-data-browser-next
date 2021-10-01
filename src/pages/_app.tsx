@@ -1,8 +1,8 @@
 import { AppState, Auth0Provider } from "@auth0/auth0-react";
 import { theme, PageWrapper } from "@dataware-tools/app-common";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import { ThemeProvider } from "@material-ui/core/styles";
-import { StylesProvider } from "@material-ui/styles";
+import CssBaseline from "@mui/material/CssBaseline";
+import { ThemeProvider } from "@mui/material/styles";
+import { StylesProvider } from "@mui/styles";
 import { AppProps } from "next/app";
 import Head from "next/head";
 import React, { useEffect } from "react";

@@ -13,8 +13,8 @@ import {
   confirm,
   alert,
 } from "@dataware-tools/app-common";
-import Dialog from "@material-ui/core/Dialog";
-import LoadingButton from "@material-ui/lab/LoadingButton";
+import LoadingButton from "@mui/lab/LoadingButton";
+import Dialog from "@mui/material/Dialog";
 import { useState, useEffect } from "react";
 import {
   MetadataInputFieldList,

@@ -1,5 +1,5 @@
 import { sleep } from "@dataware-tools/app-common";
-import AddCircleIcon from "@material-ui/icons/AddCircle";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
 import { Story } from "@storybook/react";
 import { FileMenuItem, FileMenuItemProps } from "./FileMenuItem";
 

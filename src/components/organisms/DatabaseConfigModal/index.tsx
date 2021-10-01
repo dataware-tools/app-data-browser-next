@@ -7,7 +7,7 @@ import {
   DialogTitle,
   NoticeableLetters,
 } from "@dataware-tools/app-common";
-import Dialog from "@material-ui/core/Dialog";
+import Dialog from "@mui/material/Dialog";
 import { useState, useEffect, ReactNode } from "react";
 import { DisplayFieldsConfigBody } from "./DisplayFieldsConfigBody";
 import { InputFieldsConfigBody } from "./InputFieldsConfigBody";

@@ -1,5 +1,5 @@
-import Box from "@material-ui/core/Box";
-import AddIcon from "@material-ui/icons/Add";
+import AddIcon from "@mui/icons-material/Add";
+import Box from "@mui/material/Box";
 
 export type AddListItemButtonProps = {
   onClick: () => void;

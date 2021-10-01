@@ -1,8 +1,8 @@
-import Menu from "@material-ui/core/Menu";
-import DeleteIcon from "@material-ui/icons/Delete";
-import EditIcon from "@material-ui/icons/Edit";
-import FileDownloadIcon from "@material-ui/icons/FileDownload";
-import PageviewIcon from "@material-ui/icons/Pageview";
+import DeleteIcon from "@mui/icons-material/Delete";
+import EditIcon from "@mui/icons-material/Edit";
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import PageviewIcon from "@mui/icons-material/Pageview";
+import Menu from "@mui/material/Menu";
 import { FileMenuItem, FileMenuItemProps } from "components/atoms/FileMenuItem";
 import { RenderToggleByAction } from "components/atoms/RenderToggleByAction";
 

@@ -18,8 +18,8 @@ import {
   extractErrorMessageFromFetchError,
 } from "@dataware-tools/app-common";
 
-import Pagination from "@material-ui/core/Pagination";
-import StorageIcon from "@material-ui/icons/Storage";
+import StorageIcon from "@mui/icons-material/Storage";
+import Pagination from "@mui/material/Pagination";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { useRecoilState, useSetRecoilState } from "recoil";

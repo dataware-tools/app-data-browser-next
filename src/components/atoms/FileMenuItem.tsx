@@ -1,6 +1,6 @@
 import { Spacer } from "@dataware-tools/app-common";
-import CircularProgress from "@material-ui/core/CircularProgress";
-import MenuItem from "@material-ui/core/MenuItem";
+import CircularProgress from "@mui/material/CircularProgress";
+import MenuItem from "@mui/material/MenuItem";
 import { ReactNode, useState } from "react";
 
 export type FileMenuItemPresentationProps = {

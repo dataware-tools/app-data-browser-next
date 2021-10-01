@@ -5,7 +5,7 @@ import {
   extractErrorMessageFromFetchError,
   LoadingIndicator,
 } from "@dataware-tools/app-common";
-import { DataGrid, GridColumns, DataGridProps } from "@material-ui/data-grid";
+import { DataGrid, GridColumns, DataGridProps } from "@mui/x-data-grid";
 import { useState, useEffect } from "react";
 import { useHistory } from "react-router-dom";
 import { DatabaseListItemProps } from "components/organisms/DatabaseListItem";

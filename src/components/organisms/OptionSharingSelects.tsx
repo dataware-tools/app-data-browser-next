@@ -1,6 +1,6 @@
 import { Spacer } from "@dataware-tools/app-common";
-import Box from "@material-ui/core/Box";
-import DragIndicatorIcon from "@material-ui/icons/DragIndicator";
+import DragIndicatorIcon from "@mui/icons-material/DragIndicator";
+import Box from "@mui/material/Box";
 import { produce } from "immer";
 import { useState } from "react";
 import {

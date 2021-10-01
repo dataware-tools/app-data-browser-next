@@ -7,8 +7,8 @@ import {
   metaStore,
   ToolBar,
 } from "@dataware-tools/app-common";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Switch from "@material-ui/core/Switch";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Switch from "@mui/material/Switch";
 import dynamic from "next/dynamic";
 import { useState } from "react";
 import { RecordInfoTable } from "components/organisms/RecordInfoTable";

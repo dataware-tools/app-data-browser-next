@@ -1,8 +1,8 @@
 import { metaStore } from "@dataware-tools/app-common";
-import ListItem from "@material-ui/core/ListItem";
-import ListItemIcon from "@material-ui/core/ListItemIcon";
-import ListItemText from "@material-ui/core/ListItemText";
-import StorageIcon from "@material-ui/icons/Storage";
+import StorageIcon from "@mui/icons-material/Storage";
+import ListItem from "@mui/material/ListItem";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
 
 export type DatabaseType = metaStore.DatabaseModel;
 

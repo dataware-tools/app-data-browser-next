@@ -1,4 +1,4 @@
-import Box from "@material-ui/core/Box";
+import Box from "@mui/material/Box";
 type ImagePreviewerProps = { url: string };
 export const ImagePreviewer = ({ url }: ImagePreviewerProps): JSX.Element => {
   return (

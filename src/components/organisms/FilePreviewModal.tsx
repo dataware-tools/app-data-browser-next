@@ -7,10 +7,10 @@ import {
   DialogWrapper,
   usePrevious,
 } from "@dataware-tools/app-common";
-import Button from "@material-ui/core/Button";
-import Dialog, { DialogProps } from "@material-ui/core/Dialog";
-import ArrowBack from "@material-ui/icons/ArrowBack";
-import ArrowForward from "@material-ui/icons/ArrowForward";
+import ArrowBack from "@mui/icons-material/ArrowBack";
+import ArrowForward from "@mui/icons-material/ArrowForward";
+import Button from "@mui/material/Button";
+import Dialog, { DialogProps } from "@mui/material/Dialog";
 import { useState, useEffect } from "react";
 import { FilePreviewer } from "components/molecules/FilePreviewer";
 import { FileType } from "components/organisms/FileListItem";

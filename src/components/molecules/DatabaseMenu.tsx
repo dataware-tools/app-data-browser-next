@@ -1,6 +1,6 @@
-import Box, { BoxProps } from "@material-ui/core/Box";
-import Menu from "@material-ui/core/Menu";
-import MenuItem from "@material-ui/core/MenuItem";
+import Box, { BoxProps } from "@mui/material/Box";
+import Menu from "@mui/material/Menu";
+import MenuItem from "@mui/material/MenuItem";
 
 export type DatabaseMenuProps = {
   menu: (
