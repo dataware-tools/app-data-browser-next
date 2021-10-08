@@ -42,11 +42,13 @@ export const FileMenuPresentation = ({
       }}
     >
       {onPreview ? (
-        <FileMenuItem
-          onClick={onPreview}
-          icon={<PageviewIcon />}
-          text="Preview"
-        />
+        <RenderToggleByAction required="file:read">
+          <FileMenuItem
+            onClick={onPreview}
+            icon={<PageviewIcon />}
+            text="Preview"
+          />
+        </RenderToggleByAction>
       ) : null}
 
       {onEdit ? (
@@ -56,7 +58,7 @@ export const FileMenuPresentation = ({
       ) : null}
 
       {onDelete ? (
-        <RenderToggleByAction required="metadata:write:delete">
+        <RenderToggleByAction required="file:write:delete">
           <FileMenuItem
             onClick={onDelete}
             icon={<DeleteIcon />}
@@ -66,11 +68,13 @@ export const FileMenuPresentation = ({
       ) : null}
 
       {onDownload ? (
-        <FileMenuItem
-          onClick={onDownload}
-          icon={<FileDownloadIcon />}
-          text="Download"
-        />
+        <RenderToggleByAction required="file:read">
+          <FileMenuItem
+            onClick={onDownload}
+            icon={<FileDownloadIcon />}
+            text="Download"
+          />
+        </RenderToggleByAction>
       ) : null}
     </Menu>
   );

@@ -119,7 +119,7 @@ export const RecordDetailModalPresentation = ({
         <DialogToolBar
           right={
             <>
-              <RenderToggleByAction required="metadata:write:add">
+              <RenderToggleByAction required="file:write:add">
                 <FileUploadButton
                   onFileChange={onAddFile}
                   startIcon={<UploadIcon />}
