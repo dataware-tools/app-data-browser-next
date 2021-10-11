@@ -64,7 +64,12 @@ type UserActionType =
   | "metadata:write"
   | "metadata:write:add"
   | "metadata:write:update"
-  | "metadata:write:delete";
+  | "metadata:write:delete"
+  | "file"
+  | "file:read"
+  | "file:write"
+  | "file:write:add"
+  | "file:write:delete";
 
 type ParamTypeListRecords = Parameters<
   typeof metaStore.RecordService.listRecords
