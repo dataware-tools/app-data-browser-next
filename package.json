@@ -1,5 +1,9 @@
 {
   "name": "@dataware-tools/app-data-browser",
+  "engines": {
+    "node": "16.x",
+    "npm": ">=7.0.0 <9"
+  },
   "version": "0.1.0",
   "private": true,
   "repository": "https://github.com/dataware-tools/app-data-browser-next.git",
@@ -123,5 +127,8 @@
     "maintained Node versions",
     "last 2 Safari versions",
     "last 2 Samsung versions"
-  ]
+  ],
+  "volta": {
+    "node": "16.10.0"
+  }
 }
