@@ -160,13 +160,17 @@ export const InputConfigList = ({
     );
     setRestColumns((prev) => {
       if (prev) {
-        const newOptions = produce(prev, (prev) => {
-          prev.splice(
-            prev.findIndex((elem) => elem.name === newColumn.name),
-            1
-          );
-        });
-        return newOptions;
+        const splicedIndex = prev.findIndex(
+          (elem) => elem.name === newColumn.name
+        );
+        if (splicedIndex >= 0) {
+          const newOptions = produce(prev, (prev) => {
+            prev.splice(splicedIndex, 1);
+          });
+          return newOptions;
+        } else {
+          return prev;
+        }
       } else {
         return prev;
       }
@@ -239,7 +243,11 @@ export const InputConfigList = ({
       .sort(compInputFields) || [];
 
   const alreadyUsedColumnDisplayNames = [
-    ...new Set(value.map((column) => column.display_name)),
+    ...new Set(
+      inputConfig
+        .concat(value.filter((elem) => pydtkSystemColumns.includes(elem.name)))
+        .map((column) => column.display_name)
+    ),
   ];
 
   const alreadyUsedColumnNames = [
