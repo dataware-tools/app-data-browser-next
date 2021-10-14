@@ -1,8 +1,11 @@
 {
   "name": "@dataware-tools/app-data-browser",
   "engines": {
-    "node": "16.10.x",
+    "node": "16.10.0",
     "npm": "^7.x"
+  },
+  "volta": {
+    "node": "16.10.0"
   },
   "version": "0.1.0",
   "private": true,
@@ -127,8 +130,5 @@
     "maintained Node versions",
     "last 2 Safari versions",
     "last 2 Samsung versions"
-  ],
-  "volta": {
-    "node": "16.10.0"
-  }
+  ]
 }
