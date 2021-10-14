@@ -7,4 +7,5 @@ module.exports = {
     },
   },
   setupFilesAfterEnv: ["./src/setupTest.ts"],
+  testEnvironment: "jsdom",
 };
