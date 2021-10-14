@@ -15,9 +15,9 @@ import {
   InputConfigListItemProps,
 } from "components/molecules/InputConfigListItem";
 import {
-  InputConfigAddModal,
-  InputConfigAddModalProps,
-} from "components/organisms/InputConfigAddModal";
+  InputConfigListItemModal,
+  InputConfigListItemModalProps,
+} from "components/organisms/InputConfigListItemModal";
 import {
   DatabaseColumnsConfigType,
   compInputFields,
@@ -29,32 +29,36 @@ export type ValueType = (InputConfigListItemProps["value"] & {
 })[];
 
 export type InputConfigListPresentationProps = {
-  onUpdate: InputConfigListItemProps["onUpdate"];
+  onConfigure: (index: number) => void;
   onDelete: InputConfigListItemProps["onDelete"];
-  onAdd: InputConfigAddModalProps["onSave"];
+  onAddOrUpdate: InputConfigListItemModalProps["onSave"];
   onOpenAddModal: () => void;
   onCloseAddModal: () => void;
+  onCloseConfigureModal: () => void;
   openAddModal: boolean;
-  alreadyUsedColumnNames: InputConfigAddModalProps["alreadyUsedNames"];
-  alreadyUsedColumnDisplayNames: InputConfigAddModalProps["alreadyUsedDisplayNames"];
+  configureModalOpeningIndex: number;
+  alreadyUsedColumnNames: InputConfigListItemModalProps["alreadyUsedNames"];
+  alreadyUsedColumnDisplayNames: InputConfigListItemModalProps["alreadyUsedDisplayNames"];
   onDragEnd: DragDropContextProps["onDragEnd"];
 } & Omit<InputConfigListProps, "onChange">;
 
 export type InputConfigListProps = {
   value: ValueType;
-  restColumns: InputConfigAddModalProps["options"];
+  restColumns: InputConfigListItemModalProps["options"];
   onChange: (newValue: ValueType) => void;
 };
 
 export const InputConfigListPresentation = ({
   value,
-  onUpdate,
   onDelete,
+  onConfigure,
   onOpenAddModal,
   restColumns,
   openAddModal,
+  configureModalOpeningIndex,
   onCloseAddModal,
-  onAdd,
+  onCloseConfigureModal,
+  onAddOrUpdate,
   alreadyUsedColumnDisplayNames,
   alreadyUsedColumnNames,
   onDragEnd,
@@ -97,10 +101,29 @@ export const InputConfigListPresentation = ({
                             </Box>
                           }
                           value={config}
-                          onUpdate={onUpdate}
                           onDelete={onDelete}
+                          onConfigure={() => {
+                            onConfigure(index);
+                          }}
                         />
                         <Spacer direction="vertical" size="3vh" />
+                        <InputConfigListItemModal
+                          options={restColumns}
+                          open={configureModalOpeningIndex === index}
+                          onClose={onCloseConfigureModal}
+                          onSave={onAddOrUpdate}
+                          alreadyUsedNames={alreadyUsedColumnNames.filter(
+                            (value) => {
+                              return value !== config.name;
+                            }
+                          )}
+                          alreadyUsedDisplayNames={alreadyUsedColumnDisplayNames.filter(
+                            (value) => {
+                              return value !== config.display_name;
+                            }
+                          )}
+                          initialData={config}
+                        />
                       </div>
                     )}
                   </Draggable>
@@ -113,13 +136,14 @@ export const InputConfigListPresentation = ({
       </DragDropContext>
       <AddListItemButton onClick={onOpenAddModal} />
       {restColumns ? (
-        <InputConfigAddModal
+        <InputConfigListItemModal
           options={restColumns}
           open={openAddModal}
           onClose={onCloseAddModal}
-          onSave={onAdd}
+          onSave={onAddOrUpdate}
           alreadyUsedNames={alreadyUsedColumnNames}
           alreadyUsedDisplayNames={alreadyUsedColumnDisplayNames}
+          initialData={null}
         />
       ) : null}
     </Box>
@@ -132,6 +156,9 @@ export const InputConfigList = ({
   restColumns: initRestColumns,
 }: InputConfigListProps): JSX.Element => {
   const [openAddModal, setOpenAddModal] = useState(false);
+  const [configureModalOpeningIndex, setConfigureModalOpeningIndex] = useState(
+    -1
+  );
   const [restColumns, setRestColumns] = useState<
     InputConfigListPresentationProps["restColumns"]
   >(initRestColumns);
@@ -144,7 +171,9 @@ export const InputConfigList = ({
       .sort(compInputFields)
       .map((column) => column.name) || [];
 
-  const onAdd: InputConfigListPresentationProps["onAdd"] = (newColumn) => {
+  const onAddOrUpdate: InputConfigListPresentationProps["onAddOrUpdate"] = (
+    newColumn
+  ) => {
     onChange(
       value.some((prevColumn) => prevColumn.name === newColumn.name)
         ? value.map((prevColumn) =>
@@ -152,7 +181,6 @@ export const InputConfigList = ({
               ? {
                   ...prevColumn,
                   ...newColumn,
-                  order_of_input: order.length,
                 }
               : prevColumn
           )
@@ -203,17 +231,6 @@ export const InputConfigList = ({
     });
   };
 
-  const onUpdate: InputConfigListPresentationProps["onUpdate"] = (
-    newValue,
-    oldValue
-  ) => {
-    onChange(
-      value.map((column) =>
-        column.name === oldValue.name ? { ...column, ...newValue } : column
-      )
-    );
-  };
-
   const onDragEnd: InputConfigListPresentationProps["onDragEnd"] = (result) => {
     if (result.destination) {
       const newOrder = produce(order, (draft) => {
@@ -252,12 +269,16 @@ export const InputConfigList = ({
     <InputConfigListPresentation
       alreadyUsedColumnNames={alreadyUsedColumnNames}
       alreadyUsedColumnDisplayNames={alreadyUsedColumnDisplayNames}
-      onAdd={onAdd}
+      onAddOrUpdate={onAddOrUpdate}
       onDelete={onDelete}
-      onUpdate={onUpdate}
+      onConfigure={(index) => {
+        setConfigureModalOpeningIndex(index);
+      }}
+      onCloseConfigureModal={() => setConfigureModalOpeningIndex(-1)}
       onCloseAddModal={() => setOpenAddModal(false)}
       onOpenAddModal={() => setOpenAddModal(true)}
       openAddModal={openAddModal}
+      configureModalOpeningIndex={configureModalOpeningIndex}
       restColumns={restColumns}
       value={inputConfig}
       onDragEnd={onDragEnd}

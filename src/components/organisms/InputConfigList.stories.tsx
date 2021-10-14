@@ -18,12 +18,14 @@ Default.args = {
       display_name: "Test1",
       necessity: "required",
       order_of_input: 1,
+      is_secret: false,
     },
     {
       name: "test2",
       display_name: "Test2",
       necessity: "optional",
       order_of_input: 0,
+      is_secret: true,
     },
   ],
   onChange: (newValue) =>

@@ -12,12 +12,15 @@ import Autocomplete, {
   createFilterOptions,
 } from "@mui/material/Autocomplete";
 import Button from "@mui/material/Button";
+import Checkbox from "@mui/material/Checkbox";
 import Dialog from "@mui/material/Dialog";
 import FormControl from "@mui/material/FormControl";
+import FormControlLabel from "@mui/material/FormControlLabel";
 import FormHelperText from "@mui/material/FormHelperText";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
+import { useEffect } from "react";
 import {
   useForm,
   Controller,
@@ -36,12 +39,15 @@ type OptionType = {
   newOption?: boolean;
 };
 export type NewColumnType = Required<
-  Pick<DatabaseColumnsConfigType[number], "display_name" | "name" | "necessity">
+  Pick<
+    DatabaseColumnsConfigType[number],
+    "display_name" | "name" | "necessity" | "is_secret"
+  >
 >;
 type NameAutocompleteProps = AutocompleteProps<OptionType, false, false, true>;
 type ValidateRuleType = ControllerProps["rules"];
 
-export type InputConfigAddModalPresentationProps = {
+export type InputConfigListItemModalPresentationProps = {
   formControl: Control<NewColumnType>;
   validateRules: Record<keyof NewColumnType, ValidateRuleType>;
   validateErrors: FieldErrors<NewColumnType>;
@@ -53,32 +59,36 @@ export type InputConfigAddModalPresentationProps = {
   getNameOptionLabel: NameAutocompleteProps["getOptionLabel"];
   necessity?: DatabaseColumnsConfigNecessityType;
   onAdd: () => void;
+  onUpdate: () => void;
 } & Omit<
-  InputConfigAddModalProps,
+  InputConfigListItemModalProps,
   "onSave" | "alreadyUsedNames" | "alreadyUsedDisplayNames"
 >;
 
-export type InputConfigAddModalProps = {
+export type InputConfigListItemModalProps = {
   options: OptionType[];
   open: boolean;
   onClose: () => void;
   onSave: (newConfig: NewColumnType) => void;
   alreadyUsedNames: string[];
   alreadyUsedDisplayNames: string[];
+  initialData: NewColumnType | null;
 };
 
-export const InputConfigAddModalPresentation = ({
+export const InputConfigListItemModalPresentation = ({
   open,
   options,
   onClose,
   filterNameOptions,
   getNameOptionLabel,
   onAdd,
+  onUpdate,
   formControl,
   validateRules,
   validateErrors,
   validateErrorMessages,
-}: InputConfigAddModalPresentationProps): JSX.Element => {
+  initialData,
+}: InputConfigListItemModalPresentationProps): JSX.Element => {
   return (
     <Dialog open={open} onClose={onClose} fullWidth>
       <DialogWrapper>
@@ -91,7 +101,6 @@ export const InputConfigAddModalPresentation = ({
                 name="name"
                 control={formControl}
                 rules={validateRules.name}
-                shouldUnregister
                 render={({ field }) => {
                   return (
                     <Autocomplete
@@ -105,7 +114,8 @@ export const InputConfigAddModalPresentation = ({
                               validateErrorMessages.name[
                                 validateErrors.name?.type
                               ]) ||
-                            (field.value &&
+                            (!initialData &&
+                              field.value &&
                               !options.some(
                                 (option) => option.name === field.value
                               ) &&
@@ -129,6 +139,7 @@ export const InputConfigAddModalPresentation = ({
                       filterSelectedOptions
                       fullWidth
                       autoSelect
+                      disabled={!!initialData}
                     />
                   );
                 }}
@@ -139,7 +150,6 @@ export const InputConfigAddModalPresentation = ({
                   name="display_name"
                   control={formControl}
                   rules={validateRules.display_name}
-                  shouldUnregister
                   render={({ field }) => (
                     <TextField
                       {...field}
@@ -160,7 +170,6 @@ export const InputConfigAddModalPresentation = ({
                   control={formControl}
                   rules={validateRules.necessity}
                   defaultValue="required"
-                  shouldUnregister
                   render={({ field }) => (
                     <FormControl error={Boolean(validateErrors.necessity)}>
                       <Select {...field} variant="outlined">
@@ -180,9 +189,37 @@ export const InputConfigAddModalPresentation = ({
                     </FormControl>
                   )}
                 />
+                <DialogSubTitle>Visibility</DialogSubTitle>
+                <Controller
+                  name="is_secret"
+                  control={formControl}
+                  rules={validateRules.is_secret}
+                  defaultValue={false}
+                  render={({ field }) => (
+                    <FormControl error={Boolean(validateErrors.is_secret)}>
+                      <FormControlLabel
+                        control={
+                          <Checkbox
+                            onChange={(e) => field.onChange(e.target.checked)}
+                            checked={field.value}
+                          />
+                        }
+                        label="Hide from restricted users"
+                      />
+                    </FormControl>
+                  )}
+                />
               </>
             </DialogMain>
-            <DialogToolBar right={<Button onClick={onAdd}>Add</Button>} />
+            <DialogToolBar
+              right={
+                initialData ? (
+                  <Button onClick={onUpdate}>OK</Button>
+                ) : (
+                  <Button onClick={onAdd}>Add</Button>
+                )
+              }
+            />
           </DialogBody>
         </DialogContainer>
       </DialogWrapper>
@@ -190,19 +227,33 @@ export const InputConfigAddModalPresentation = ({
   );
 };
 
-export const InputConfigAddModal = ({
+export const InputConfigListItemModal = ({
   options,
   open,
   onClose,
   onSave,
   alreadyUsedNames,
   alreadyUsedDisplayNames,
-}: InputConfigAddModalProps): JSX.Element => {
+  initialData,
+}: InputConfigListItemModalProps): JSX.Element => {
   const {
     control,
     handleSubmit,
+    setValue,
+    reset,
     formState: { errors: validateErrors },
   } = useForm<NewColumnType>();
+
+  useEffect(() => {
+    if (initialData) {
+      setValue("name", initialData.name);
+      setValue("display_name", initialData.display_name);
+      setValue("necessity", initialData.necessity);
+      setValue("is_secret", initialData.is_secret);
+    } else {
+      reset();
+    }
+  }, [open, initialData, setValue, reset]);
 
   const validateRules = {
     name: {
@@ -225,6 +276,7 @@ export const InputConfigAddModal = ({
     necessity: {
       required: true,
     },
+    is_secret: {},
   };
   const validateErrorMessages = {
     name: {
@@ -237,10 +289,11 @@ export const InputConfigAddModal = ({
       duplicate: "This display name is already used",
     },
     necessity: { required: "Necessity is required" },
+    is_secret: {},
   };
 
   const filter = createFilterOptions<OptionType>();
-  const filterNameOptions: InputConfigAddModalPresentationProps["filterNameOptions"] = (
+  const filterNameOptions: InputConfigListItemModalPresentationProps["filterNameOptions"] = (
     options,
     params
   ) => {
@@ -261,7 +314,7 @@ export const InputConfigAddModal = ({
     return filtered;
   };
 
-  const getNameOptionLabel: InputConfigAddModalPresentationProps["getNameOptionLabel"] = (
+  const getNameOptionLabel: InputConfigListItemModalPresentationProps["getNameOptionLabel"] = (
     option
   ) => {
     if (typeof option === "string") {
@@ -275,8 +328,13 @@ export const InputConfigAddModal = ({
     onClose();
   });
 
+  const onUpdate = handleSubmit((data) => {
+    onSave(data);
+    onClose();
+  });
+
   return (
-    <InputConfigAddModalPresentation
+    <InputConfigListItemModalPresentation
       validateErrors={validateErrors}
       validateErrorMessages={validateErrorMessages}
       validateRules={validateRules}
@@ -284,9 +342,11 @@ export const InputConfigAddModal = ({
       filterNameOptions={filterNameOptions}
       getNameOptionLabel={getNameOptionLabel}
       onAdd={onAdd}
+      onUpdate={onUpdate}
       onClose={onClose}
       open={open}
       options={options}
+      initialData={initialData}
     />
   );
 };
