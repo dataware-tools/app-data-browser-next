@@ -53,7 +53,7 @@
     "react-router-dom": "^5.2.0",
     "react-syntax-highlighter": "^15.4.4",
     "recoil": "^0.4.1",
-    "swr": "^0.5.4",
+    "swr": "^1.0.1",
     "wavesurfer.js": "^5.1.0"
   },
   "devDependencies": {
