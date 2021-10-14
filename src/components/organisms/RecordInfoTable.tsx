@@ -4,16 +4,19 @@ import TableBody from "@mui/material/TableBody";
 import MuiTableCell, { TableCellProps } from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
 import dynamic from "next/dynamic";
+import { DatabaseConfigType } from "../../utils";
 const ReactJson = dynamic(import("react-json-view"), { ssr: false });
 
 export type RecordInfoTablePresentationProps = RecordInfoTableProps;
 
 export type RecordInfoTableProps = {
   record: metaStore.RecordModel;
+  databaseConfig?: DatabaseConfigType;
 };
 
 export const RecordInfoTablePresentation = ({
   record,
+  databaseConfig,
 }: RecordInfoTablePresentationProps): JSX.Element => {
   const TableCell = ({ ...delegated }: TableCellProps) => (
     <MuiTableCell
@@ -27,9 +30,13 @@ export const RecordInfoTablePresentation = ({
       <TableBody>
         {Object.keys(record).map((key) => {
           const value = record[key];
+          const columnConfig =
+            databaseConfig?.columns.find((element) => element.name === key) ||
+            null;
+          const displayKey = columnConfig ? columnConfig.display_name : key;
           return (
             <TableRow key={key}>
-              <TableCell>{key}</TableCell>
+              <TableCell>{displayKey}</TableCell>
               <TableCell>
                 {value !== null && typeof value === "object" ? (
                   <ReactJson

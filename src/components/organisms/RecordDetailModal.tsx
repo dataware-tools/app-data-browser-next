@@ -38,6 +38,7 @@ import {
   uploadFileToFileProvider,
   useGetConfig,
   createSystemMetadata,
+  DatabaseConfigType,
 } from "utils";
 
 export type RecordDetailModalPresentationProps = {
@@ -51,6 +52,7 @@ export type RecordDetailModalPresentationProps = {
   onCloseRecordEditModal: RecordEditModalProps["onClose"];
   onAddFile: FileUploadButtonProps["onFileChange"];
   onEditRecord: () => void;
+  databaseConfig?: DatabaseConfigType;
 } & RecordDetailModalProps;
 
 export type RecordDetailModalProps = {
@@ -58,6 +60,7 @@ export type RecordDetailModalProps = {
   onClose: () => void;
   recordId: string;
   databaseId: string;
+  databaseConfig?: DatabaseConfigType;
 };
 
 export const RecordDetailModalPresentation = ({
@@ -75,6 +78,7 @@ export const RecordDetailModalPresentation = ({
   onCloseRecordEditModal,
   onAddFile,
   onEditRecord,
+  databaseConfig,
 }: RecordDetailModalPresentationProps): JSX.Element => {
   const currentTabName = tabNames[selectedTabIndex];
   return (
@@ -101,7 +105,11 @@ export const RecordDetailModalPresentation = ({
               >
                 <DialogMain width="60vw">
                   {currentTabName === "Info" ? (
-                    <RecordInfo databaseId={databaseId} recordId={recordId} />
+                    <RecordInfo
+                      databaseId={databaseId}
+                      recordId={recordId}
+                      databaseConfig={databaseConfig}
+                    />
                   ) : currentTabName === "Files" ? (
                     <FileList databaseId={databaseId} recordId={recordId} />
                   ) : null}
@@ -147,6 +155,7 @@ export const RecordDetailModal = ({
   onClose,
   databaseId,
   recordId,
+  databaseConfig,
 }: RecordDetailModalProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken, user } = useAuth0();
   const [selectedTabIndex, setSelectedTabIndex] = useState(0);
@@ -268,6 +277,7 @@ export const RecordDetailModal = ({
       selectedTabIndex={selectedTabIndex}
       tabNames={tabNames}
       title={title}
+      databaseConfig={databaseConfig}
     />
   );
 };

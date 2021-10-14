@@ -12,7 +12,7 @@ import Switch from "@mui/material/Switch";
 import dynamic from "next/dynamic";
 import { useState } from "react";
 import { RecordInfoTable } from "components/organisms/RecordInfoTable";
-import { useGetRecord } from "utils";
+import { DatabaseConfigType, useGetRecord } from "utils";
 const ReactJson = dynamic(import("react-json-view"), { ssr: false });
 
 export type RecordInfoPresentationProps = {
@@ -21,9 +21,14 @@ export type RecordInfoPresentationProps = {
   isFetchComplete: boolean;
   isJsonView: boolean;
   onToggleIsJsonView: () => void;
+  databaseConfig?: DatabaseConfigType;
 };
 
-export type RecordInfoProps = { databaseId: string; recordId: string };
+export type RecordInfoProps = {
+  databaseId: string;
+  recordId: string;
+  databaseConfig?: DatabaseConfigType;
+};
 
 export const RecordInfoPresentation = ({
   record,
@@ -31,6 +36,7 @@ export const RecordInfoPresentation = ({
   isFetchComplete,
   isJsonView,
   onToggleIsJsonView,
+  databaseConfig,
 }: RecordInfoPresentationProps): JSX.Element => {
   return (
     <>
@@ -59,7 +65,7 @@ export const RecordInfoPresentation = ({
               collapseStringsAfterLength={80}
             />
           ) : (
-            <RecordInfoTable record={record} />
+            <RecordInfoTable record={record} databaseConfig={databaseConfig} />
           )}
         </>
       ) : (
@@ -72,6 +78,7 @@ export const RecordInfoPresentation = ({
 export const RecordInfo = ({
   databaseId,
   recordId,
+  databaseConfig,
 }: RecordInfoProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const { data: getRecordRes, error: getRecordError } = useGetRecord(
@@ -113,6 +120,7 @@ export const RecordInfo = ({
       isFetchComplete={isFetchComplete}
       isJsonView={isJsonView}
       onToggleIsJsonView={onToggleIsJsonView}
+      databaseConfig={databaseConfig}
     />
   );
 };
