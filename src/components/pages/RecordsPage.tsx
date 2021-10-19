@@ -41,6 +41,7 @@ import {
 } from "components/organisms/RecordDetailModal";
 import { RecordList, RecordListProps } from "components/organisms/RecordList";
 
+import { RecordListMapView } from "components/organisms/RecordListMapView";
 import { userActionsState, recordPaginateState } from "globalStates";
 import {
   useListRecords,
@@ -69,6 +70,7 @@ export type RecordsPagePresentationProps = {
   onAddRecordSucceeded: RecordAddButtonProps["onAddRecordSucceeded"];
   onCloseRecordDetailModal: RecordDetailModalProps["onClose"];
   onEndInitializeDatabase: DatabaseConfigModalProps["onClose"];
+  listStyle: "map" | "table";
 };
 
 export const RecordsPagePresentation = ({
@@ -90,6 +92,7 @@ export const RecordsPagePresentation = ({
   onCloseRecordDetailModal,
   searchColumns,
   onEndInitializeDatabase,
+  listStyle,
 }: RecordsPagePresentationProps): JSX.Element => {
   return (
     <>
@@ -134,7 +137,7 @@ export const RecordsPagePresentation = ({
             {error ? (
               <ErrorMessage {...error} />
             ) : isFetchComplete ? (
-              <>
+              listStyle === "table" ? (
                 <RecordList
                   databaseId={databaseId}
                   page={page}
@@ -142,7 +145,15 @@ export const RecordsPagePresentation = ({
                   search={searchText}
                   searchKey={searchColumns}
                 />
-              </>
+              ) : listStyle === "map" ? (
+                <RecordListMapView
+                  databaseId={databaseId}
+                  page={page}
+                  perPage={perPage}
+                  search={searchText}
+                  searchKey={searchColumns}
+                />
+              ) : null
             ) : (
               <LoadingIndicator />
             )}
@@ -303,6 +314,8 @@ export const RecordsPage = (): JSX.Element => {
     : 0;
   const databaseName = getDatabaseRes?.name;
 
+  const listStyle = getQueryString("listStyle") === "map" ? "map" : "table";
+
   return (
     <RecordsPagePresentation
       error={error}
@@ -323,6 +336,7 @@ export const RecordsPage = (): JSX.Element => {
       searchColumns={searchKey}
       isNewDatabase={isNewDatabase}
       onEndInitializeDatabase={onEndInitializeDatabase}
+      listStyle={listStyle}
     />
   );
 };
