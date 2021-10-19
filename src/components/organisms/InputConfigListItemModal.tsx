@@ -60,9 +60,10 @@ export type InputConfigListItemModalPresentationProps = {
   necessity?: DatabaseColumnsConfigNecessityType;
   onAdd: () => void;
   onUpdate: () => void;
+  hasInitialData: boolean;
 } & Omit<
   InputConfigListItemModalProps,
-  "onSave" | "alreadyUsedNames" | "alreadyUsedDisplayNames"
+  "onSave" | "alreadyUsedNames" | "alreadyUsedDisplayNames" | "initialData"
 >;
 
 export type InputConfigListItemModalProps = {
@@ -87,7 +88,7 @@ export const InputConfigListItemModalPresentation = ({
   validateRules,
   validateErrors,
   validateErrorMessages,
-  initialData,
+  hasInitialData,
 }: InputConfigListItemModalPresentationProps): JSX.Element => {
   return (
     <Dialog open={open} onClose={onClose} fullWidth>
@@ -114,7 +115,7 @@ export const InputConfigListItemModalPresentation = ({
                               validateErrorMessages.name[
                                 validateErrors.name?.type
                               ]) ||
-                            (!initialData &&
+                            (!hasInitialData &&
                               field.value &&
                               !options.some(
                                 (option) => option.name === field.value
@@ -139,7 +140,7 @@ export const InputConfigListItemModalPresentation = ({
                       filterSelectedOptions
                       fullWidth
                       autoSelect
-                      disabled={!!initialData}
+                      disabled={hasInitialData}
                     />
                   );
                 }}
@@ -213,7 +214,7 @@ export const InputConfigListItemModalPresentation = ({
             </DialogMain>
             <DialogToolBar
               right={
-                initialData ? (
+                hasInitialData ? (
                   <Button onClick={onUpdate}>OK</Button>
                 ) : (
                   <Button onClick={onAdd}>Add</Button>
@@ -346,7 +347,7 @@ export const InputConfigListItemModal = ({
       onClose={onClose}
       open={open}
       options={options}
-      initialData={initialData}
+      hasInitialData={!!initialData}
     />
   );
 };

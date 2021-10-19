@@ -4,7 +4,6 @@ import SettingsIcon from "@mui/icons-material/Settings";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import React, { ReactNode } from "react";
-import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
 import { DatabaseColumnsConfigType } from "utils";
 
 export type ValueType = Required<
@@ -42,17 +41,16 @@ export const InputConfigListItemPresentation = ({
           display: "flex",
           flexDirection: "row",
           justifyContent: "flex-end",
+          alignItems: "center",
         }}
       >
         <IconButton onClick={() => onConfigure()}>
           <SettingsIcon />
         </IconButton>
         <Spacer direction="horizontal" size="10px" />
-        <ElemCenteringFlexDiv>
-          <IconButton onClick={() => onDelete(value)}>
-            <DeleteIcon />
-          </IconButton>
-        </ElemCenteringFlexDiv>
+        <IconButton onClick={() => onDelete(value)}>
+          <DeleteIcon />
+        </IconButton>
       </Box>
     </Box>
   );
