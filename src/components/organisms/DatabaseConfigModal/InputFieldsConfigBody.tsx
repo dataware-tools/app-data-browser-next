@@ -105,6 +105,7 @@ export const InputFieldsConfigBody = ({
         name: column.name,
         display_name: column.display_name,
         necessity: column.necessity || "unnecessary",
+        is_secret: column.is_secret || false,
         order_of_input: column.order_of_input,
       })) || []
     );
@@ -138,6 +139,7 @@ export const InputFieldsConfigBody = ({
             name: column.name,
             display_name: column.display_name,
             necessity: column.necessity,
+            is_secret: column.is_secret,
             order_of_input: column.order_of_input,
             dtype: "string" as const,
             aggregation: "first" as const,

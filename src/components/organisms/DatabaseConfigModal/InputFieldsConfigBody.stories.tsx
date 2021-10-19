@@ -29,12 +29,14 @@ export const Presentation = (): JSX.Element => (
         display_name: "test1",
         name: "Test1",
         necessity: "required",
+        is_secret: false,
       },
       {
         order_of_input: 2,
         display_name: "test2",
         name: "Test2",
         necessity: "optional",
+        is_secret: true,
       },
     ]}
     isFetchComplete
