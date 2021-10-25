@@ -15,7 +15,6 @@ import {
   extractErrorMessageFromFetchError,
 } from "@dataware-tools/app-common";
 import LoadingButton from "@mui/lab/LoadingButton";
-import Box from "@mui/material/Box";
 import Dialog from "@mui/material/Dialog";
 import FormControl from "@mui/material/FormControl";
 import InputLabel from "@mui/material/InputLabel";
@@ -65,30 +64,28 @@ export const ExportMetadataModalPresentation = ({
             {error ? (
               <ErrorMessage {...error} />
             ) : (
-              <DialogMain>
-                <Box
-                  sx={{
-                    alignItems: "center",
-                    display: "flex",
-                    flexShrink: 0,
-                    justifyContent: "center",
-                    width: "100%",
-                  }}
-                >
-                  <FormControl>
-                    <InputLabel id="export-type-label">Format: </InputLabel>
-                    <Select
-                      labelId="export-type-label"
-                      value={exportType}
-                      onChange={(event) => {
-                        onChangeExportType(event.target.value);
-                      }}
-                    >
-                      <MenuItem value="JSON">JSON</MenuItem>
-                      <MenuItem value="CSV">CSV</MenuItem>
-                    </Select>
-                  </FormControl>
-                </Box>
+              <DialogMain
+                sx={{
+                  alignItems: "center",
+                  display: "flex",
+                  flexShrink: 0,
+                  justifyContent: "center",
+                }}
+              >
+                <FormControl sx={{ margin: 1 }}>
+                  <InputLabel id="export-type-label">Format: </InputLabel>
+                  <Select
+                    label="Format:"
+                    labelId="export-type-label"
+                    value={exportType}
+                    onChange={(event) => {
+                      onChangeExportType(event.target.value);
+                    }}
+                  >
+                    <MenuItem value="JSON">JSON</MenuItem>
+                    <MenuItem value="CSV">CSV</MenuItem>
+                  </Select>
+                </FormControl>
               </DialogMain>
             )}
           </DialogBody>
