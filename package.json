@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@auth0/auth0-react": "^1.8.0",
-    "@dataware-tools/app-common": "^21.10.1",
+    "@dataware-tools/app-common": "^21.10.4",
     "@emotion/react": "^11.4.1",
     "@emotion/styled": "^11.3.0",
     "@mui/icons-material": "^5.0.3",
