@@ -1,4 +1,4 @@
-import { jobStore } from "@dataware-tools/app-common";
+import { jobStore } from "@dataware-tools/api-job-store-client";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import TableCell from "@mui/material/TableCell";

@@ -1,9 +1,6 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import {
-  LoadingIndicator,
-  API_ROUTE,
-  metaStore,
-} from "@dataware-tools/app-common";
+import { metaStore } from "@dataware-tools/api-meta-store-client";
+import { LoadingIndicator, API_ROUTE } from "@dataware-tools/app-common";
 import { useCreateJwtToDownloadFile } from "utils";
 
 type FileType = metaStore.FileModel;

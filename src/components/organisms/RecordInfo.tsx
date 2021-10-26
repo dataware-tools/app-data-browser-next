@@ -1,10 +1,10 @@
 import { useAuth0 } from "@auth0/auth0-react";
+import { metaStore } from "@dataware-tools/api-meta-store-client";
 import {
   ErrorMessage,
   ErrorMessageProps,
   extractErrorMessageFromFetchError,
   LoadingIndicator,
-  metaStore,
   ToolBar,
 } from "@dataware-tools/app-common";
 import FormControlLabel from "@mui/material/FormControlLabel";

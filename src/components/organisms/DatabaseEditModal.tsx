@@ -1,4 +1,5 @@
 import { useAuth0 } from "@auth0/auth0-react";
+import { metaStore } from "@dataware-tools/api-meta-store-client";
 import {
   DialogBody,
   DialogCloseButton,
@@ -7,8 +8,6 @@ import {
   DialogTitle,
   DialogToolBar,
   DialogWrapper,
-  metaStore,
-  fetchMetaStore,
   ErrorMessageProps,
   ErrorMessage,
   usePrevious,
@@ -29,6 +28,7 @@ import {
 import { useRecoilValue } from "recoil";
 import { databasePaginateState } from "globalStates";
 import {
+  fetchMetaStore,
   initializeDatabaseConfig,
   useGetDatabase,
   useListDatabases,

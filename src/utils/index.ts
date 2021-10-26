@@ -1,4 +1,5 @@
-import { AUTH_CONFIG, metaStore } from "@dataware-tools/app-common";
+import { metaStore } from "@dataware-tools/api-meta-store-client";
+import { AUTH_CONFIG } from "@dataware-tools/app-common";
 import { fetchMetaStore } from "utils";
 import { DatabaseConfigType, DatabaseColumnsConfigType } from "utils/utilTypes";
 

@@ -1,4 +1,6 @@
 import { useAuth0 } from "@auth0/auth0-react";
+import { fileProvider } from "@dataware-tools/api-file-provider-client";
+import { metaStore } from "@dataware-tools/api-meta-store-client";
 import {
   alert,
   API_ROUTE,
@@ -6,9 +8,7 @@ import {
   ErrorMessage,
   ErrorMessageProps,
   extractErrorMessageFromFetchError,
-  fileProvider,
   LoadingIndicator,
-  metaStore,
 } from "@dataware-tools/app-common";
 import List from "@mui/material/List";
 import { useState, useMemo } from "react";

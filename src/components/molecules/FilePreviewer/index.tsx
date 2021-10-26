@@ -1,4 +1,4 @@
-import { metaStore } from "@dataware-tools/app-common";
+import { metaStore } from "@dataware-tools/api-meta-store-client";
 import dynamic from "next/dynamic";
 import { CsvPreviewer } from "./CsvPreviewer";
 import { DefaultPreviewer } from "./DefaultPreviewer";

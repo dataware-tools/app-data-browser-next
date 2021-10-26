@@ -1,4 +1,4 @@
-import { metaStore } from "@dataware-tools/app-common";
+import { metaStore } from "@dataware-tools/api-meta-store-client";
 import { useState, useEffect } from "react";
 import SyntaxHighlighter from "react-syntax-highlighter";
 
