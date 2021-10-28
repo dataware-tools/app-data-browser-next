@@ -6,10 +6,63 @@ import { theme } from "@dataware-tools/app-common";
 import { SWRConfig } from "swr";
 import { SwrOptions } from "../src/utils";
 import { userActionsState } from "../src/globalStates";
+import { databaseConfigState } from "../src/components/organisms/DatabaseConfigModal/DatabaseConfigState";
 import { RecoilRoot } from "recoil";
 
 export const parameters = {
   actions: { argTypesRegex: "^on[A-Z].*" },
+};
+
+const initialDatabaseConfig = {
+  columns: [
+    {
+      name: "record_name",
+      display_name: "Record Name",
+      necessity: "required",
+      order_of_input: 0,
+      dtype: "string",
+      aggregation: "first",
+      is_search_target: true,
+      is_display_field: true,
+      is_record_title: true,
+      is_secret: false,
+    },
+    {
+      name: "description",
+      display_name: "Description",
+      necessity: "recommended",
+      order_of_input: 1,
+      dtype: "string",
+      aggregation: "first",
+      is_display_field: true,
+      is_record_title: false,
+      is_secret: false,
+      is_search_target: false,
+    },
+    {
+      name: "contents",
+      dtype: "dict",
+      aggregation: "mergeObjects",
+      display_name: "Contents",
+      is_display_field: false,
+      is_record_title: false,
+      necessity: "unnecessary",
+      is_search_target: false,
+      is_secret: true,
+    },
+    {
+      name: "record_id",
+      dtype: "string",
+      aggregation: "first",
+      display_name: "Record ID",
+      is_display_field: false,
+      is_record_title: false,
+      necessity: "unnecessary",
+      is_search_target: false,
+      is_secret: false,
+    },
+  ],
+  index_columns: ["record_id", "path"],
 };
 
 export const decorators = [
@@ -26,9 +79,10 @@ export const decorators = [
             <CssBaseline />
             <SWRConfig value={SwrOptions}>
               <RecoilRoot
-                initializeState={({ set }) =>
-                  set(userActionsState, ["databases", "metadata"])
-                }
+                initializeState={({ set }) => {
+                  set(userActionsState, ["databases", "metadata"]);
+                  set(databaseConfigState, initialDatabaseConfig);
+                }}
               >
                 <Story {...context} />
               </RecoilRoot>
