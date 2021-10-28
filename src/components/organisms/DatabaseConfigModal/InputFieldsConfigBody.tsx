@@ -1,136 +1,70 @@
-import { useAuth0 } from "@auth0/auth0-react";
-import { metaStore } from "@dataware-tools/api-meta-store-client";
-import {
-  ErrorMessage,
-  DialogToolBar,
-  DialogBody,
-  DialogMain,
-  LoadingIndicator,
-  ErrorMessageProps,
-  extractErrorMessageFromFetchError,
-} from "@dataware-tools/app-common";
-import LoadingButton from "@mui/lab/LoadingButton";
+import { DialogMain, ErrorMessage } from "@dataware-tools/app-common";
 import { produce } from "immer";
-import { useState, useEffect } from "react";
+import { useRecoilState } from "recoil";
+import { databaseConfigState } from "./DatabaseConfigState";
 import {
   InputConfigList,
   InputConfigListProps,
 } from "components/organisms/InputConfigList";
-import { useGetConfig, fetchMetaStore, isEditableColumnName } from "utils";
-
-export type ConfigNameType = "record_add_editable_columns";
+import { isEditableColumnName } from "utils";
 
 export type InputFieldsConfigBodyPresentationProps = {
-  error?: ErrorMessageProps;
-  isFetchComplete: boolean;
   inputColumns: InputConfigListProps["value"];
   nonInputColumns: InputConfigListProps["restColumns"];
   onChangeInputColumns: InputConfigListProps["onChange"];
-  isSaving: boolean;
-  onSave: () => void;
-} & Omit<InputFieldsConfigBodyProps, "databaseId">;
-
-export type InputFieldsConfigBodyProps = {
-  databaseId: string;
 };
 
 export const InputFieldsConfigBodyPresentation = ({
-  error,
-  isFetchComplete,
   inputColumns,
   nonInputColumns,
   onChangeInputColumns,
-  isSaving,
-  onSave,
 }: InputFieldsConfigBodyPresentationProps): JSX.Element => {
-  return error ? (
-    <ErrorMessage {...error} />
-  ) : isFetchComplete ? (
-    <DialogBody>
-      <DialogMain>
-        <InputConfigList
-          value={inputColumns}
-          onChange={onChangeInputColumns}
-          restColumns={nonInputColumns}
-        />
-      </DialogMain>
-      <DialogToolBar
-        right={
-          <LoadingButton loading={isSaving} onClick={onSave}>
-            Save
-          </LoadingButton>
-        }
+  return (
+    <DialogMain>
+      <InputConfigList
+        value={inputColumns}
+        onChange={onChangeInputColumns}
+        restColumns={nonInputColumns}
       />
-    </DialogBody>
-  ) : (
-    <LoadingIndicator />
+    </DialogMain>
   );
 };
 
-export const InputFieldsConfigBody = ({
-  databaseId,
-}: InputFieldsConfigBodyProps): JSX.Element => {
-  const { getAccessTokenSilently: getAccessToken } = useAuth0();
-  const [isSaving, setIsSaving] = useState(false);
-  const [error, setError] = useState<ErrorMessageProps | undefined>(undefined);
-  const [inputColumns, setInputColumns] = useState<
-    InputConfigListProps["value"]
-  >([]);
+export const InputFieldsConfigBody = (): JSX.Element => {
+  const [databaseConfig, setDatabaseConfig] = useRecoilState(
+    databaseConfigState
+  );
 
-  const {
-    data: getConfigRes,
-    error: getConfigError,
-    mutate: getConfigMutate,
-  } = useGetConfig(getAccessToken, {
-    databaseId,
-  });
+  if (typeof databaseConfig === "undefined") {
+    console.error("database config should not be undefined!!");
+    return <ErrorMessage reason="Invalid state" />;
+  }
 
-  const fetchError = getConfigError;
-  useEffect(() => {
-    if (fetchError) {
-      const { reason, instruction } = extractErrorMessageFromFetchError(
-        fetchError
-      );
-      setError({ reason, instruction });
-    } else {
-      setError(undefined);
-    }
-  }, [fetchError]);
+  const inputColumns =
+    databaseConfig?.columns.map((column) => ({
+      name: column.name,
+      display_name: column.display_name,
+      necessity: column.necessity || "unnecessary",
+      is_secret: column.is_secret || false,
+      order_of_input: column.order_of_input,
+    })) || [];
 
-  const initializeInputColumns = (
-    getConfigRes: ReturnType<typeof useGetConfig>["data"]
+  const onChangeInputColumns: InputFieldsConfigBodyPresentationProps["onChangeInputColumns"] = (
+    newInputColumns
   ) => {
-    setInputColumns(
-      getConfigRes?.columns.map((column) => ({
-        name: column.name,
-        display_name: column.display_name,
-        necessity: column.necessity || "unnecessary",
-        is_secret: column.is_secret || false,
-        order_of_input: column.order_of_input,
-      })) || []
-    );
-  };
-  useEffect(() => {
-    initializeInputColumns(getConfigRes);
-  }, [getConfigRes]);
-
-  const onSave = async () => {
-    if (getConfigRes && inputColumns) {
-      setIsSaving(true);
-
-      const newDatabaseConfig = produce(getConfigRes, (draft) => {
+    if (databaseConfig) {
+      const newDatabaseConfig = produce(databaseConfig, (draft) => {
         // update existing columns
-        draft.columns = getConfigRes.columns.map((oldColumn) => {
-          const newColumn = inputColumns.find(
+        draft.columns = databaseConfig.columns.map((oldColumn) => {
+          const newColumn = newInputColumns.find(
             (column) => column.name === oldColumn.name
           );
           return { ...oldColumn, ...newColumn };
         });
-
         // add new columns
-        const addedColumns = inputColumns
+        const addedColumns = newInputColumns
           .filter((column) => {
-            const existingNames = getConfigRes.columns.map(
+            const existingNames = databaseConfig.columns.map(
               (column) => column.name
             );
             return !existingNames.includes(column.name);
@@ -146,34 +80,14 @@ export const InputFieldsConfigBody = ({
           }));
         draft.columns = draft.columns.concat(addedColumns);
       });
-
-      const [updateConfigRes, updateConfigError] = await fetchMetaStore(
-        getAccessToken,
-        metaStore.ConfigService.updateConfig,
-        {
-          databaseId,
-          requestBody: newDatabaseConfig,
-        }
-      );
-
-      if (updateConfigError) {
-        const { reason, instruction } = extractErrorMessageFromFetchError(
-          updateConfigError
-        );
-        setError({ reason, instruction });
-      } else {
-        getConfigMutate(updateConfigRes);
-      }
-
-      setIsSaving(false);
+      setDatabaseConfig(newDatabaseConfig);
     }
   };
 
-  const isFetchComplete = Boolean(!fetchError && getConfigRes);
-  const nonInputColumns = (getConfigRes?.columns
+  const nonInputColumns = (databaseConfig?.columns
     .filter(
       (column) =>
-        isEditableColumnName(getConfigRes, column.name) &&
+        isEditableColumnName(databaseConfig, column.name) &&
         (column.necessity == null || column.necessity === "unnecessary")
     )
     ?.map((column) => ({
@@ -186,13 +100,9 @@ export const InputFieldsConfigBody = ({
 
   return (
     <InputFieldsConfigBodyPresentation
-      error={error}
       inputColumns={inputColumns}
-      isFetchComplete={isFetchComplete}
-      isSaving={isSaving}
       nonInputColumns={nonInputColumns}
-      onChangeInputColumns={setInputColumns}
-      onSave={onSave}
+      onChangeInputColumns={onChangeInputColumns}
     />
   );
 };
