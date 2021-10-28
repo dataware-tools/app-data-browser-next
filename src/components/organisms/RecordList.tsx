@@ -24,6 +24,7 @@ import {
   fetchMetaStore,
   useListRecords,
   ParamTypeListRecords,
+  DatabaseConfigType,
 } from "utils";
 
 export type RecordListPresentationProps = {
@@ -34,6 +35,7 @@ export type RecordListPresentationProps = {
   records: metaStore.RecordModel[];
   onSelectRecord: DataGridProps["onCellClick"];
   onSortModelChange: DataGridProps["onSortModelChange"];
+  databaseConfig?: DatabaseConfigType;
 } & Pick<RecordListProps, "databaseId">;
 
 export type RecordListProps = ParamTypeListRecords;
@@ -47,6 +49,7 @@ export const RecordListPresentation = ({
   selectedRecordId,
   onCloseRecordDetailModal,
   onSortModelChange,
+  databaseConfig,
 }: RecordListPresentationProps): JSX.Element => {
   return (
     <>
@@ -70,6 +73,7 @@ export const RecordListPresentation = ({
               recordId={selectedRecordId}
               databaseId={databaseId}
               onClose={onCloseRecordDetailModal}
+              databaseConfig={databaseConfig}
             />
           ) : null}
         </>
@@ -245,6 +249,7 @@ export const RecordList = ({
       onSelectRecord={onSelectRecord}
       onSortModelChange={onSortModelChange}
       selectedRecordId={selectedRecordId}
+      databaseConfig={getConfigRes}
     />
   );
 };
