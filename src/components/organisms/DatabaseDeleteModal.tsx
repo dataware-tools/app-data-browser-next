@@ -170,7 +170,6 @@ export const DatabaseDeleteModal = ({
       }
     )();
 
-    console.log(cancelCloseModal);
     if (!cancelCloseModal) {
       propsOnClose();
     }
