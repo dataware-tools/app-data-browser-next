@@ -13,7 +13,7 @@ jobs:
       - name: Build test image
         env:
           NPM_REGISTRY: https://npm.pkg.github.com
-          NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
         run: |
           export DOCKER_BUILDKIT=1
           [[ -n "${NPM_TOKEN}" ]] && echo "//${NPM_REGISTRY##*://}/:_authToken=${NPM_TOKEN}" > /tmp/.npmrc
@@ -49,7 +49,7 @@ jobs:
       - name: Build production image
         env:
           NPM_REGISTRY: https://npm.pkg.github.com
-          NPM_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.REPO_ACCESS_TOKEN }}
         run: |
           export DOCKER_BUILDKIT=1
           [[ -n "${NPM_TOKEN}" ]] && echo "//${NPM_REGISTRY##*://}/:_authToken=${NPM_TOKEN}" > /tmp/.npmrc

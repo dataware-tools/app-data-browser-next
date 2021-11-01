@@ -1,4 +1,5 @@
-import { metaStore, theme as themeInstance } from "@dataware-tools/app-common";
+import { metaStore } from "@dataware-tools/api-meta-store-client";
+import { theme as themeInstance } from "@dataware-tools/app-common";
 import DescriptionIcon from "@mui/icons-material/Description";
 import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";

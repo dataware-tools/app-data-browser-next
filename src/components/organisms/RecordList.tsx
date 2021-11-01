@@ -1,10 +1,10 @@
 import { useAuth0 } from "@auth0/auth0-react";
+import { metaStore } from "@dataware-tools/api-meta-store-client";
 import {
   confirm,
   ErrorMessage,
   ErrorMessageProps,
   extractErrorMessageFromFetchError,
-  metaStore,
 } from "@dataware-tools/app-common";
 import DeleteIcon from "@mui/icons-material/Delete";
 import IconButton from "@mui/material/IconButton";

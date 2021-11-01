@@ -1,11 +1,8 @@
-import {
-  API_ROUTE,
-  fileProvider,
-  jobStore,
-  metaStore,
-  objToQueryString,
-  permissionManager,
-} from "@dataware-tools/app-common";
+import { fileProvider } from "@dataware-tools/api-file-provider-client";
+import { jobStore } from "@dataware-tools/api-job-store-client";
+import { metaStore } from "@dataware-tools/api-meta-store-client";
+import { permissionManager } from "@dataware-tools/api-permission-manager-client";
+import { API_ROUTE, objToQueryString } from "@dataware-tools/app-common";
 import { useState, useEffect } from "react";
 import useSWR, { SWRResponse } from "swr";
 import { AwaitType, DatabaseConfigType } from "utils/utilTypes";

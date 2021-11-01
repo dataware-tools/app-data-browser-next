@@ -1,4 +1,4 @@
-import { jobStore } from "@dataware-tools/app-common";
+import { jobStore } from "@dataware-tools/api-job-store-client";
 import Button from "@mui/material/Button";
 import { JobTemplateInfo } from "./JobTemplateInfo";
 import { SoloSelect } from "components/molecules/SoloSelect";

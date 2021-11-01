@@ -1,5 +1,5 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import { metaStore } from "@dataware-tools/app-common";
+import { metaStore } from "@dataware-tools/api-meta-store-client";
 import { useState } from "react";
 import { DatabaseConfigModal } from "./DatabaseConfigModal";
 import { DatabaseDeleteModal } from "./DatabaseDeleteModal";

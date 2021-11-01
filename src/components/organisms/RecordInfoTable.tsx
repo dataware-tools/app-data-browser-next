@@ -1,4 +1,4 @@
-import { metaStore } from "@dataware-tools/app-common";
+import { metaStore } from "@dataware-tools/api-meta-store-client";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import MuiTableCell, { TableCellProps } from "@mui/material/TableCell";

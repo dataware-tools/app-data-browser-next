@@ -1,4 +1,4 @@
-import { metaStore } from "@dataware-tools/app-common";
+import { metaStore } from "@dataware-tools/api-meta-store-client";
 import StorageIcon from "@mui/icons-material/Storage";
 import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
