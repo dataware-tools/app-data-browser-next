@@ -248,17 +248,6 @@ export const RecordsPage = (): JSX.Element => {
   }, [fetchError]);
 
   useEffect(() => {
-    addQueryString(
-      {
-        page,
-        perPage,
-        search,
-      },
-      "replace"
-    );
-  }, [page, perPage, search]);
-
-  useEffect(() => {
     setRecordPaginateState((prev) => ({
       ...prev,
       page: Number(getQueryString("page")) || 1,
@@ -269,6 +258,17 @@ export const RecordsPage = (): JSX.Element => {
         .map((column) => column.name) || ["record_id"],
     }));
   }, [getConfigRes, setRecordPaginateState, databaseId]);
+
+  useEffect(() => {
+    addQueryString(
+      {
+        page,
+        perPage,
+        search,
+      },
+      "replace"
+    );
+  }, [page, perPage, search]);
 
   useEffect(() => {
     if (listPermittedActionRes) {
