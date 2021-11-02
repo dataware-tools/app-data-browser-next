@@ -1,215 +1,145 @@
-import { useAuth0 } from "@auth0/auth0-react";
-import { metaStore } from "@dataware-tools/api-meta-store-client";
 import {
-  ErrorMessage,
-  DialogBody,
   DialogMain,
-  DialogToolBar,
   DialogSubTitle,
-  ErrorMessageProps,
-  extractErrorMessageFromFetchError,
+  ErrorMessage,
 } from "@dataware-tools/app-common";
-import LoadingButton, { LoadingButtonProps } from "@mui/lab/LoadingButton";
 import { produce } from "immer";
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { useRecoilState } from "recoil";
+import { databaseConfigState } from "./DatabaseConfigState";
 import { SoloSelect, SoloSelectProps } from "components/molecules/SoloSelect";
 
 import {
   OptionSharingSelects,
   OptionSharingSelectsProps,
 } from "components/organisms/OptionSharingSelects";
-import { useGetConfig, fetchMetaStore, compStr } from "utils";
-
-export type ConfigNameType = "record_list_display_columns";
+import { compStr } from "utils";
 
 export type DisplayFieldsConfigBodyPresentationProps = {
-  error?: ErrorMessageProps;
   displayColumns: OptionSharingSelectsProps["values"];
   displayColumnsOptions: OptionSharingSelectsProps["options"];
-  isFetchComplete: boolean;
   recordTitleColumn: SoloSelectProps["value"];
   recordTitleColumnOptions: SoloSelectProps["options"];
-  isDisableSaveButton: LoadingButtonProps["disabled"];
-  isSaving: LoadingButtonProps["loading"];
   onChangeDisplayColumns: OptionSharingSelectsProps["onChange"];
   onChangeRecordTitleColumn: SoloSelectProps["onChange"];
-  onSave: LoadingButtonProps["onClick"];
-} & Omit<DisplayFieldsConfigBodyProps, "databaseId">;
-
-export type DisplayFieldsConfigBodyProps = {
-  databaseId: string;
 };
 
 export const DisplayFieldsConfigBodyPresentation = ({
-  error,
   displayColumnsOptions,
   displayColumns,
-  isFetchComplete,
   recordTitleColumn,
   recordTitleColumnOptions,
-  isDisableSaveButton,
-  isSaving,
   onChangeDisplayColumns,
   onChangeRecordTitleColumn,
-  onSave,
 }: DisplayFieldsConfigBodyPresentationProps): JSX.Element => {
   return (
-    <DialogBody>
-      {error ? (
-        <ErrorMessage {...error} />
-      ) : isFetchComplete ? (
-        <>
-          <DialogMain>
-            <DialogSubTitle>Record table columns</DialogSubTitle>
-            <OptionSharingSelects
-              onChange={onChangeDisplayColumns}
-              options={displayColumnsOptions}
-              values={displayColumns}
-              creatable
-              deletable
-              draggable
-            />
-            <DialogSubTitle>Record title</DialogSubTitle>
-            <SoloSelect
-              options={recordTitleColumnOptions}
-              onChange={onChangeRecordTitleColumn}
-              value={recordTitleColumn}
-            />
-          </DialogMain>
-          <DialogToolBar
-            right={
-              <LoadingButton
-                disabled={isDisableSaveButton}
-                loading={isSaving}
-                onClick={onSave}
-              >
-                Save
-              </LoadingButton>
-            }
-          />
-        </>
-      ) : null}
-    </DialogBody>
+    <DialogMain>
+      <DialogSubTitle>Record table columns</DialogSubTitle>
+      <OptionSharingSelects
+        onChange={onChangeDisplayColumns}
+        options={displayColumnsOptions}
+        values={displayColumns}
+        creatable
+        deletable
+        draggable
+      />
+      <DialogSubTitle>Record title</DialogSubTitle>
+      <SoloSelect
+        options={recordTitleColumnOptions}
+        onChange={onChangeRecordTitleColumn}
+        value={recordTitleColumn}
+      />
+    </DialogMain>
   );
 };
 
-export const DisplayFieldsConfigBody = ({
-  databaseId,
-}: DisplayFieldsConfigBodyProps): JSX.Element => {
-  const { getAccessTokenSilently: getAccessToken } = useAuth0();
-  const [isSaving, setIsSaving] = useState(false);
-  const [displayColumns, setDisplayColumns] = useState<string[]>([]);
-  const [recordTitleColumn, setRecordTitleColumn] = useState("");
-  const [error, setError] = useState<ErrorMessageProps | undefined>(undefined);
+export const DisplayFieldsConfigBody = (): JSX.Element => {
+  const [databaseConfig, setDatabaseConfig] = useRecoilState(
+    databaseConfigState
+  );
+  const [numOfDisplayColumns, setNumOfDisplayColumns] = useState<number>(
+    databaseConfig?.columns.filter((column) => column.is_display_field)
+      .length || 0
+  );
 
-  const {
-    data: getConfigRes,
-    error: getConfigError,
-    mutate: getConfigMutate,
-  } = useGetConfig(getAccessToken, {
-    databaseId,
-  });
+  if (typeof databaseConfig === "undefined") {
+    console.error("database config should not be undefined!!");
+    return <ErrorMessage reason="Invalid state" />;
+  }
 
-  const fetchError = getConfigError;
-  useEffect(() => {
-    if (fetchError) {
-      const { reason, instruction } = extractErrorMessageFromFetchError(
-        fetchError
-      );
-      setError({ reason, instruction });
-    } else {
-      setError(undefined);
-    }
-  }, [fetchError]);
+  const tempDisplayColumns =
+    databaseConfig?.columns
+      .filter((column) => column.is_display_field)
+      .map((column) => column.name) || [];
+  const displayColumns =
+    tempDisplayColumns.length < numOfDisplayColumns
+      ? tempDisplayColumns.concat(
+          new Array(numOfDisplayColumns - tempDisplayColumns.length).fill("")
+        )
+      : tempDisplayColumns;
 
-  useEffect(() => {
-    if (getConfigRes) {
-      setDisplayColumns(
-        getConfigRes.columns
-          .filter((column) => column.is_display_field)
-          .map((column) => column.name) || []
-      );
-      setRecordTitleColumn(
-        getConfigRes.columns.find((column) => column.is_record_title)?.name ||
-          ""
-      );
-    }
-  }, [getConfigRes]);
-
-  const onSave = async () => {
-    if (getConfigRes) {
-      setIsSaving(true);
-      const newDatabaseConfig = produce(getConfigRes, (draft) => {
+  const onChangeDisplayColumns: DisplayFieldsConfigBodyPresentationProps["onChangeDisplayColumns"] = (
+    newDisplayColumns
+  ) => {
+    setNumOfDisplayColumns(newDisplayColumns.length);
+    if (databaseConfig) {
+      const newDatabaseConfig = produce(databaseConfig, (draft) => {
         draft.columns = draft.columns.map((column) => ({
           ...column,
-          is_display_field: displayColumns.includes(column.name),
+          is_display_field: newDisplayColumns.includes(column.name),
         }));
 
         draft.columns.sort((a, b) => {
           if (
-            displayColumns.includes(a.name) &&
-            displayColumns.includes(b.name)
+            newDisplayColumns.includes(a.name) &&
+            newDisplayColumns.includes(b.name)
           ) {
             return (
-              displayColumns.indexOf(a.name) - displayColumns.indexOf(b.name)
+              newDisplayColumns.indexOf(a.name) -
+              newDisplayColumns.indexOf(b.name)
             );
-          } else if (displayColumns.includes(a.name)) {
+          } else if (newDisplayColumns.includes(a.name)) {
             return -1;
-          } else if (displayColumns.includes(b.name)) {
+          } else if (newDisplayColumns.includes(b.name)) {
             return 1;
           } else {
             return compStr(a.name, b.name);
           }
         });
+      });
+      setDatabaseConfig(newDatabaseConfig);
+    }
+  };
 
+  const recordTitleColumn =
+    databaseConfig?.columns.find((column) => column.is_record_title)?.name ||
+    "";
+  const onChangeRecordTitleColumn: DisplayFieldsConfigBodyPresentationProps["onChangeRecordTitleColumn"] = (
+    newTitleColumn
+  ) => {
+    if (databaseConfig) {
+      const newDatabaseConfig = produce(databaseConfig, (draft) => {
         draft.columns = draft.columns.map((column) => ({
           ...column,
-          is_record_title: column.name === recordTitleColumn,
+          is_record_title: column.name === newTitleColumn,
         }));
       });
-
-      const [updateConfigRes, updateConfigError] = await fetchMetaStore(
-        getAccessToken,
-        metaStore.ConfigService.updateConfig,
-        {
-          databaseId,
-          requestBody: newDatabaseConfig,
-        }
-      );
-
-      if (updateConfigError) {
-        const { reason, instruction } = extractErrorMessageFromFetchError(
-          updateConfigError
-        );
-        setError({ reason, instruction });
-      } else {
-        getConfigMutate(updateConfigRes);
-      }
-
-      setIsSaving(false);
+      setDatabaseConfig(newDatabaseConfig);
     }
   };
 
   const columnOptions =
-    getConfigRes?.columns.map((column) => ({
+    databaseConfig?.columns.map((column) => ({
       label: `${column.name} (display name: ${column.display_name})`,
       value: column.name,
     })) || [];
-  const isFetchComplete = Boolean(!fetchError && getConfigRes);
-  const isDisableSaveButton =
-    displayColumns.length <= 0 || displayColumns.includes("");
 
   return (
     <DisplayFieldsConfigBodyPresentation
       displayColumns={displayColumns}
       displayColumnsOptions={columnOptions}
-      error={error}
-      isDisableSaveButton={isDisableSaveButton}
-      isFetchComplete={isFetchComplete}
-      isSaving={isSaving}
-      onChangeDisplayColumns={setDisplayColumns}
-      onChangeRecordTitleColumn={setRecordTitleColumn}
-      onSave={onSave}
+      onChangeDisplayColumns={onChangeDisplayColumns}
+      onChangeRecordTitleColumn={onChangeRecordTitleColumn}
       recordTitleColumn={recordTitleColumn}
       recordTitleColumnOptions={columnOptions}
     />

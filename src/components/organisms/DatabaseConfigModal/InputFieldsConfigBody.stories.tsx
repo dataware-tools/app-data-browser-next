@@ -1,7 +1,6 @@
 import { Story } from "@storybook/react";
 import {
   InputFieldsConfigBody,
-  InputFieldsConfigBodyProps,
   InputFieldsConfigBodyPresentation,
 } from "./InputFieldsConfigBody";
 import { CONST_STORY_BOOK, TestAuthProvider } from "test-utils";
@@ -11,7 +10,7 @@ export default {
   title: "DatabaseConfigModal/InputFieldsConfigBody",
 };
 
-const Template: Story<InputFieldsConfigBodyProps> = (args) => (
+const Template: Story = (args) => (
   <TestAuthProvider>
     <InputFieldsConfigBody {...args} />
   </TestAuthProvider>
@@ -39,12 +38,7 @@ export const Presentation = (): JSX.Element => (
         is_secret: true,
       },
     ]}
-    isFetchComplete
-    isSaving={false}
     nonInputColumns={[]}
-    onSave={() => {
-      window.alert("save");
-    }}
     onChangeInputColumns={(inputColumns) => {
       window.alert(JSON.stringify(inputColumns));
     }}

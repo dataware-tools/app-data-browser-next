@@ -1,7 +1,6 @@
 import { Story } from "@storybook/react";
 import {
   SecretFieldsConfigBody,
-  SecretFieldsConfigBodyProps,
   SecretFieldsConfigBodyPresentation,
 } from "./SecretFieldsConfigBody";
 import { CONST_STORY_BOOK, TestAuthProvider } from "test-utils";
@@ -11,7 +10,7 @@ export default {
   title: "DatabaseConfigModal/SecretFieldsConfigBody",
 };
 
-const Template: Story<SecretFieldsConfigBodyProps> = (args) => (
+const Template: Story = (args) => (
   <TestAuthProvider>
     <SecretFieldsConfigBody {...args} />
   </TestAuthProvider>
@@ -29,14 +28,8 @@ export const Presentation = (): JSX.Element => {
   ];
   return (
     <SecretFieldsConfigBodyPresentation
-      isDisableSaveButton={false}
       secretColumns={["test1", "test2"]}
       secretColumnsOptions={columnOptions}
-      isFetchComplete
-      isSaving={false}
-      onSave={() => {
-        window.alert("save");
-      }}
       onChangeSecretColumns={(secretColumns) => {
         window.alert(JSON.stringify(secretColumns));
       }}

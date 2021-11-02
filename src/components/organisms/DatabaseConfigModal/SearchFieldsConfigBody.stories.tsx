@@ -1,7 +1,6 @@
 import { Story } from "@storybook/react";
 import {
   SearchFieldsConfigBody,
-  SearchFieldsConfigBodyProps,
   SearchFieldsConfigBodyPresentation,
 } from "./SearchFieldsConfigBody";
 import { CONST_STORY_BOOK, TestAuthProvider } from "test-utils";
@@ -11,9 +10,9 @@ export default {
   title: "DatabaseConfigModal/SearchFieldsConfigBody",
 };
 
-const Template: Story<SearchFieldsConfigBodyProps> = (args) => (
+const Template: Story = () => (
   <TestAuthProvider>
-    <SearchFieldsConfigBody {...args} />
+    <SearchFieldsConfigBody />
   </TestAuthProvider>
 );
 
@@ -29,14 +28,8 @@ export const Presentation = (): JSX.Element => {
   ];
   return (
     <SearchFieldsConfigBodyPresentation
-      isDisableSaveButton={false}
       searchTargetColumns={["test1", "test2"]}
       searchTargetColumnsOptions={columnOptions}
-      isFetchComplete
-      isSaving={false}
-      onSave={() => {
-        window.alert("save");
-      }}
       onChangeSearchTargetColumns={(searchColumns) => {
         window.alert(JSON.stringify(searchColumns));
       }}

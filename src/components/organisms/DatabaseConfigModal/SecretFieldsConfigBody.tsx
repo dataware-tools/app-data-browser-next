@@ -1,115 +1,57 @@
-import { useAuth0 } from "@auth0/auth0-react";
-import { metaStore } from "@dataware-tools/api-meta-store-client";
 import {
   ErrorMessage,
-  DialogBody,
-  DialogToolBar,
   DialogMain,
   ErrorMessageProps,
-  LoadingIndicator,
-  extractErrorMessageFromFetchError,
 } from "@dataware-tools/app-common";
-import LoadingButton from "@mui/lab/LoadingButton";
 import { produce } from "immer";
-import { useState, useEffect } from "react";
+import { useState, useLayoutEffect } from "react";
 
+import { useRecoilState } from "recoil";
+import { databaseConfigState } from "./DatabaseConfigState";
 import {
   OptionSharingSelects,
   OptionSharingSelectsProps,
 } from "components/organisms/OptionSharingSelects";
-import { useGetConfig, fetchMetaStore } from "utils";
-
-export type ConfigNameType = "secret_columns";
 
 export type SecretFieldsConfigBodyPresentationProps = {
   error?: ErrorMessageProps;
-  isFetchComplete: boolean;
   onChangeSecretColumns: OptionSharingSelectsProps["onChange"];
   secretColumnsOptions: OptionSharingSelectsProps["options"];
   secretColumns: OptionSharingSelectsProps["values"];
-  isDisableSaveButton: boolean;
-  isSaving: boolean;
-  onSave: () => void;
-} & Omit<SecretFieldsConfigBodyProps, "databaseId">;
-
-export type SecretFieldsConfigBodyProps = {
-  databaseId: string;
 };
 
 export const SecretFieldsConfigBodyPresentation = ({
   error,
-  isFetchComplete,
   onChangeSecretColumns,
   secretColumnsOptions,
   secretColumns,
-  isDisableSaveButton,
-  isSaving,
-  onSave,
 }: SecretFieldsConfigBodyPresentationProps): JSX.Element => {
   return error ? (
     <ErrorMessage {...error} />
-  ) : isFetchComplete ? (
-    <DialogBody>
-      <DialogMain>
-        <OptionSharingSelects
-          onChange={onChangeSecretColumns}
-          options={secretColumnsOptions}
-          values={secretColumns}
-          creatable
-          deletable
-        />
-      </DialogMain>
-      <DialogToolBar
-        right={
-          <LoadingButton
-            disabled={isDisableSaveButton}
-            loading={isSaving}
-            onClick={onSave}
-          >
-            Save
-          </LoadingButton>
-        }
-      />
-    </DialogBody>
   ) : (
-    <LoadingIndicator />
+    <DialogMain>
+      <OptionSharingSelects
+        onChange={onChangeSecretColumns}
+        options={secretColumnsOptions}
+        values={secretColumns}
+        creatable
+        deletable
+      />
+    </DialogMain>
   );
 };
 
-export const SecretFieldsConfigBody = ({
-  databaseId,
-}: SecretFieldsConfigBodyProps): JSX.Element => {
-  const { getAccessTokenSilently: getAccessToken } = useAuth0();
-  const [isSaving, setIsSaving] = useState(false);
-  const [secretColumns, setSecretColumns] = useState<string[]>([]);
+export const SecretFieldsConfigBody = (): JSX.Element => {
   const [error, setError] = useState<ErrorMessageProps | undefined>(undefined);
+  const [databaseConfig, setDatabaseConfig] = useRecoilState(
+    databaseConfigState
+  );
+  const [numOfSecretColumns, setNumOfSecretColumns] = useState<number>(
+    databaseConfig?.columns?.filter((column) => column.is_secret).length || 0
+  );
 
-  const {
-    data: getConfigRes,
-    error: getConfigError,
-    mutate: getConfigMutate,
-  } = useGetConfig(getAccessToken, {
-    databaseId,
-  });
-
-  const fetchError = getConfigError;
-  useEffect(() => {
-    if (fetchError) {
-      const { reason, instruction } = extractErrorMessageFromFetchError(
-        fetchError
-      );
-      setError({ reason, instruction });
-    }
-  }, [fetchError]);
-
-  useEffect(() => {
-    setSecretColumns(
-      getConfigRes?.columns
-        ?.filter((column) => column.is_secret)
-        ?.map((column) => column.name) || []
-    );
-
-    if (getConfigRes && getConfigRes.columns.length <= 0) {
+  useLayoutEffect(() => {
+    if (databaseConfig && databaseConfig.columns.length <= 0) {
       setError({
         reason: "No available column",
         instruction: "Please add data or input field",
@@ -117,55 +59,49 @@ export const SecretFieldsConfigBody = ({
     } else {
       setError(undefined);
     }
-  }, [getConfigRes]);
+  }, [databaseConfig]);
 
-  const onSave = async () => {
-    if (getConfigRes?.columns) {
-      setIsSaving(true);
-      const newConfig = produce(getConfigRes, (draft) => {
+  if (typeof databaseConfig === "undefined") {
+    console.error("database config should not be undefined!!");
+    return <ErrorMessage reason="Invalid state" />;
+  }
+
+  const tempSecretColumns =
+    databaseConfig?.columns
+      ?.filter((column) => column.is_secret)
+      ?.map((column) => column.name) || [];
+  const secretColumns =
+    tempSecretColumns.length < numOfSecretColumns
+      ? tempSecretColumns.concat(
+          new Array(numOfSecretColumns - tempSecretColumns.length).fill("")
+        )
+      : tempSecretColumns;
+
+  const onChangeSecretColumns: SecretFieldsConfigBodyPresentationProps["onChangeSecretColumns"] = (
+    newSecretColumns
+  ) => {
+    setNumOfSecretColumns(newSecretColumns.length);
+    if (databaseConfig?.columns) {
+      const newDatabaseConfig = produce(databaseConfig, (draft) => {
         draft.columns = draft.columns.map((column) => ({
           ...column,
-          is_secret: secretColumns.includes(column.name),
+          is_secret: newSecretColumns.includes(column.name),
         }));
       });
 
-      const [data, error] = await fetchMetaStore(
-        getAccessToken,
-        metaStore.ConfigService.updateConfig,
-        {
-          databaseId,
-          requestBody: newConfig,
-        }
-      );
-
-      if (error) {
-        const { reason, instruction } = extractErrorMessageFromFetchError(
-          error
-        );
-        setError({ reason, instruction });
-      } else {
-        getConfigMutate(data);
-      }
-
-      setIsSaving(false);
+      setDatabaseConfig(newDatabaseConfig);
     }
   };
 
   const secretColumnsOptions =
-    getConfigRes?.columns.map((column) => ({
+    databaseConfig?.columns.map((column) => ({
       label: `${column.name} (display name: ${column.display_name})`,
       value: column.name,
     })) || [];
-  const isFetchComplete = Boolean(!fetchError && getConfigRes);
-  const isDisableSaveButton = secretColumns.includes("");
 
   return (
     <SecretFieldsConfigBodyPresentation
-      isDisableSaveButton={isDisableSaveButton}
-      isFetchComplete={isFetchComplete}
-      isSaving={isSaving}
-      onChangeSecretColumns={setSecretColumns}
-      onSave={onSave}
+      onChangeSecretColumns={onChangeSecretColumns}
       secretColumns={secretColumns}
       secretColumnsOptions={secretColumnsOptions}
       error={error}

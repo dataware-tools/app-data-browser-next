@@ -1,3 +1,5 @@
+import { useAuth0 } from "@auth0/auth0-react";
+import { metaStore } from "@dataware-tools/api-meta-store-client";
 import {
   DialogWrapper,
   DialogContainer,
@@ -6,13 +8,23 @@ import {
   DialogTabBar,
   DialogTitle,
   NoticeableLetters,
+  ErrorMessageProps,
+  extractErrorMessageFromFetchError,
+  DialogBody,
+  LoadingIndicator,
+  ErrorMessage,
+  DialogToolBar,
 } from "@dataware-tools/app-common";
+import LoadingButton, { LoadingButtonProps } from "@mui/lab/LoadingButton";
 import Dialog from "@mui/material/Dialog";
-import { useState, useEffect, ReactNode } from "react";
+import { useState, useEffect } from "react";
+import { useRecoilState } from "recoil";
+import { databaseConfigState } from "./DatabaseConfigState";
 import { DisplayFieldsConfigBody } from "./DisplayFieldsConfigBody";
 import { InputFieldsConfigBody } from "./InputFieldsConfigBody";
 import { SearchFieldsConfigBody } from "./SearchFieldsConfigBody";
 import { SecretFieldsConfigBody } from "./SecretFieldsConfigBody";
+import { fetchMetaStore, useGetConfig } from "utils";
 
 export type ConfigNameType = "record_list_display_columns";
 
@@ -20,7 +32,11 @@ export type DatabaseConfigModalPresentationProps = {
   tabIndex: number;
   tabNames: string[];
   onTabChange: (tabIndex: number) => void;
-  bodyComponent: ReactNode;
+  error?: ErrorMessageProps;
+  isFetchComplete: boolean;
+  isDisableSaveButton: LoadingButtonProps["disabled"];
+  isSaving: LoadingButtonProps["loading"];
+  onSave: LoadingButtonProps["onClick"];
 } & DatabaseConfigModalProps;
 
 export type DatabaseConfigModalProps = {
@@ -34,8 +50,12 @@ export const DatabaseConfigModalPresentation = ({
   tabIndex,
   tabNames,
   onTabChange,
-  bodyComponent,
   onClose,
+  error,
+  isFetchComplete,
+  isDisableSaveButton,
+  isSaving,
+  onSave,
 }: DatabaseConfigModalPresentationProps): JSX.Element => {
   return (
     <Dialog open={open} maxWidth="xl" onClose={onClose}>
@@ -50,7 +70,36 @@ export const DatabaseConfigModalPresentation = ({
             tabNames={tabNames}
             onChange={onTabChange}
           />
-          {bodyComponent}
+          <DialogBody>
+            {error ? (
+              <ErrorMessage {...error} />
+            ) : isFetchComplete ? (
+              <>
+                {tabIndex === 0 ? (
+                  <InputFieldsConfigBody />
+                ) : tabIndex === 1 ? (
+                  <DisplayFieldsConfigBody />
+                ) : tabIndex === 2 ? (
+                  <SearchFieldsConfigBody />
+                ) : tabIndex === 3 ? (
+                  <SecretFieldsConfigBody />
+                ) : null}
+                <DialogToolBar
+                  right={
+                    <LoadingButton
+                      disabled={isDisableSaveButton}
+                      loading={isSaving}
+                      onClick={onSave}
+                    >
+                      Save
+                    </LoadingButton>
+                  }
+                />
+              </>
+            ) : (
+              <LoadingIndicator />
+            )}
+          </DialogBody>
         </DialogContainer>
       </DialogWrapper>
     </Dialog>
@@ -62,17 +111,50 @@ export const DatabaseConfigModal = ({
   onClose,
   databaseId,
 }: DatabaseConfigModalProps): JSX.Element => {
+  const { getAccessTokenSilently: getAccessToken } = useAuth0();
+  const [isSaving, setIsSaving] = useState(false);
+  const [error, setError] = useState<ErrorMessageProps | undefined>(undefined);
+  const [databaseConfig, setDatabaseConfig] = useRecoilState(
+    databaseConfigState
+  );
   const [tabIndex, setTabIndex] = useState(0);
+
+  const {
+    data: getDatabaseConfigRes,
+    error: getConfigError,
+    mutate: getConfigMutate,
+  } = useGetConfig(getAccessToken, {
+    databaseId,
+  });
+
+  useEffect(() => {
+    if (getDatabaseConfigRes) {
+      setDatabaseConfig(getDatabaseConfigRes);
+    }
+  }, [getDatabaseConfigRes, setDatabaseConfig]);
+
+  const fetchError = getConfigError;
+  useEffect(() => {
+    if (fetchError) {
+      const { reason, instruction } = extractErrorMessageFromFetchError(
+        fetchError
+      );
+      setError({ reason, instruction });
+    } else {
+      setError(undefined);
+    }
+  }, [fetchError]);
 
   const initializeState = () => {
     setTabIndex(0);
+    setDatabaseConfig(getDatabaseConfigRes);
   };
   const prevOpen = usePrevious(open);
   useEffect(() => {
     if (open && !prevOpen) {
       initializeState();
     }
-  }, [open, prevOpen]);
+  }, [open, prevOpen, initializeState]);
 
   const tabNames = [
     "Input fields",
@@ -81,26 +163,45 @@ export const DatabaseConfigModal = ({
     "Secret fields",
   ];
 
-  const bodyComponent =
-    tabIndex === 0 ? (
-      <InputFieldsConfigBody databaseId={databaseId} />
-    ) : tabIndex === 1 ? (
-      <DisplayFieldsConfigBody databaseId={databaseId} />
-    ) : tabIndex === 2 ? (
-      <SearchFieldsConfigBody databaseId={databaseId} />
-    ) : tabIndex === 3 ? (
-      <SecretFieldsConfigBody databaseId={databaseId} />
-    ) : null;
+  const onSave = async () => {
+    setIsSaving(true);
+    const [updateConfigRes, updateConfigError] = await fetchMetaStore(
+      getAccessToken,
+      metaStore.ConfigService.updateConfig,
+      {
+        databaseId,
+        requestBody: databaseConfig,
+      }
+    );
+
+    if (updateConfigError) {
+      const { reason, instruction } = extractErrorMessageFromFetchError(
+        updateConfigError
+      );
+      setError({ reason, instruction });
+    } else {
+      getConfigMutate(updateConfigRes);
+    }
+    setIsSaving(false);
+    onClose();
+  };
+
+  const isFetchComplete = Boolean(!fetchError && databaseConfig);
+  const isDisableSaveButton = false;
 
   return (
     <DatabaseConfigModalPresentation
       databaseId={databaseId}
-      bodyComponent={bodyComponent}
       onClose={onClose}
       open={open}
       onTabChange={setTabIndex}
       tabIndex={tabIndex}
       tabNames={tabNames}
+      error={error}
+      isDisableSaveButton={isDisableSaveButton}
+      isFetchComplete={isFetchComplete}
+      isSaving={isSaving}
+      onSave={onSave}
     />
   );
 };

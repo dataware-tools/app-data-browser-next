@@ -1,7 +1,6 @@
 import { Story } from "@storybook/react";
 import {
   DisplayFieldsConfigBody,
-  DisplayFieldsConfigBodyProps,
   DisplayFieldsConfigBodyPresentation,
 } from "./DisplayFieldsConfigBody";
 import { CONST_STORY_BOOK, TestAuthProvider } from "test-utils";
@@ -11,9 +10,9 @@ export default {
   title: "DatabaseConfigModal/DisplayFieldsConfigBody",
 };
 
-const Template: Story<DisplayFieldsConfigBodyProps> = (args) => (
+const Template: Story = () => (
   <TestAuthProvider>
-    <DisplayFieldsConfigBody {...args} />
+    <DisplayFieldsConfigBody />
   </TestAuthProvider>
 );
 
@@ -31,15 +30,9 @@ export const Presentation = (): JSX.Element => {
     <DisplayFieldsConfigBodyPresentation
       displayColumns={["test1", "test2"]}
       displayColumnsOptions={columnOptions}
-      isDisableSaveButton={false}
       onChangeRecordTitleColumn={(titleColumn) => window.alert(titleColumn)}
       recordTitleColumn="test1"
       recordTitleColumnOptions={columnOptions}
-      isFetchComplete
-      isSaving={false}
-      onSave={() => {
-        window.alert("save");
-      }}
       onChangeDisplayColumns={(displayColumns) => {
         window.alert(JSON.stringify(displayColumns));
       }}
