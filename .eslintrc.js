@@ -17,7 +17,6 @@ module.exports = {
     "plugin:import/typescript",
     // "plugin:jsx-a11y/recommended",
     // "plugin:compat/recommended",
-    "next",
     "prettier",
   ],
   parser: "@typescript-eslint/parser",

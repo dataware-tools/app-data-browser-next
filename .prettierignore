@@ -1,4 +1,40 @@
-dist/
-node_modules/
+# dependencies
+/node_modules
 
+# testing
+/coverage
+.snapshots
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+/public
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# vercel
+.vercel
+
+#storybook
+.storybook
 storybook-static
+
+#minified
+*.min.js
+*.modern.js

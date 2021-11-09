@@ -1,13 +1,16 @@
+# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
+
 # dependencies
 /node_modules
+/.pnp
+.pnp.js
 
 # testing
 /coverage
-.snapshots
 
-# next.js
-/.next/
-/out/
+# vite
+/.vite/
+/dist/
 
 # production
 /build
@@ -15,7 +18,6 @@
 # misc
 .DS_Store
 *.pem
-/public
 
 # debug
 npm-debug.log*
@@ -28,13 +30,7 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
-# vercel
-.vercel
+# idea
+.idea
 
-#storybook
-.storybook
 storybook-static
-
-#minified
-*.min.js
-*.modern.js
