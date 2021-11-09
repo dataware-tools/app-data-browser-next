@@ -9,8 +9,6 @@ import Router from "./Router";
 import { SwrOptions } from "./utils/index";
 
 const App = () => {
-  console.log(process.env);
-  console.log(import.meta);
   return (
     <SWRConfig value={SwrOptions}>
       <StylesProvider injectFirst>
