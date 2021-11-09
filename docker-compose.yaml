@@ -1,4 +1,4 @@
-version: '3'
+version: "3"
 services:
   app-role-manager:
     image: app:latest
@@ -6,6 +6,5 @@ services:
       - 3000:3000
     volumes:
       - .:/opt/app
-      - /opt/app/node_modules
-    command: node_modules/.bin/next start
+    command: node_modules/.bin/serve dist -p 3000 -s
     tty: true
