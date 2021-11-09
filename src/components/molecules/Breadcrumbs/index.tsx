@@ -1,5 +1,4 @@
 import MuiBreadcrumbs from "@mui/material/Breadcrumbs";
-import React from "react";
 
 import { BreadcrumbsItem, BreadcrumbsItemProps } from "./BreadcrumbsItem";
 

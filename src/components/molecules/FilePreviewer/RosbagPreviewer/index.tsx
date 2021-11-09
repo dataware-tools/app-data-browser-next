@@ -6,7 +6,7 @@ import {
   ErrorMessage,
   extractErrorMessageFromFetchError,
 } from "@dataware-tools/app-common";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { JobSubmitter } from "./JobSubmitter";
 import { JobViewer } from "./JobViewer";
 import {
@@ -70,16 +70,12 @@ export const RosbagPreviewer = ({
   const [job, setJob] = useState<jobStore.JobPostedModel | undefined>(
     undefined
   );
-  const {
-    data: listJobTemplateRes,
-    error: listJobTemplateError,
-  } = useListJobTemplate(getAccessToken, undefined as never);
-  const {
-    data: getJobTemplateRes,
-    error: getJobTemplateError,
-  } = useGetJobTemplate(getAccessToken, {
-    jobTemplateId: jobTemplateId ? parseInt(jobTemplateId, 10) : undefined,
-  });
+  const { data: listJobTemplateRes, error: listJobTemplateError } =
+    useListJobTemplate(getAccessToken, undefined as never);
+  const { data: getJobTemplateRes, error: getJobTemplateError } =
+    useGetJobTemplate(getAccessToken, {
+      jobTemplateId: jobTemplateId ? parseInt(jobTemplateId, 10) : undefined,
+    });
   const { data: getJobTypeRes, error: getJobTypeError } = useGetJobTypes(
     getAccessToken,
     {
@@ -91,9 +87,8 @@ export const RosbagPreviewer = ({
     listJobTemplateError || getJobTemplateError || getJobTypeError;
   useEffect(() => {
     if (fetchError) {
-      const { reason, instruction } = extractErrorMessageFromFetchError(
-        fetchError
-      );
+      const { reason, instruction } =
+        extractErrorMessageFromFetchError(fetchError);
       setError({ reason, instruction });
     } else {
       setError(undefined);
