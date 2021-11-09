@@ -15,9 +15,10 @@ yarn install
 If you want to change Auth0's configurations (i.e., client-id, domain, etc.),
 you need to set the following environment variables:
 
-- `NEXT_PUBLIC_DATAWARE_TOOLS_AUTH_CONFIG_DOMAIN`: Domain (default: `dataware-tools.us.auth0.com`)
-- `NEXT_PUBLIC_DATAWARE_TOOLS_AUTH_CONFIG_CLIENT_ID`: Client ID (default: the one for the demo page)
-- `NEXT_PUBLIC_DATAWARE_TOOLS_AUTH_CONFIG_API_URL`: API URL (default: `https://demo.dataware-tools.com/`)
+- `NEXT_PUBLIC_DATAWARE_TOOLS_AUTH_CONFIG_DOMAIN`: Domain of auth0 (default: `dataware-tools.us.auth0.com`)
+- `NEXT_PUBLIC_DATAWARE_TOOLS_AUTH_CONFIG_CLIENT_ID`: Client ID of auth0 (default: the one for the demo page)
+- `NEXT_PUBLIC_DATAWARE_TOOLS_AUTH_CONFIG_API_URL`: Audience of auth0 (default: `https://demo.dataware-tools.com/`)
+- `NEXT_PUBLIC_BACKEND_API_PREFIX`: Backend api url prefix(default: `/api/latest`)
 
 Next, run the development server:
 
@@ -27,7 +28,7 @@ npm run dev
 yarn dev
 ```
 
-Open http://localhost:3000/data-browser with your browser to see the result.
+Open http://localhost:3000 with your browser to see the result.
 
 You can start editing the page by modifying `pages/*.tsx`, `components/*.tsx`. The page auto-updates as you edit the file.
 
@@ -68,9 +69,9 @@ $ dc up
 
 ### Production
 
-- [Next.js](https://nextjs.org/learn/basics/create-nextjs-app)
+- [Vite](https://vitejs.dev/guide/)
 
-  React Framework. No complex config needed, but extendable.
+  Build tool for modern front end application aiming to provide a fast development experience.
 
 - [Material-UI](https://next.material-ui.com/getting-started/usage/)
 
