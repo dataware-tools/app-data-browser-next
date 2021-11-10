@@ -1,5 +1,13 @@
 {
   "name": "vite-project",
+  "engines": {
+    "node": "16.10.0",
+    "engine": "^7.x"
+  },
+  "volta": {
+    "node": "16.10.0",
+    "npm": "7.24.2"
+  },
   "version": "0.0.0",
   "basePath": "/data-browser/",
   "repository": "https://github.com/dataware-tools/app-template-vite.git",
@@ -33,7 +41,6 @@
     "@mui/material": "^5.0.2",
     "@mui/styles": "^5.0.1",
     "@mui/x-data-grid": "^5.0.0-beta.6",
-    "cross-env": "^7.0.3",
     "immer": "^9.0.6",
     "papaparse": "^5.3.1",
     "pigeon-maps": "^0.19.7",
@@ -71,6 +78,7 @@
     "@types/wavesurfer.js": "^5.2.2",
     "@vitejs/plugin-react": "^1.0.7",
     "babel-loader": "^8.2.3",
+    "cross-env": "^7.0.3",
     "eslint": "^7.32.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-config-standard": "^16.0.3",
@@ -101,9 +109,5 @@
     "vite": "^2.5.4",
     "vite-plugin-env-compatible": "^1.1.1",
     "vite-tsconfig-paths": "^3.3.17"
-  },
-  "volta": {
-    "node": "16.13.0",
-    "npm": "7.24.2"
   }
 }
