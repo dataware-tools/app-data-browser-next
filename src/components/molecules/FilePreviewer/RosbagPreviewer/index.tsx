@@ -6,6 +6,10 @@ import {
   ErrorMessage,
   extractErrorMessageFromFetchError,
 } from "@dataware-tools/app-common";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Tab from "@mui/material/Tab";
+import Tabs from "@mui/material/Tabs";
 import React, { useEffect, useState } from "react";
 import { JobSubmitter } from "./JobSubmitter";
 import { JobViewer } from "./JobViewer";
@@ -17,6 +21,9 @@ import {
 } from "utils";
 
 type Props = {
+  tabIndex: number;
+  handleChangeTab: (_: React.SyntheticEvent, newValue: number) => void;
+  url: string;
   error?: ErrorMessageProps;
   onChangeJobTemplate: (jobTemplateId: string) => void;
   onSubmitJob: () => void;
@@ -27,8 +34,11 @@ type Props = {
   job?: jobStore.JobPostedModel;
 };
 
-export type RosbagPreviewerProps = { filePath: string };
+export type RosbagPreviewerProps = { filePath: string; url: string };
 const RosbagPreviewerPresentation = ({
+  tabIndex,
+  handleChangeTab,
+  url,
   error,
   onChangeJobTemplate,
   onSubmitJob,
@@ -41,28 +51,54 @@ const RosbagPreviewerPresentation = ({
   return error ? (
     <ErrorMessage {...error} />
   ) : (
-    <div>
-      <DialogTitle>Submit a job</DialogTitle>
-      {jobTemplateList && (
-        <JobSubmitter
-          jobTemplateId={jobTemplateId}
-          jobTemplateList={jobTemplateList}
-          jobTemplate={jobTemplate}
-          jobType={jobType}
-          job={job}
-          onSubmitJob={onSubmitJob}
-          onChangeJobTemplate={onChangeJobTemplate}
-        />
+    <Box>
+      <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
+        <Tabs value={tabIndex} onChange={handleChangeTab} aria-label="tabs">
+          <Tab label="webviz" />
+          <Tab label="webviz with rosbridge" />
+        </Tabs>
+      </Box>
+      {tabIndex === 0 && (
+        <Box sx={{ paddingTop: "1em" }}>
+          <Button
+            onClick={() => {
+              window.open(
+                "https://webviz.io/app?remote-bag-url=" + url,
+                "_blank"
+              );
+            }}
+          >
+            Open with webviz
+          </Button>
+        </Box>
       )}
-      {jobType && job && <JobViewer jobType={jobType} job={job} />}
-    </div>
+      {tabIndex === 1 && (
+        <Box>
+          <DialogTitle>Submit a job</DialogTitle>
+          {jobTemplateList && (
+            <JobSubmitter
+              jobTemplateId={jobTemplateId}
+              jobTemplateList={jobTemplateList}
+              jobTemplate={jobTemplate}
+              jobType={jobType}
+              job={job}
+              onSubmitJob={onSubmitJob}
+              onChangeJobTemplate={onChangeJobTemplate}
+            />
+          )}
+          {jobType && job && <JobViewer jobType={jobType} job={job} />}
+        </Box>
+      )}
+    </Box>
   );
 };
 
 export const RosbagPreviewer = ({
   filePath,
+  url,
 }: RosbagPreviewerProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
+  const [tabIndex, setTabIndex] = useState<number>(0);
   const [error, setError] = useState<ErrorMessageProps | undefined>(undefined);
   const [jobTemplateId, setJobTemplateId] = useState<string | undefined>(
     undefined
@@ -70,16 +106,12 @@ export const RosbagPreviewer = ({
   const [job, setJob] = useState<jobStore.JobPostedModel | undefined>(
     undefined
   );
-  const {
-    data: listJobTemplateRes,
-    error: listJobTemplateError,
-  } = useListJobTemplate(getAccessToken, undefined as never);
-  const {
-    data: getJobTemplateRes,
-    error: getJobTemplateError,
-  } = useGetJobTemplate(getAccessToken, {
-    jobTemplateId: jobTemplateId ? parseInt(jobTemplateId, 10) : undefined,
-  });
+  const { data: listJobTemplateRes, error: listJobTemplateError } =
+    useListJobTemplate(getAccessToken, undefined as never);
+  const { data: getJobTemplateRes, error: getJobTemplateError } =
+    useGetJobTemplate(getAccessToken, {
+      jobTemplateId: jobTemplateId ? parseInt(jobTemplateId, 10) : undefined,
+    });
   const { data: getJobTypeRes, error: getJobTypeError } = useGetJobTypes(
     getAccessToken,
     {
@@ -91,9 +123,8 @@ export const RosbagPreviewer = ({
     listJobTemplateError || getJobTemplateError || getJobTypeError;
   useEffect(() => {
     if (fetchError) {
-      const { reason, instruction } = extractErrorMessageFromFetchError(
-        fetchError
-      );
+      const { reason, instruction } =
+        extractErrorMessageFromFetchError(fetchError);
       setError({ reason, instruction });
     } else {
       setError(undefined);
@@ -122,8 +153,15 @@ export const RosbagPreviewer = ({
     }
   };
 
+  const handleChangeTab = (_: React.SyntheticEvent, newValue: number) => {
+    setTabIndex(newValue);
+  };
+
   return (
     <RosbagPreviewerPresentation
+      tabIndex={tabIndex}
+      handleChangeTab={handleChangeTab}
+      url={url}
       error={error}
       jobTemplateId={jobTemplateId}
       onChangeJobTemplate={setJobTemplateId}
