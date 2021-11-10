@@ -15,7 +15,7 @@ export default defineConfig({
       exclude: /\.stories\.(t|j)sx?$/,
     }),
     tsconfigPaths(),
-    env({ prefix: "NEXT_PUBLIC" }),
+    env({ prefix: "DATAWARE_TOOLS" }),
   ],
   base: packageInfo.basePath,
   cacheDir: "./.vite",
