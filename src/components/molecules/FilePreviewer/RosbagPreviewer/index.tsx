@@ -61,7 +61,6 @@ const RosbagPreviewerPresentation = ({
       {tabIndex === 0 && (
         <Box sx={{ paddingTop: "1em" }}>
           <Button
-            variant="contained"
             onClick={() => {
               window.open(
                 "https://webviz.io/app?remote-bag-url=" + url,
