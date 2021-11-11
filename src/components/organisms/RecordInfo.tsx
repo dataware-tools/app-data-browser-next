@@ -63,6 +63,7 @@ export const RecordInfoPresentation = ({
               displayDataTypes={false}
               quotesOnKeys={false}
               collapseStringsAfterLength={80}
+              collapsed={1}
             />
           ) : (
             <RecordInfoTable record={record} databaseConfig={databaseConfig} />
