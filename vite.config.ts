@@ -20,4 +20,5 @@ export default defineConfig({
   base: packageInfo.basePath,
   cacheDir: "./.vite",
   assetsInclude: ["robots.txt"],
+  build: { outDir: "./dist" + packageInfo.basePath },
 });

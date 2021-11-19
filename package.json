@@ -13,8 +13,8 @@
   "repository": "https://github.com/dataware-tools/app-template-vite.git",
   "scripts": {
     "dev": "vite --open",
-    "build": "vite build",
-    "preview": "vite preview --port 3000",
+    "build": "vite build; cp serve.json dist",
+    "start": "serve dist -p 3000 -s",
     "test": "run-s lint test:unit test:build test:visual-regression",
     "lint": "run-s lint:eslint lint:tsc",
     "lint:eslint": "eslint .",
