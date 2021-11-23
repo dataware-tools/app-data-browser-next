@@ -156,12 +156,10 @@ export const InputConfigList = ({
   restColumns: initRestColumns,
 }: InputConfigListProps): JSX.Element => {
   const [openAddModal, setOpenAddModal] = useState(false);
-  const [configureModalOpeningIndex, setConfigureModalOpeningIndex] = useState(
-    -1
-  );
-  const [restColumns, setRestColumns] = useState<
-    InputConfigListPresentationProps["restColumns"]
-  >(initRestColumns);
+  const [configureModalOpeningIndex, setConfigureModalOpeningIndex] =
+    useState(-1);
+  const [restColumns, setRestColumns] =
+    useState<InputConfigListPresentationProps["restColumns"]>(initRestColumns);
 
   const order =
     value
@@ -178,10 +176,16 @@ export const InputConfigList = ({
       value.some((prevColumn) => prevColumn.name === newColumn.name)
         ? value.map((prevColumn) =>
             prevColumn.name === newColumn.name
-              ? {
-                  ...prevColumn,
-                  ...newColumn,
-                }
+              ? typeof prevColumn.order_of_input === "undefined"
+                ? {
+                    ...prevColumn,
+                    ...newColumn,
+                    order_of_input: order.length,
+                  }
+                : {
+                    ...prevColumn,
+                    ...newColumn,
+                  }
               : prevColumn
           )
         : [...value, { ...newColumn, order_of_input: order.length }]
