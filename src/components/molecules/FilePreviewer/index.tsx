@@ -99,8 +99,14 @@ const filePreviewerCandidates: Record<string, FilePreviewerContentWithSpec> = {
     ),
   },
   rosbag: {
-    spec: { extensions: ["bag"], contentTypes: ["application/rosbag"] },
-    render: (_, file) => <RosbagPreviewer filePath={file.path} />,
+    spec: { extensions: [".bag"], contentTypes: ["application/rosbag"] },
+    render: (databaseId, file) => (
+      <FileDownloadUrlInjector
+        databaseId={databaseId}
+        file={file}
+        render={(_, url) => <RosbagPreviewer filePath={file.path} url={url} />}
+      />
+    ),
   },
   audio: {
     spec: { extensions: [".wav", ".mp3"], contentTypes: ["audio/.*"] },

@@ -17,23 +17,25 @@ export const FileDownloadUrlInjector = ({
   render,
 }: FileDownloadUrlInjectorProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
-  const {
-    data: createJwtRes,
-    error: createJwtError,
-  } = useCreateJwtToDownloadFile(
-    getAccessToken,
-    {
-      requestBody: {
-        database_id: databaseId,
-        file_uuid: file.uuid,
-        content_type: file["content-type"],
+  const { data: createJwtRes, error: createJwtError } =
+    useCreateJwtToDownloadFile(
+      getAccessToken,
+      {
+        requestBody: {
+          database_id: databaseId,
+          file_uuid: file.uuid,
+          content_type: file["content-type"],
+        },
       },
-    },
-    Boolean(file.uuid)
-  );
+      Boolean(file.uuid)
+    );
+
+  const urlPrefix = API_ROUTE.FILE.BASE.startsWith("http")
+    ? API_ROUTE.FILE.BASE
+    : `${window.origin}${API_ROUTE.FILE.BASE}`;
 
   const downloadURL = createJwtRes
-    ? `${API_ROUTE.FILE.BASE}/download/${createJwtRes.token}`
+    ? `${urlPrefix}/download/${createJwtRes.token}`
     : undefined;
   const isFetchFailed = Boolean(createJwtError);
 
