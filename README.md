@@ -15,10 +15,10 @@ yarn install
 If you want to change Auth0's configurations (i.e., client-id, domain, etc.),
 you need to set the following environment variables:
 
-- `NEXT_PUBLIC_DATAWARE_TOOLS_AUTH_CONFIG_DOMAIN`: Domain of auth0 (default: `dataware-tools.us.auth0.com`)
-- `NEXT_PUBLIC_DATAWARE_TOOLS_AUTH_CONFIG_CLIENT_ID`: Client ID of auth0 (default: the one for the demo page)
-- `NEXT_PUBLIC_DATAWARE_TOOLS_AUTH_CONFIG_API_URL`: Audience of auth0 (default: `https://demo.dataware-tools.com/`)
-- `NEXT_PUBLIC_BACKEND_API_PREFIX`: Backend api url prefix(default: `/api/latest`)
+- `DATAWARE_TOOLS_AUTH_CONFIG_DOMAIN`: Domain of auth0 (default: `dataware-tools.us.auth0.com`)
+- `DATAWARE_TOOLS_AUTH_CONFIG_CLIENT_ID`: Client ID of auth0 (default: the one for the demo page)
+- `DATAWARE_TOOLS_AUTH_CONFIG_API_URL`: Audience of auth0 (default: `https://demo.dataware-tools.com/`)
+- `DATAWARE_TOOLS_BACKEND_API_PREFIX`: Backend api url prefix(default: `/api/latest`)
 
 Next, run the development server:
 

@@ -1,5 +1,5 @@
 {
-  "name": "vite-project",
+  "name": "app-data-browser",
   "engines": {
     "node": "16.10.0",
     "engine": "^7.x"
@@ -10,7 +10,7 @@
   },
   "version": "0.0.0",
   "basePath": "/data-browser/",
-  "repository": "https://github.com/dataware-tools/app-template-vite.git",
+  "repository": "https://github.com/dataware-tools/app-data-browser-next",
   "scripts": {
     "dev": "vite --open",
     "build": "vite build; cp serve.json dist",
