@@ -2,7 +2,6 @@ import { Story } from "@storybook/react";
 import {
   InputConfigListItemModal,
   InputConfigListItemModalProps,
-  NewColumnType,
 } from "./InputConfigListItemModal";
 import { CONST_STORY_BOOK } from "test-utils";
 
@@ -18,8 +17,7 @@ const Template: Story<InputConfigListItemModalProps> = (args) => (
 export const Default = Template.bind({});
 Default.args = {
   open: true,
-  onSave: (newConfig: NewColumnType) =>
-    window.alert(`save! ${JSON.stringify(newConfig)}`),
+  onSave: (newConfig) => window.alert(`save! ${JSON.stringify(newConfig)}`),
   options: [
     { name: "test1", display_name: "Test1" },
     { name: "test2", display_name: "Test2" },
@@ -34,8 +32,7 @@ Default.parameters = { ...CONST_STORY_BOOK.PARAM_SKIP_VISUAL_REGRESSION_TEST };
 export const WithInitialData = Template.bind({});
 WithInitialData.args = {
   open: true,
-  onSave: (newConfig: NewColumnType) =>
-    window.alert(`save! ${JSON.stringify(newConfig)}`),
+  onSave: (newConfig) => window.alert(`save! ${JSON.stringify(newConfig)}`),
   options: [
     { name: "test1", display_name: "Test1" },
     { name: "test2", display_name: "Test2" },
@@ -47,6 +44,8 @@ WithInitialData.args = {
     display_name: "Test1",
     necessity: "required",
     is_secret: true,
+    dtype: "string",
+    aggregation: "first",
   },
 };
 // TODO: Include visual regression test.

@@ -42,10 +42,10 @@ export const RecordEditModal = ({
   const [error, setError] = useState<ErrorMessageProps | undefined>(undefined);
   const recordPaginateValue = useRecoilValue(recordPaginateState);
 
-  const {
-    data: listRecordsRes,
-    mutate: listRecordsMutate,
-  } = useListRecords(getAccessToken, { databaseId, ...recordPaginateValue });
+  const { data: listRecordsRes, mutate: listRecordsMutate } = useListRecords(
+    getAccessToken,
+    { databaseId, ...recordPaginateValue }
+  );
   const {
     data: getRecordRes,
     error: getRecordError,
@@ -62,7 +62,7 @@ export const RecordEditModal = ({
     }
   );
 
-  const fields: MetadataEditModalProps["fields"] = useMemo(
+  const fields = useMemo(
     () =>
       getConfigRes?.columns
         .filter((column) =>
@@ -73,10 +73,8 @@ export const RecordEditModal = ({
           )
         )
         .map((column) => ({
-          name: column.name,
-          display_name: column.display_name,
           necessity: column.necessity || "unnecessary",
-          order_of_input: column.order_of_input,
+          ...column,
         }))
         .sort(compInputFields) || [],
     [getConfigRes, create]
@@ -84,9 +82,8 @@ export const RecordEditModal = ({
   const fetchError = getRecordError || getConfigError;
   useEffect(() => {
     if (fetchError) {
-      const { reason, instruction } = extractErrorMessageFromFetchError(
-        fetchError
-      );
+      const { reason, instruction } =
+        extractErrorMessageFromFetchError(fetchError);
       setError({ reason, instruction });
     } else if (create && fields.length <= 0) {
       setError({
@@ -121,9 +118,8 @@ export const RecordEditModal = ({
         );
 
     if (saveRecordError) {
-      const { reason, instruction } = extractErrorMessageFromFetchError(
-        saveRecordError
-      );
+      const { reason, instruction } =
+        extractErrorMessageFromFetchError(saveRecordError);
       setError({ reason, instruction });
       return false;
     }

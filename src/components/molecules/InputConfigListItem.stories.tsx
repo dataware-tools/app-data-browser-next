@@ -26,5 +26,7 @@ Default.args = {
     display_name: "display_name",
     necessity: "recommended" as const,
     is_secret: false,
+    dtype: "string",
+    aggregation: "first",
   },
 };

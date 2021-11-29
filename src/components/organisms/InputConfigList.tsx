@@ -25,7 +25,7 @@ import {
 } from "utils";
 
 export type ValueType = (InputConfigListItemProps["value"] & {
-  order_of_input: DatabaseColumnsConfigType[number]["order_of_input"];
+  order_of_input?: DatabaseColumnsConfigType[number]["order_of_input"];
 })[];
 
 export type InputConfigListPresentationProps = {
@@ -156,12 +156,10 @@ export const InputConfigList = ({
   restColumns: initRestColumns,
 }: InputConfigListProps): JSX.Element => {
   const [openAddModal, setOpenAddModal] = useState(false);
-  const [configureModalOpeningIndex, setConfigureModalOpeningIndex] = useState(
-    -1
-  );
-  const [restColumns, setRestColumns] = useState<
-    InputConfigListPresentationProps["restColumns"]
-  >(initRestColumns);
+  const [configureModalOpeningIndex, setConfigureModalOpeningIndex] =
+    useState(-1);
+  const [restColumns, setRestColumns] =
+    useState<InputConfigListPresentationProps["restColumns"]>(initRestColumns);
 
   const order =
     value
@@ -184,7 +182,14 @@ export const InputConfigList = ({
                 }
               : prevColumn
           )
-        : [...value, { ...newColumn, order_of_input: order.length }]
+        : [
+            ...value,
+            {
+              ...newColumn,
+              order_of_input: order.length,
+              aggregation: "first" as const,
+            },
+          ]
     );
     setRestColumns((prev) => {
       if (prev) {
