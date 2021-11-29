@@ -11,12 +11,18 @@ type DatabaseColumnsConfigDtypeType =
   | "string"
   | "str"
   | "text"
+  | "integer"
   | "int"
   | "float"
   | "double"
+  | "number"
+  | "list"
   | "boolean"
   | "bool"
-  | "object";
+  | "object"
+  | "obj"
+  | "dict"
+  | "datetime";
 type DatabaseColumnsConfigAggregationType =
   | "accumulator"
   | "addToSet"

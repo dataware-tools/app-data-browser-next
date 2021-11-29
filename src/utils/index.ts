@@ -67,9 +67,12 @@ const editableColumnDtype: DatabaseColumnsConfigType[number]["dtype"][] = [
   "string",
   "str",
   "text",
-  "double",
-  "float",
+  "integer",
   "int",
+  "float",
+  "double",
+  "number",
+  "datetime",
 ];
 
 const compInputFields = (
