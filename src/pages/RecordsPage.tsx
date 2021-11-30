@@ -23,14 +23,14 @@ import Pagination from "@mui/material/Pagination";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
 import { useRecoilState, useSetRecoilState } from "recoil";
-import {
-  DatabaseConfigModal,
-  DatabaseConfigModalProps,
-} from "../organisms/DatabaseConfigModal/index";
 import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
 import { RenderToggleByAction } from "components/atoms/RenderToggleByAction";
 import { Breadcrumbs } from "components/molecules/Breadcrumbs";
 import { ControlledDatabaseMenuButton } from "components/organisms/ControlledDatabaseMenuButton";
+import {
+  DatabaseConfigModal,
+  DatabaseConfigModalProps,
+} from "components/organisms/DatabaseConfigModal";
 import {
   RecordAddButton,
   RecordAddButtonProps,
@@ -196,10 +196,8 @@ type ParamType = { databaseId: string };
 export const RecordsPage = (): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const { databaseId } = useParams<ParamType>();
-  const [
-    { page, perPage, search, searchKey },
-    setRecordPaginateState,
-  ] = useRecoilState(recordPaginateState);
+  const [{ page, perPage, search, searchKey }, setRecordPaginateState] =
+    useRecoilState(recordPaginateState);
   const setUserActions = useSetRecoilState(userActionsState);
   const [addedRecordId, serAddedRecordId] = useState<string | undefined>(
     undefined
@@ -219,10 +217,8 @@ export const RecordsPage = (): JSX.Element => {
     }
   );
 
-  const {
-    data: listPermittedActionRes,
-    error: listPermittedActionError,
-  } = useListPermittedActions(getAccessToken, { databaseId });
+  const { data: listPermittedActionRes, error: listPermittedActionError } =
+    useListPermittedActions(getAccessToken, { databaseId });
 
   const {
     data: listRecordsRes,
@@ -238,9 +234,8 @@ export const RecordsPage = (): JSX.Element => {
     listRecordsError || getConfigError || listPermittedActionError;
   useEffect(() => {
     if (fetchError) {
-      const { reason, instruction } = extractErrorMessageFromFetchError(
-        fetchError
-      );
+      const { reason, instruction } =
+        extractErrorMessageFromFetchError(fetchError);
       setError({ reason, instruction });
     } else {
       setError(undefined);
@@ -276,11 +271,10 @@ export const RecordsPage = (): JSX.Element => {
     }
   }, [listPermittedActionRes, setUserActions]);
 
-  const onAddRecordSucceeded: RecordsPagePresentationProps["onAddRecordSucceeded"] = (
-    newRecord
-  ) => {
-    serAddedRecordId(newRecord.record_id);
-  };
+  const onAddRecordSucceeded: RecordsPagePresentationProps["onAddRecordSucceeded"] =
+    (newRecord) => {
+      serAddedRecordId(newRecord.record_id);
+    };
   const onCloseRecordDetailModal = () => {
     serAddedRecordId(undefined);
     listRecordsMutate();
@@ -292,19 +286,19 @@ export const RecordsPage = (): JSX.Element => {
   ) => {
     setRecordPaginateState((prev) => ({ ...prev, perPage, page: 1 }));
   };
-  const onChangeSearchText: RecordsPagePresentationProps["onChangeSearchText"] = (
-    searchText
-  ) => {
-    setRecordPaginateState((prev) => ({
-      ...prev,
-      search: searchText || "",
-      page: 1,
-    }));
-  };
-  const onEndInitializeDatabase: RecordsPagePresentationProps["onEndInitializeDatabase"] = () => {
-    setIsNewDatabase(false);
-    deleteQueryString("new", "replace");
-  };
+  const onChangeSearchText: RecordsPagePresentationProps["onChangeSearchText"] =
+    (searchText) => {
+      setRecordPaginateState((prev) => ({
+        ...prev,
+        search: searchText || "",
+        page: 1,
+      }));
+    };
+  const onEndInitializeDatabase: RecordsPagePresentationProps["onEndInitializeDatabase"] =
+    () => {
+      setIsNewDatabase(false);
+      deleteQueryString("new", "replace");
+    };
 
   const isFetchComplete = Boolean(
     !fetchError && listRecordsRes && getConfigRes && listPermittedActionRes

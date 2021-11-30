@@ -3,9 +3,8 @@ import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
 import MuiTableCell, { TableCellProps } from "@mui/material/TableCell";
 import TableRow from "@mui/material/TableRow";
-import dynamic from "next/dynamic";
+import ReactJson from "react-json-view";
 import { DatabaseConfigType } from "../../utils";
-const ReactJson = dynamic(import("react-json-view"), { ssr: false });
 
 export type RecordInfoTablePresentationProps = RecordInfoTableProps;
 

@@ -9,11 +9,10 @@ import {
 } from "@dataware-tools/app-common";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Switch from "@mui/material/Switch";
-import dynamic from "next/dynamic";
 import { useState } from "react";
+import ReactJson from "react-json-view";
 import { RecordInfoTable } from "components/organisms/RecordInfoTable";
 import { DatabaseConfigType, useGetRecord } from "utils";
-const ReactJson = dynamic(import("react-json-view"), { ssr: false });
 
 export type RecordInfoPresentationProps = {
   record: metaStore.RecordModel;

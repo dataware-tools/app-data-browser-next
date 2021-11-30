@@ -1,5 +1,5 @@
 import { metaStore } from "@dataware-tools/api-meta-store-client";
-import dynamic from "next/dynamic";
+import { AudioPreviewer } from "./AudioPreviewer";
 import { CsvPreviewer } from "./CsvPreviewer";
 import { DefaultPreviewer } from "./DefaultPreviewer";
 import { ImagePreviewer } from "./ImagePreviewer";
@@ -12,10 +12,6 @@ import {
 import { TextPreviewer } from "./TextPreviewer";
 import { VideoPreviewer } from "./VideoPreviewer";
 import { FileDownloadUrlInjector } from "components/organisms/FileDownloadUrlInjector";
-const AudioPreviewer = dynamic<any>(
-  () => import("./AudioPreviewer").then((module) => module.AudioPreviewer),
-  { ssr: false }
-);
 
 type FilePreviewerContentWithSpec = {
   spec: {

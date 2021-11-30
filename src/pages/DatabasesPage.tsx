@@ -123,10 +123,8 @@ export const DatabasesPage = (): JSX.Element => {
     databasePaginateState
   );
 
-  const {
-    data: listDatabasesRes,
-    error: listDatabasesError,
-  } = useListDatabases(getAccessToken, { page, perPage, search });
+  const { data: listDatabasesRes, error: listDatabasesError } =
+    useListDatabases(getAccessToken, { page, perPage, search });
 
   useEffect(() => {
     setDatabasePaginateState({
@@ -148,21 +146,19 @@ export const DatabasesPage = (): JSX.Element => {
   ) => {
     setDatabasePaginateState((prev) => ({ ...prev, perPage, page: 1 }));
   };
-  const onChangeSearchText: DatabasesPagePresentationProps["onChangeSearchText"] = (
-    searchText
-  ) => {
-    setDatabasePaginateState((prev) => ({
-      ...prev,
-      search: searchText || "",
-      page: 1,
-    }));
-  };
+  const onChangeSearchText: DatabasesPagePresentationProps["onChangeSearchText"] =
+    (searchText) => {
+      setDatabasePaginateState((prev) => ({
+        ...prev,
+        search: searchText || "",
+        page: 1,
+      }));
+    };
 
-  const onAddDatabaseSucceeded: DatabasesPagePresentationProps["onAddDatabaseSucceeded"] = (
-    newDatabase
-  ) => {
-    history.push(`/databases/${newDatabase.database_id}/records?new=true`);
-  };
+  const onAddDatabaseSucceeded: DatabasesPagePresentationProps["onAddDatabaseSucceeded"] =
+    (newDatabase) => {
+      history.push(`/databases/${newDatabase.database_id}/records?new=true`);
+    };
 
   const error: DatabasesPagePresentationProps["error"] = listDatabasesError
     ? extractErrorMessageFromFetchError(listDatabasesError)
