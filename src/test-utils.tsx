@@ -44,7 +44,7 @@ const AllTheProviders: React.FC = ({ children }) => {
     </StylesProvider>
   );
 };
-// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+
 export const customRender = (
   ui: React.ReactElement,
   options?: Omit<RenderOptions, "queries">
