@@ -19,6 +19,8 @@ Default.args = {
       necessity: "required",
       order_of_input: 1,
       is_secret: false,
+      dtype: "string",
+      aggregation: "first",
     },
     {
       name: "test2",
@@ -26,6 +28,8 @@ Default.args = {
       necessity: "optional",
       order_of_input: 0,
       is_secret: true,
+      dtype: "string",
+      aggregation: "first",
     },
   ],
   onChange: (newValue) =>

@@ -29,6 +29,8 @@ export const Presentation = (): JSX.Element => (
         name: "Test1",
         necessity: "required",
         is_secret: false,
+        dtype: "string",
+        aggregation: "first",
       },
       {
         order_of_input: 2,
@@ -36,6 +38,8 @@ export const Presentation = (): JSX.Element => (
         name: "Test2",
         necessity: "optional",
         is_secret: true,
+        dtype: "string",
+        aggregation: "first",
       },
     ]}
     nonInputColumns={[]}

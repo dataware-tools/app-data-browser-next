@@ -39,10 +39,10 @@ export const FileEditModal = ({
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const [error, setError] = useState<ErrorMessageProps | undefined>(undefined);
 
-  const {
-    data: listFilesRes,
-    mutate: listFilesMutate,
-  } = useListFiles(getAccessToken, { databaseId, recordId });
+  const { data: listFilesRes, mutate: listFilesMutate } = useListFiles(
+    getAccessToken,
+    { databaseId, recordId }
+  );
   const {
     data: getFileRes,
     error: getFileError,
@@ -59,7 +59,7 @@ export const FileEditModal = ({
     }
   );
 
-  const fields: MetadataEditModalProps["fields"] = useMemo(
+  const fields = useMemo(
     () =>
       getConfigRes?.columns
         .filter(
@@ -69,9 +69,8 @@ export const FileEditModal = ({
             editableColumnDtype.includes(column.dtype)
         )
         .map((column) => ({
-          name: column.name,
-          display_name: column.display_name,
           necessity: column.necessity || "unnecessary",
+          ...column,
         }))
         .sort(compInputFields) || [],
     [getConfigRes]
@@ -79,9 +78,8 @@ export const FileEditModal = ({
   const fetchError = getFileError || getConfigError;
   useEffect(() => {
     if (fetchError) {
-      const { reason, instruction } = extractErrorMessageFromFetchError(
-        fetchError
-      );
+      const { reason, instruction } =
+        extractErrorMessageFromFetchError(fetchError);
       setError({ reason, instruction });
     } else {
       setError(undefined);
@@ -100,9 +98,8 @@ export const FileEditModal = ({
     );
 
     if (saveFileError) {
-      const { reason, instruction } = extractErrorMessageFromFetchError(
-        saveFileError
-      );
+      const { reason, instruction } =
+        extractErrorMessageFromFetchError(saveFileError);
       setError({ reason, instruction });
       return false;
     }

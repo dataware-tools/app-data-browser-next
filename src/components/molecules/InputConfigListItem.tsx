@@ -6,12 +6,7 @@ import IconButton from "@mui/material/IconButton";
 import React, { ReactNode } from "react";
 import { DatabaseColumnsConfigType } from "utils";
 
-export type ValueType = Required<
-  Pick<
-    DatabaseColumnsConfigType[number],
-    "display_name" | "name" | "necessity" | "is_secret"
-  >
->;
+export type ValueType = DatabaseColumnsConfigType[number];
 
 export type InputConfigListItemPresentationProps = InputConfigListItemProps;
 export type InputConfigListItemProps = {

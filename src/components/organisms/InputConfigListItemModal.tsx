@@ -38,21 +38,21 @@ type OptionType = {
   display_name: string;
   newOption?: boolean;
 };
-export type NewColumnType = Required<
-  Pick<
-    DatabaseColumnsConfigType[number],
-    "display_name" | "name" | "necessity" | "is_secret"
-  >
->;
+export type NewColumnType = DatabaseColumnsConfigType[number];
+
 type NameAutocompleteProps = AutocompleteProps<OptionType, false, false, true>;
 type ValidateRuleType = ControllerProps["rules"];
+type FormType = Pick<
+  NewColumnType,
+  "display_name" | "dtype" | "is_secret" | "name" | "necessity"
+>;
 
 export type InputConfigListItemModalPresentationProps = {
-  formControl: Control<NewColumnType>;
-  validateRules: Record<keyof NewColumnType, ValidateRuleType>;
-  validateErrors: FieldErrors<NewColumnType>;
+  formControl: Control<FormType>;
+  validateRules: Record<keyof FormType, ValidateRuleType>;
+  validateErrors: FieldErrors<FormType>;
   validateErrorMessages: Record<
-    keyof NewColumnType,
+    keyof FormType,
     Record<keyof ValidateRuleType, string>
   >;
   filterNameOptions: NameAutocompleteProps["filterOptions"];
@@ -70,7 +70,7 @@ export type InputConfigListItemModalProps = {
   options: OptionType[];
   open: boolean;
   onClose: () => void;
-  onSave: (newConfig: NewColumnType) => void;
+  onSave: (newConfig: FormType) => void;
   alreadyUsedNames: string[];
   alreadyUsedDisplayNames: string[];
   initialData: NewColumnType | null;
@@ -165,6 +165,47 @@ export const InputConfigListItemModalPresentation = ({
                     />
                   )}
                 />
+                <DialogSubTitle>Data type</DialogSubTitle>
+                <Controller
+                  name="dtype"
+                  control={formControl}
+                  rules={validateRules.dtype}
+                  defaultValue="string"
+                  render={({ field }) => (
+                    <FormControl error={Boolean(validateErrors.dtype)}>
+                      <Select
+                        {...field}
+                        variant="outlined"
+                        disabled={
+                          !["string", "number", "datetime"].includes(
+                            field.value
+                          )
+                        }
+                      >
+                        <MenuItem value="string">String</MenuItem>
+                        <MenuItem value="number">Number</MenuItem>
+                        <MenuItem value="datetime">Datetime</MenuItem>
+                      </Select>
+                      {!["string", "number", "datetime"].includes(
+                        field.value
+                      ) ? (
+                        <FormHelperText>
+                          Data type {field.value} is not supported on data
+                          browser
+                        </FormHelperText>
+                      ) : null}
+                      {validateErrors.dtype ? (
+                        <FormHelperText>
+                          {
+                            validateErrorMessages.dtype[
+                              validateErrors.dtype.type
+                            ]
+                          }
+                        </FormHelperText>
+                      ) : null}
+                    </FormControl>
+                  )}
+                />
                 <DialogSubTitle>Necessity</DialogSubTitle>
                 <Controller
                   name="necessity"
@@ -243,14 +284,24 @@ export const InputConfigListItemModal = ({
     setValue,
     reset,
     formState: { errors: validateErrors },
-  } = useForm<NewColumnType>();
+  } = useForm<FormType>();
 
   useEffect(() => {
     if (initialData) {
+      const fixedDtype = {
+        string: "string" as const,
+        str: "string" as const,
+        text: "string" as const,
+        float: "number" as const,
+        double: "number" as const,
+        number: "number" as const,
+        datetime: "datetime" as const,
+      };
       setValue("name", initialData.name);
       setValue("display_name", initialData.display_name);
       setValue("necessity", initialData.necessity);
       setValue("is_secret", initialData.is_secret);
+      setValue("dtype", fixedDtype[initialData.dtype] || initialData.dtype);
     } else {
       reset();
     }
@@ -278,6 +329,7 @@ export const InputConfigListItemModal = ({
       required: true,
     },
     is_secret: {},
+    dtype: { required: true },
   };
   const validateErrorMessages = {
     name: {
@@ -291,46 +343,45 @@ export const InputConfigListItemModal = ({
     },
     necessity: { required: "Necessity is required" },
     is_secret: {},
+    dtype: { required: "Dtype is required" },
   };
 
   const filter = createFilterOptions<OptionType>();
-  const filterNameOptions: InputConfigListItemModalPresentationProps["filterNameOptions"] = (
-    options,
-    params
-  ) => {
-    const filtered = filter(options, params);
-    const { inputValue } = params;
+  const filterNameOptions: InputConfigListItemModalPresentationProps["filterNameOptions"] =
+    (options, params) => {
+      const filtered = filter(options, params);
+      const { inputValue } = params;
 
-    const isExisting =
-      options.some((option) => inputValue === option.name) ||
-      alreadyUsedNames.includes(inputValue);
-    if (inputValue !== "" && !isExisting) {
-      filtered.push({
-        newOption: true,
-        name: inputValue,
-        display_name: inputValue,
-      });
-    }
+      const isExisting =
+        options.some((option) => inputValue === option.name) ||
+        alreadyUsedNames.includes(inputValue);
+      if (inputValue !== "" && !isExisting) {
+        filtered.push({
+          newOption: true,
+          name: inputValue,
+          display_name: inputValue,
+        });
+      }
 
-    return filtered;
-  };
+      return filtered;
+    };
 
-  const getNameOptionLabel: InputConfigListItemModalPresentationProps["getNameOptionLabel"] = (
-    option
-  ) => {
-    if (typeof option === "string") {
-      return option;
-    }
-    return option.name;
-  };
+  const getNameOptionLabel: InputConfigListItemModalPresentationProps["getNameOptionLabel"] =
+    (option) => {
+      if (typeof option === "string") {
+        return option;
+      }
+      return option.name;
+    };
 
   const onAdd = handleSubmit((data) => {
-    onSave(data);
+    console.log(data);
+    onSave({ ...data });
     onClose();
   });
 
   const onUpdate = handleSubmit((data) => {
-    onSave(data);
+    onSave({ ...data });
     onClose();
   });
 

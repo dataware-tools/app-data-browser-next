@@ -5,10 +5,7 @@ import { DatabaseColumnsConfigType } from "utils";
 
 type MetadataType = Record<string, unknown>;
 
-type FieldType = Pick<
-  DatabaseColumnsConfigType[number],
-  "display_name" | "name" | "necessity"
->;
+type FieldType = DatabaseColumnsConfigType[number];
 
 export type MetadataInputFieldListProps = {
   currentMetadata?: MetadataType;
@@ -31,6 +28,17 @@ export const MetadataInputFieldList = ({
         const necessity = field.necessity;
         const required = necessity === "required";
         const recommended = necessity === "recommended";
+        const dataTypeMap = {
+          string: "text" as const,
+          str: "text" as const,
+          text: "text" as const,
+          integer: "number" as const,
+          int: "number" as const,
+          float: "number" as const,
+          double: "number" as const,
+          number: "number" as const,
+          datetime: "datetime-local" as const,
+        };
         const id = `${prefixInputElementId}_${name.replace(/\s+/g, "")}`;
         return (
           <div key={name}>
@@ -48,6 +56,7 @@ export const MetadataInputFieldList = ({
               <TextField
                 fullWidth
                 key={field.name}
+                type={dataTypeMap[field.dtype]}
                 id={id}
                 defaultValue={currentMetadata?.[name]}
                 error={nonFilledRequiredFieldNames.includes(name)}

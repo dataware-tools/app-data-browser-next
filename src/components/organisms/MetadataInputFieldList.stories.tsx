@@ -17,13 +17,27 @@ export const Default = Template.bind({});
 Default.args = {
   currentMetadata: { required: "required" },
   fields: [
-    { name: "required", display_name: "Required", necessity: "required" },
+    {
+      name: "required",
+      display_name: "Required",
+      necessity: "required",
+      dtype: "string",
+      aggregation: "first",
+    },
     {
       name: "recommended",
       display_name: "Recommended",
       necessity: "recommended",
+      dtype: "string",
+      aggregation: "first",
     },
-    { name: "optional", display_name: "Optional", necessity: "optional" },
+    {
+      name: "optional",
+      display_name: "Optional",
+      necessity: "optional",
+      dtype: "string",
+      aggregation: "first",
+    },
   ],
   prefixInputElementId: "#",
   nonFilledRequiredFieldNames: [],
