@@ -176,10 +176,16 @@ export const InputConfigList = ({
       value.some((prevColumn) => prevColumn.name === newColumn.name)
         ? value.map((prevColumn) =>
             prevColumn.name === newColumn.name
-              ? {
-                  ...prevColumn,
-                  ...newColumn,
-                }
+              ? typeof prevColumn.order_of_input === "undefined"
+                ? {
+                    ...prevColumn,
+                    ...newColumn,
+                    order_of_input: order.length,
+                  }
+                : {
+                    ...prevColumn,
+                    ...newColumn,
+                  }
               : prevColumn
           )
         : [
