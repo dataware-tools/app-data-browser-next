@@ -39,7 +39,7 @@
     "@mui/icons-material": "^5.0.5",
     "@mui/lab": "^5.0.0-alpha.58",
     "@mui/material": "^5.0.2",
-    "@mui/styles": "^5.0.1",
+    "@mui/styles": "^5.2.3",
     "@mui/x-data-grid": "^5.0.0-beta.6",
     "immer": "^9.0.6",
     "papaparse": "^5.3.1",
