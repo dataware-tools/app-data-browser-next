@@ -62,7 +62,7 @@
   "devDependencies": {
     "@babel/core": "^7.16.0",
     "@originjs/vite-plugin-commonjs": "^1.0.0",
-    "@rollup/plugin-commonjs": "^20.0.0",
+    "@rollup/plugin-commonjs": "^21.0.1",
     "@storybook/addon-actions": "^6.4.1",
     "@storybook/addon-essentials": "^6.4.7",
     "@storybook/addon-links": "^6.4.8",
