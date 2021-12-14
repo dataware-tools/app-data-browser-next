@@ -13,18 +13,28 @@ import { TextPreviewer } from "./TextPreviewer";
 import { VideoPreviewer } from "./VideoPreviewer";
 import { FileDownloadUrlInjector } from "components/organisms/FileDownloadUrlInjector";
 
+type FilePreviewerContentRenderSpec = {
+  databaseId: string;
+  recordId: string;
+  file: FileType;
+};
+
 type FilePreviewerContentWithSpec = {
   spec: {
     extensions: string[];
     contentTypes: string[];
   };
-  render: (databaseId: string, recordId: string, file: FileType) => JSX.Element;
+  render: ({
+    databaseId,
+    recordId,
+    file,
+  }: FilePreviewerContentRenderSpec) => JSX.Element;
 };
 
 const filePreviewerCandidates: Record<string, FilePreviewerContentWithSpec> = {
   default: {
     spec: { extensions: [".*"], contentTypes: [".*"] },
-    render: (databaseId, _, file) => (
+    render: ({ databaseId, file }) => (
       <FileDownloadUrlInjector
         databaseId={databaseId}
         file={file}
@@ -34,7 +44,7 @@ const filePreviewerCandidates: Record<string, FilePreviewerContentWithSpec> = {
   },
   text: {
     spec: { extensions: [".txt"], contentTypes: ["text/.*"] },
-    render: (databaseId, _, file) => (
+    render: ({ databaseId, file }) => (
       <FileDownloadUrlInjector
         databaseId={databaseId}
         file={file}
@@ -44,7 +54,7 @@ const filePreviewerCandidates: Record<string, FilePreviewerContentWithSpec> = {
   },
   markdown: {
     spec: { extensions: [".md"], contentTypes: ["text/.*"] },
-    render: (databaseId, _, file) => (
+    render: ({ databaseId, file }) => (
       <FileDownloadUrlInjector
         databaseId={databaseId}
         file={file}
@@ -54,7 +64,7 @@ const filePreviewerCandidates: Record<string, FilePreviewerContentWithSpec> = {
   },
   csv: {
     spec: { extensions: [".csv"], contentTypes: ["csv/.*"] },
-    render: (databaseId, _, file) => (
+    render: ({ databaseId, file }) => (
       <FileDownloadUrlInjector
         databaseId={databaseId}
         file={file}
@@ -64,7 +74,7 @@ const filePreviewerCandidates: Record<string, FilePreviewerContentWithSpec> = {
   },
   video: {
     spec: { extensions: [".mp4"], contentTypes: ["video/.*"] },
-    render: (databaseId, _, file) => (
+    render: ({ databaseId, file }) => (
       <FileDownloadUrlInjector
         databaseId={databaseId}
         file={file}
@@ -77,7 +87,7 @@ const filePreviewerCandidates: Record<string, FilePreviewerContentWithSpec> = {
       extensions: sourceCodeExtensions,
       contentTypes: ["text/.*"],
     },
-    render: (databaseId, _, file) => (
+    render: ({ databaseId, file }) => (
       <FileDownloadUrlInjector
         databaseId={databaseId}
         file={file}
@@ -90,7 +100,7 @@ const filePreviewerCandidates: Record<string, FilePreviewerContentWithSpec> = {
       extensions: [".jpg", ".jpeg", ".png", ".gif"],
       contentTypes: ["image/.*"],
     },
-    render: (databaseId, _, file) => (
+    render: ({ databaseId, file }) => (
       <FileDownloadUrlInjector
         databaseId={databaseId}
         file={file}
@@ -100,7 +110,7 @@ const filePreviewerCandidates: Record<string, FilePreviewerContentWithSpec> = {
   },
   rosbag: {
     spec: { extensions: [".bag"], contentTypes: ["application/rosbag"] },
-    render: (databaseId, recordId, file) => (
+    render: ({ databaseId, recordId, file }) => (
       <FileDownloadUrlInjector
         databaseId={databaseId}
         file={file}
@@ -117,7 +127,7 @@ const filePreviewerCandidates: Record<string, FilePreviewerContentWithSpec> = {
   },
   audio: {
     spec: { extensions: [".wav", ".mp3"], contentTypes: ["audio/.*"] },
-    render: (databaseId, _, file) => (
+    render: ({ databaseId, file }) => (
       <FileDownloadUrlInjector
         databaseId={databaseId}
         file={file}
@@ -173,6 +183,6 @@ export const FilePreviewer = ({
   ) || [undefined, undefined];
 
   return previewer
-    ? previewer.render(databaseId, recordId, file)
-    : filePreviewerCandidates.default.render(databaseId, recordId, file);
+    ? previewer.render({ databaseId, recordId, file })
+    : filePreviewerCandidates.default.render({ databaseId, recordId, file });
 };
