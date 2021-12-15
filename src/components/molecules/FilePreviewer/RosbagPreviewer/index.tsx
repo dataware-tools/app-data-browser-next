@@ -34,7 +34,12 @@ type Props = {
   job?: jobStore.JobPostedModel;
 };
 
-export type RosbagPreviewerProps = { filePath: string; url: string };
+export type RosbagPreviewerProps = {
+  databaseId: string;
+  recordId: string;
+  filePath: string;
+  url: string;
+};
 const RosbagPreviewerPresentation = ({
   tabIndex,
   handleChangeTab,
@@ -94,6 +99,8 @@ const RosbagPreviewerPresentation = ({
 };
 
 export const RosbagPreviewer = ({
+  databaseId,
+  recordId,
   filePath,
   url,
 }: RosbagPreviewerProps): JSX.Element => {
@@ -141,6 +148,8 @@ export const RosbagPreviewer = ({
       {
         requestBody: {
           job_template_id: parseInt(getJobTemplateRes.job_template_id),
+          database_id: databaseId,
+          record_id: recordId,
           path_to_rosbag: filePath, // FIXME: Generalize JobPostModel
         },
       }

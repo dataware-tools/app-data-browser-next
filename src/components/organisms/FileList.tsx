@@ -75,6 +75,7 @@ export const FileListPresentation = ({
           {previewingFile ? (
             <FilePreviewModal
               databaseId={databaseId}
+              recordId={recordId}
               fileList={files}
               open={Boolean(previewingFile)}
               onClose={onCloseFilePreviewModal}

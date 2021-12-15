@@ -25,7 +25,7 @@ export const JobTemplateInfo = ({
             <TableCell>Args: </TableCell>
             <TableCell>
               {jobType.job_type.args.map((arg: any) => {
-                return arg.name;
+                return arg.name + " ";
               })}
             </TableCell>
           </TableRow>
