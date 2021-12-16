@@ -34,7 +34,7 @@
     "@dataware-tools/api-meta-store-client": "^0.5.1",
     "@dataware-tools/api-permission-manager-client": "^0.2.1",
     "@dataware-tools/app-common": "^21.11.3",
-    "@emotion/react": "^11.4.1",
+    "@emotion/react": "^11.7.1",
     "@emotion/styled": "^11.3.0",
     "@mui/icons-material": "^5.0.5",
     "@mui/lab": "^5.0.0-alpha.58",
