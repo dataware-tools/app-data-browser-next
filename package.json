@@ -36,7 +36,7 @@
     "@dataware-tools/app-common": "^21.11.3",
     "@emotion/react": "^11.7.1",
     "@emotion/styled": "^11.3.0",
-    "@mui/icons-material": "^5.0.5",
+    "@mui/icons-material": "^5.2.4",
     "@mui/lab": "^5.0.0-alpha.58",
     "@mui/material": "^5.0.2",
     "@mui/styles": "^5.0.1",
