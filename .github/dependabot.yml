@@ -16,6 +16,8 @@ updates:
     # Check the npm registry for updates every day (weekdays)
     schedule:
       interval: "daily"
+    registries:
+      - npm-github
 
   # Enable version updates for Docker
   - package-ecosystem: "docker"
