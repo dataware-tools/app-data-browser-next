@@ -76,7 +76,14 @@ type UserActionType =
   | "file:read"
   | "file:write"
   | "file:write:add"
-  | "file:write:delete";
+  | "file:write:delete"
+  | "job"
+  | "job:execute"
+  | "job:read"
+  | "job:write"
+  | "job:write:add"
+  | "job:write:update"
+  | "job:write:delete";
 
 type ParamTypeListRecords = Parameters<
   typeof metaStore.RecordService.listRecords

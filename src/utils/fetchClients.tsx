@@ -118,9 +118,11 @@ const useListPermittedActions: UseAPI<
     ? async () => {
         permissionManager.OpenAPI.TOKEN = token;
         permissionManager.OpenAPI.BASE = API_ROUTE.PERMISSION.BASE;
-        const res = await permissionManager.PermittedActionService.listPermittedActions(
-          { databaseId, ...query }
-        );
+        const res =
+          await permissionManager.PermittedActionService.listPermittedActions({
+            databaseId,
+            ...query,
+          });
         return res;
       }
     : null;
@@ -291,32 +293,38 @@ const useGetFile: UseAPI<typeof metaStore.FileService.getFile> = (
 
 const useListJobTemplate: UseAPI<
   typeof jobStore.JobTemplateService.listJobTemplates
-> = (token, _nonParam, shouldFetch = true) => {
-  const cacheKey = `${API_ROUTE.JOB.BASE}/job-templates`;
-  const fetcher = async () => {
-    jobStore.OpenAPI.TOKEN = token;
-    jobStore.OpenAPI.BASE = API_ROUTE.JOB.BASE;
-    const res = await jobStore.JobTemplateService.listJobTemplates();
-    return res;
-  };
+> = (token, { databaseId }, shouldFetch = true) => {
+  const cacheKey = `${API_ROUTE.JOB.BASE}/databases/${databaseId}/job-templates`;
+  const fetcher = databaseId
+    ? async () => {
+        jobStore.OpenAPI.TOKEN = token;
+        jobStore.OpenAPI.BASE = API_ROUTE.JOB.BASE;
+        const res = await jobStore.JobTemplateService.listJobTemplates({
+          databaseId: databaseId,
+        });
+        return res;
+      }
+    : null;
   const swrRes = useSWR(shouldFetch ? cacheKey : null, fetcher);
   return { ...swrRes, cacheKey };
 };
 
 const useGetJobTemplate: UseAPI<
   typeof jobStore.JobTemplateService.getJobTemplate
-> = (token, { jobTemplateId }, shouldFetch = true) => {
-  const cacheKey = `${API_ROUTE.JOB.BASE}/job-templates/${jobTemplateId}`;
-  const fetcher = jobTemplateId
-    ? async () => {
-        jobStore.OpenAPI.TOKEN = token;
-        jobStore.OpenAPI.BASE = API_ROUTE.JOB.BASE;
-        const res = await jobStore.JobTemplateService.getJobTemplate({
-          jobTemplateId,
-        });
-        return res;
-      }
-    : null;
+> = (token, { jobTemplateId, databaseId }, shouldFetch = true) => {
+  const cacheKey = `${API_ROUTE.JOB.BASE}/databases/${databaseId}/job-templates/${jobTemplateId}`;
+  const fetcher =
+    jobTemplateId && databaseId
+      ? async () => {
+          jobStore.OpenAPI.TOKEN = token;
+          jobStore.OpenAPI.BASE = API_ROUTE.JOB.BASE;
+          const res = await jobStore.JobTemplateService.getJobTemplate({
+            jobTemplateId,
+            databaseId,
+          });
+          return res;
+        }
+      : null;
   const swrRes = useSWR(
     shouldFetch && jobTemplateId ? cacheKey : null,
     fetcher
@@ -326,20 +334,22 @@ const useGetJobTemplate: UseAPI<
 
 const useGetJobTypes: UseAPI<typeof jobStore.JobTypeService.getJobTypes> = (
   token,
-  { jobTypeUid },
+  { jobTypeUid, databaseId },
   shouldFetch = true
 ) => {
-  const cacheKey = `${API_ROUTE.JOB.BASE}/job-templates/${jobTypeUid}`;
-  const fetcher = jobTypeUid
-    ? async () => {
-        jobStore.OpenAPI.TOKEN = token;
-        jobStore.OpenAPI.BASE = API_ROUTE.JOB.BASE;
-        const res = await jobStore.JobTypeService.getJobTypes({
-          jobTypeUid,
-        });
-        return res;
-      }
-    : null;
+  const cacheKey = `${API_ROUTE.JOB.BASE}/databases/${databaseId}/job-templates/${jobTypeUid}`;
+  const fetcher =
+    jobTypeUid && databaseId
+      ? async () => {
+          jobStore.OpenAPI.TOKEN = token;
+          jobStore.OpenAPI.BASE = API_ROUTE.JOB.BASE;
+          const res = await jobStore.JobTypeService.getJobTypes({
+            jobTypeUid,
+            databaseId,
+          });
+          return res;
+        }
+      : null;
   const swrRes = useSWR(shouldFetch && jobTypeUid ? cacheKey : null, fetcher);
   return { ...swrRes, cacheKey };
 };

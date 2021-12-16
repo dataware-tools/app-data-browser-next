@@ -91,12 +91,11 @@ export const JobViewer = ({ job, jobType }: JobViewerProps): JSX.Element => {
     setCurrentShownScript(undefined);
   };
 
-  const onClickExecuteButton: JobViewerPresentationProps["onClickExecuteButton"] = (
-    script
-  ) => {
-    // eslint-disable-next-line no-eval
-    eval(script);
-  };
+  const onClickExecuteButton: JobViewerPresentationProps["onClickExecuteButton"] =
+    (script) => {
+      // eslint-disable-next-line no-eval
+      eval(script);
+    };
 
   const scripts = Object.entries(jobType.job_type.scheme.output)
     // @ts-expect-error I don't know how to resolve this error
