@@ -35,7 +35,7 @@
     "@dataware-tools/api-permission-manager-client": "^0.2.2",
     "@dataware-tools/app-common": "^21.11.3",
     "@emotion/react": "^11.7.1",
-    "@emotion/styled": "^11.3.0",
+    "@emotion/styled": "^11.6.0",
     "@mui/icons-material": "^5.2.4",
     "@mui/lab": "^5.0.0-alpha.60",
     "@mui/material": "^5.2.4",
@@ -48,7 +48,7 @@
     "react-beautiful-dnd": "^13.1.0",
     "react-csv-downloader": "^2.7.1",
     "react-dom": "^17.0.2",
-    "react-hook-form": "^7.12.0",
+    "react-hook-form": "^7.22.2",
     "react-json-view": "^1.21.3",
     "react-markdown": "^7.1.1",
     "react-player": "^2.9.0",
@@ -60,7 +60,7 @@
     "wavesurfer.js": "^5.2.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.16.0",
+    "@babel/core": "^7.16.5",
     "@originjs/vite-plugin-commonjs": "^1.0.0",
     "@storybook/addon-actions": "^6.4.9",
     "@storybook/addon-essentials": "^6.4.7",
