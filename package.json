@@ -35,7 +35,7 @@
     "@dataware-tools/api-permission-manager-client": "^0.2.2",
     "@dataware-tools/app-common": "^21.11.3",
     "@emotion/react": "^11.7.1",
-    "@emotion/styled": "^11.3.0",
+    "@emotion/styled": "^11.6.0",
     "@mui/icons-material": "^5.2.4",
     "@mui/lab": "^5.0.0-alpha.60",
     "@mui/material": "^5.2.4",
@@ -60,7 +60,7 @@
     "wavesurfer.js": "^5.2.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.16.0",
+    "@babel/core": "^7.16.5",
     "@originjs/vite-plugin-commonjs": "^1.0.0",
     "@storybook/addon-actions": "^6.4.9",
     "@storybook/addon-essentials": "^6.4.7",
@@ -99,7 +99,7 @@
     "eslint-plugin-unused-imports": "^1.1.5",
     "husky": "^7.0.4",
     "jest": "^27.4.3",
-    "lint-staged": "^12.1.2",
+    "lint-staged": "^12.1.3",
     "loki": "^0.28.1",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.5.1",
