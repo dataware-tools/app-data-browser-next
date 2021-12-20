@@ -1,9 +1,9 @@
 import { useAuth0 } from "@auth0/auth0-react";
+import { metaStore } from "@dataware-tools/api-meta-store-client";
 import {
   ErrorMessage,
   ErrorMessageProps,
   extractErrorMessageFromFetchError,
-  metaStore,
 } from "@dataware-tools/app-common";
 import { Map, MapProps, Marker, ZoomControl } from "pigeon-maps";
 import { useState, useEffect } from "react";
@@ -95,9 +95,8 @@ export const RecordListMapView = ({
   const fetchError = listRecordsError;
   useEffect(() => {
     if (fetchError) {
-      const { reason, instruction } = extractErrorMessageFromFetchError(
-        fetchError
-      );
+      const { reason, instruction } =
+        extractErrorMessageFromFetchError(fetchError);
       setError({ reason, instruction });
     } else {
       setError(undefined);
