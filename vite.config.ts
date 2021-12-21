@@ -21,4 +21,20 @@ export default defineConfig({
   cacheDir: "./.vite",
   assetsInclude: ["robots.txt"],
   build: { outDir: "./dist" + packageInfo.basePath },
+  resolve: {
+    preserveSymlinks: true,
+    // this option should be same with app-common peerDependencies
+    dedupe: [
+      "@auth0/auth0-react",
+      "@emotion/react",
+      "@emotion/styled",
+      "@mui/icons-material",
+      "@mui/lab",
+      "@mui/material",
+      "@mui/styles",
+      "oidc-react",
+      "react",
+      "react-dom",
+    ],
+  },
 });

@@ -31,6 +31,7 @@ module.exports = {
       ...config,
       resolve: {
         ...config.resolve,
+        symlinks: false,
         alias: {
           ...config.resolve.alias,
           "@emotion/core": toPath("node_modules/@emotion/react"),
