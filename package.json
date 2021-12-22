@@ -33,7 +33,7 @@
     "@dataware-tools/api-job-store-client": "^1.4.0",
     "@dataware-tools/api-meta-store-client": "^0.5.1",
     "@dataware-tools/api-permission-manager-client": "^0.2.2",
-    "@dataware-tools/app-common": "^21.12.10",
+    "@dataware-tools/app-common": "^21.12.13",
     "@emotion/react": "^11.7.1",
     "@emotion/styled": "^11.6.0",
     "@mui/icons-material": "^5.2.5",
