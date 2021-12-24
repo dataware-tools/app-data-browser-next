@@ -11,6 +11,5 @@ const Template: Story<TextPreviewerProps> = (args) => (
 
 export const Default = Template.bind({});
 Default.args = {
-  url:
-    "https://raw.githubusercontent.com/dataware-tools/pydtk/master/README.md",
+  url: "https://raw.githubusercontent.com/dataware-tools/pydtk/master/README.md",
 };

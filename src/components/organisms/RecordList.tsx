@@ -98,9 +98,8 @@ export const RecordList = ({
   const [error, setError] = useState<
     RecordListPresentationProps["error"] | undefined
   >(undefined);
-  const [{ sortKey, sortOrder }, setRecordPaginateState] = useRecoilState(
-    recordPaginateState
-  );
+  const [{ sortKey, sortOrder }, setRecordPaginateState] =
+    useRecoilState(recordPaginateState);
 
   const { data: getConfigRes, error: getConfigError } = useGetConfig(
     getAccessToken,
@@ -152,9 +151,8 @@ export const RecordList = ({
       );
 
       if (deleteRecordError) {
-        const { reason, instruction } = extractErrorMessageFromFetchError(
-          deleteRecordError
-        );
+        const { reason, instruction } =
+          extractErrorMessageFromFetchError(deleteRecordError);
         setError({ reason, instruction });
       } else if (deleteRecordRes) {
         listRecordsMutate();
@@ -206,9 +204,8 @@ export const RecordList = ({
   const fetchError = listRecordsError || getConfigError;
   useEffect(() => {
     if (fetchError) {
-      const { reason, instruction } = extractErrorMessageFromFetchError(
-        fetchError
-      );
+      const { reason, instruction } =
+        extractErrorMessageFromFetchError(fetchError);
       setError({ reason, instruction });
     } else if (columns.length <= 0) {
       setError({

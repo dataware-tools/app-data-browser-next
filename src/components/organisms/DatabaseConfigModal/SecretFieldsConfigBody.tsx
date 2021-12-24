@@ -43,9 +43,8 @@ export const SecretFieldsConfigBodyPresentation = ({
 
 export const SecretFieldsConfigBody = (): JSX.Element => {
   const [error, setError] = useState<ErrorMessageProps | undefined>(undefined);
-  const [databaseConfig, setDatabaseConfig] = useRecoilState(
-    databaseConfigState
-  );
+  const [databaseConfig, setDatabaseConfig] =
+    useRecoilState(databaseConfigState);
   const [numOfSecretColumns, setNumOfSecretColumns] = useState<number>(
     databaseConfig?.columns?.filter((column) => column.is_secret).length || 0
   );
@@ -77,21 +76,20 @@ export const SecretFieldsConfigBody = (): JSX.Element => {
         )
       : tempSecretColumns;
 
-  const onChangeSecretColumns: SecretFieldsConfigBodyPresentationProps["onChangeSecretColumns"] = (
-    newSecretColumns
-  ) => {
-    setNumOfSecretColumns(newSecretColumns.length);
-    if (databaseConfig?.columns) {
-      const newDatabaseConfig = produce(databaseConfig, (draft) => {
-        draft.columns = draft.columns.map((column) => ({
-          ...column,
-          is_secret: newSecretColumns.includes(column.name),
-        }));
-      });
+  const onChangeSecretColumns: SecretFieldsConfigBodyPresentationProps["onChangeSecretColumns"] =
+    (newSecretColumns) => {
+      setNumOfSecretColumns(newSecretColumns.length);
+      if (databaseConfig?.columns) {
+        const newDatabaseConfig = produce(databaseConfig, (draft) => {
+          draft.columns = draft.columns.map((column) => ({
+            ...column,
+            is_secret: newSecretColumns.includes(column.name),
+          }));
+        });
 
-      setDatabaseConfig(newDatabaseConfig);
-    }
-  };
+        setDatabaseConfig(newDatabaseConfig);
+      }
+    };
 
   const secretColumnsOptions =
     databaseConfig?.columns.map((column) => ({

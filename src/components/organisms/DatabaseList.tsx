@@ -59,17 +59,14 @@ export const DatabaseList = ({
     DatabaseListPresentationProps["error"] | undefined
   >(undefined);
 
-  const {
-    data: listDatabasesRes,
-    error: listDatabasesError,
-  } = useListDatabases(getAccessToken, { page, perPage, search });
+  const { data: listDatabasesRes, error: listDatabasesError } =
+    useListDatabases(getAccessToken, { page, perPage, search });
 
   const fetchError = listDatabasesError;
   useEffect(() => {
     if (fetchError) {
-      const { reason, instruction } = extractErrorMessageFromFetchError(
-        fetchError
-      );
+      const { reason, instruction } =
+        extractErrorMessageFromFetchError(fetchError);
       setError({ reason, instruction });
     } else {
       setError(undefined);

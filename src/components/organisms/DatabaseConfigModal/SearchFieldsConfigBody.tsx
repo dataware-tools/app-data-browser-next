@@ -43,16 +43,13 @@ export const SearchFieldsConfigBodyPresentation = ({
 
 export const SearchFieldsConfigBody = (): JSX.Element => {
   const [error, setError] = useState<ErrorMessageProps | undefined>(undefined);
-  const [databaseConfig, setDatabaseConfig] = useRecoilState(
-    databaseConfigState
-  );
-  const [
-    numOfSearchTargetColumns,
-    setNumOfSearchTargetColumns,
-  ] = useState<number>(
-    databaseConfig?.columns.filter((column) => column.is_search_target)
-      .length || 0
-  );
+  const [databaseConfig, setDatabaseConfig] =
+    useRecoilState(databaseConfigState);
+  const [numOfSearchTargetColumns, setNumOfSearchTargetColumns] =
+    useState<number>(
+      databaseConfig?.columns.filter((column) => column.is_search_target)
+        .length || 0
+    );
 
   useLayoutEffect(() => {
     if (databaseConfig && databaseConfig.columns.length <= 0) {
@@ -83,21 +80,20 @@ export const SearchFieldsConfigBody = (): JSX.Element => {
         )
       : tempSearchTargetColumns;
 
-  const onChangeSearchTargetColumns: SearchFieldsConfigBodyPresentationProps["onChangeSearchTargetColumns"] = (
-    newSearchTargetColumns
-  ) => {
-    setNumOfSearchTargetColumns(newSearchTargetColumns.length);
-    if (databaseConfig) {
-      // setIsSaving(true);
-      const newDatabaseConfig = produce(databaseConfig, (draft) => {
-        draft.columns = draft.columns.map((column) => ({
-          ...column,
-          is_search_target: newSearchTargetColumns.includes(column.name),
-        }));
-      });
-      setDatabaseConfig(newDatabaseConfig);
-    }
-  };
+  const onChangeSearchTargetColumns: SearchFieldsConfigBodyPresentationProps["onChangeSearchTargetColumns"] =
+    (newSearchTargetColumns) => {
+      setNumOfSearchTargetColumns(newSearchTargetColumns.length);
+      if (databaseConfig) {
+        // setIsSaving(true);
+        const newDatabaseConfig = produce(databaseConfig, (draft) => {
+          draft.columns = draft.columns.map((column) => ({
+            ...column,
+            is_search_target: newSearchTargetColumns.includes(column.name),
+          }));
+        });
+        setDatabaseConfig(newDatabaseConfig);
+      }
+    };
 
   const searchTargetColumnsOptions =
     databaseConfig?.columns.map((column) => ({

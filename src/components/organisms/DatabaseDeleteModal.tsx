@@ -126,12 +126,13 @@ export const DatabaseDeleteModal = ({
       },
     },
   };
-  const validateErrorMessages: DatabaseDeleteModalPresentationProps["validateErrorMessages"] = {
-    databaseId: {
-      required: "Database id must be inputted",
-      mismatch: "Database id is incorrect",
-    },
-  };
+  const validateErrorMessages: DatabaseDeleteModalPresentationProps["validateErrorMessages"] =
+    {
+      databaseId: {
+        required: "Database id must be inputted",
+        mismatch: "Database id is incorrect",
+      },
+    };
   const onClose: DatabaseDeleteModalPresentationProps["onClose"] = async (
     isConfirmed
   ) => {
@@ -152,9 +153,8 @@ export const DatabaseDeleteModal = ({
         );
 
         if (deleteDatabaseError) {
-          const { reason, instruction } = extractErrorMessageFromFetchError(
-            deleteDatabaseError
-          );
+          const { reason, instruction } =
+            extractErrorMessageFromFetchError(deleteDatabaseError);
           setError({
             reason,
             instruction,

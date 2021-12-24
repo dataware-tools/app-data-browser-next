@@ -180,10 +180,8 @@ export const DatabaseEditModal = <T extends boolean>({
   const [error, setError] = useState<ErrorMessageProps | undefined>(undefined);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const {
-    data: listDatabasesRes,
-    mutate: listDatabasesMutate,
-  } = useListDatabases(getAccessToken, { page, perPage, search });
+  const { data: listDatabasesRes, mutate: listDatabasesMutate } =
+    useListDatabases(getAccessToken, { page, perPage, search });
   const { mutate: getDatabaseMutate } = useGetDatabase(getAccessToken, {
     databaseId,
   });
@@ -233,9 +231,8 @@ export const DatabaseEditModal = <T extends boolean>({
       if (add) {
         procAfterFailAdd(saveDatabaseError);
       } else {
-        const { reason, instruction } = extractErrorMessageFromFetchError(
-          saveDatabaseError
-        );
+        const { reason, instruction } =
+          extractErrorMessageFromFetchError(saveDatabaseError);
         setError({ reason, instruction: instruction });
       }
       return;
@@ -244,10 +241,7 @@ export const DatabaseEditModal = <T extends boolean>({
     if (add) {
       const createdDatabaseId =
         saveDatabaseRes?.database_id || requestBody.database_id;
-      const [
-        getConfigRes,
-        getConfigError,
-      ] = await fetchMetaStore(
+      const [getConfigRes, getConfigError] = await fetchMetaStore(
         getAccessToken,
         metaStore.ConfigService.getConfig,
         { databaseId: createdDatabaseId }

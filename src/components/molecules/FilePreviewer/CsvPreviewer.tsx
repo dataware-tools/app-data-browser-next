@@ -20,7 +20,7 @@ export const CsvPreviewer = ({
       })
       .then((text) => {
         if (text) {
-          setContent((parse<string>(text).data as unknown) as string[][]);
+          setContent(parse<string>(text).data as unknown as string[][]);
         }
       });
   }, [url]);

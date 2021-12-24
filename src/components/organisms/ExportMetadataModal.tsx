@@ -132,9 +132,8 @@ export const ExportMetadataModal = ({
   const fetchError = listRecordsError;
   useEffect(() => {
     if (fetchError) {
-      const { reason, instruction } = extractErrorMessageFromFetchError(
-        fetchError
-      );
+      const { reason, instruction } =
+        extractErrorMessageFromFetchError(fetchError);
       setError({ reason, instruction });
     } else {
       setError(undefined);

@@ -20,13 +20,11 @@ Default.args = {
     window.alert("Close");
   },
   file: {
-    path:
-      "/opt/uploaded_data/database_test1/record_20210714-055053-234/test.csv",
+    path: "/opt/uploaded_data/database_test1/record_20210714-055053-234/test.csv",
   },
   fileList: [
     {
-      path:
-        "/opt/uploaded_data/database_test1/record_20210714-055053-234/test.csv",
+      path: "/opt/uploaded_data/database_test1/record_20210714-055053-234/test.csv",
     },
   ],
   fullWidth: true,

@@ -114,9 +114,8 @@ export const DatabaseConfigModal = ({
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<ErrorMessageProps | undefined>(undefined);
-  const [databaseConfig, setDatabaseConfig] = useRecoilState(
-    databaseConfigState
-  );
+  const [databaseConfig, setDatabaseConfig] =
+    useRecoilState(databaseConfigState);
   const [tabIndex, setTabIndex] = useState(0);
 
   const {
@@ -136,9 +135,8 @@ export const DatabaseConfigModal = ({
   const fetchError = getConfigError;
   useEffect(() => {
     if (fetchError) {
-      const { reason, instruction } = extractErrorMessageFromFetchError(
-        fetchError
-      );
+      const { reason, instruction } =
+        extractErrorMessageFromFetchError(fetchError);
       setError({ reason, instruction });
     } else {
       setError(undefined);
@@ -175,9 +173,8 @@ export const DatabaseConfigModal = ({
     );
 
     if (updateConfigError) {
-      const { reason, instruction } = extractErrorMessageFromFetchError(
-        updateConfigError
-      );
+      const { reason, instruction } =
+        extractErrorMessageFromFetchError(updateConfigError);
       setError({ reason, instruction });
     } else {
       getConfigMutate(updateConfigRes);

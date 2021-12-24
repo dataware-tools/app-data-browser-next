@@ -9,7 +9,8 @@ import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
 export type ActionType = "update" | "delete";
 type OptionsType = { label: string; value: string }[];
 
-export type OptionSharingSelectsItemPresentationProps = OptionSharingSelectsItemProps;
+export type OptionSharingSelectsItemPresentationProps =
+  OptionSharingSelectsItemProps;
 
 export type OptionSharingSelectsItemProps = {
   value: string;
