@@ -54,9 +54,8 @@ export const DisplayFieldsConfigBodyPresentation = ({
 };
 
 export const DisplayFieldsConfigBody = (): JSX.Element => {
-  const [databaseConfig, setDatabaseConfig] = useRecoilState(
-    databaseConfigState
-  );
+  const [databaseConfig, setDatabaseConfig] =
+    useRecoilState(databaseConfigState);
   const [numOfDisplayColumns, setNumOfDisplayColumns] = useState<number>(
     databaseConfig?.columns.filter((column) => column.is_display_field)
       .length || 0
@@ -78,55 +77,53 @@ export const DisplayFieldsConfigBody = (): JSX.Element => {
         )
       : tempDisplayColumns;
 
-  const onChangeDisplayColumns: DisplayFieldsConfigBodyPresentationProps["onChangeDisplayColumns"] = (
-    newDisplayColumns
-  ) => {
-    setNumOfDisplayColumns(newDisplayColumns.length);
-    if (databaseConfig) {
-      const newDatabaseConfig = produce(databaseConfig, (draft) => {
-        draft.columns = draft.columns.map((column) => ({
-          ...column,
-          is_display_field: newDisplayColumns.includes(column.name),
-        }));
+  const onChangeDisplayColumns: DisplayFieldsConfigBodyPresentationProps["onChangeDisplayColumns"] =
+    (newDisplayColumns) => {
+      setNumOfDisplayColumns(newDisplayColumns.length);
+      if (databaseConfig) {
+        const newDatabaseConfig = produce(databaseConfig, (draft) => {
+          draft.columns = draft.columns.map((column) => ({
+            ...column,
+            is_display_field: newDisplayColumns.includes(column.name),
+          }));
 
-        draft.columns.sort((a, b) => {
-          if (
-            newDisplayColumns.includes(a.name) &&
-            newDisplayColumns.includes(b.name)
-          ) {
-            return (
-              newDisplayColumns.indexOf(a.name) -
-              newDisplayColumns.indexOf(b.name)
-            );
-          } else if (newDisplayColumns.includes(a.name)) {
-            return -1;
-          } else if (newDisplayColumns.includes(b.name)) {
-            return 1;
-          } else {
-            return compStr(a.name, b.name);
-          }
+          draft.columns.sort((a, b) => {
+            if (
+              newDisplayColumns.includes(a.name) &&
+              newDisplayColumns.includes(b.name)
+            ) {
+              return (
+                newDisplayColumns.indexOf(a.name) -
+                newDisplayColumns.indexOf(b.name)
+              );
+            } else if (newDisplayColumns.includes(a.name)) {
+              return -1;
+            } else if (newDisplayColumns.includes(b.name)) {
+              return 1;
+            } else {
+              return compStr(a.name, b.name);
+            }
+          });
         });
-      });
-      setDatabaseConfig(newDatabaseConfig);
-    }
-  };
+        setDatabaseConfig(newDatabaseConfig);
+      }
+    };
 
   const recordTitleColumn =
     databaseConfig?.columns.find((column) => column.is_record_title)?.name ||
     "";
-  const onChangeRecordTitleColumn: DisplayFieldsConfigBodyPresentationProps["onChangeRecordTitleColumn"] = (
-    newTitleColumn
-  ) => {
-    if (databaseConfig) {
-      const newDatabaseConfig = produce(databaseConfig, (draft) => {
-        draft.columns = draft.columns.map((column) => ({
-          ...column,
-          is_record_title: column.name === newTitleColumn,
-        }));
-      });
-      setDatabaseConfig(newDatabaseConfig);
-    }
-  };
+  const onChangeRecordTitleColumn: DisplayFieldsConfigBodyPresentationProps["onChangeRecordTitleColumn"] =
+    (newTitleColumn) => {
+      if (databaseConfig) {
+        const newDatabaseConfig = produce(databaseConfig, (draft) => {
+          draft.columns = draft.columns.map((column) => ({
+            ...column,
+            is_record_title: column.name === newTitleColumn,
+          }));
+        });
+        setDatabaseConfig(newDatabaseConfig);
+      }
+    };
 
   const columnOptions =
     databaseConfig?.columns.map((column) => ({

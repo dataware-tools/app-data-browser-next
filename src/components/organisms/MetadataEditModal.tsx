@@ -98,10 +98,8 @@ export const MetadataEditModal = ({
   ...delegated
 }: MetadataEditModalProps): JSX.Element => {
   const [isSaving, setIsSaving] = useState(false);
-  const [
-    nonFilledRequiredFieldNames,
-    setNonFilledRequiredFieldNames,
-  ] = useState<string[]>([]);
+  const [nonFilledRequiredFieldNames, setNonFilledRequiredFieldNames] =
+    useState<string[]>([]);
 
   const initializeState = () => {
     setIsSaving(false);

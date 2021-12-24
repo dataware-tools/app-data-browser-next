@@ -84,16 +84,13 @@ export const ControlledDatabaseMenuButton = ({
   const isPermittedDeleteDatabase = useIsActionPermitted(
     "databases:write:delete"
   );
-  const [isOpenDatabaseConfigModal, setIsOpenDatabaseConfigModal] = useState(
-    false
-  );
+  const [isOpenDatabaseConfigModal, setIsOpenDatabaseConfigModal] =
+    useState(false);
   const [isOpenDatabaseEditModal, setIsOpenDatabaseEditModal] = useState(false);
-  const [isOpenExportMetadataModal, setIsOpenExportMetadataModal] = useState(
-    false
-  );
-  const [isOpenDatabaseDeleteModal, setIsOpenDatabaseDeleteModal] = useState(
-    false
-  );
+  const [isOpenExportMetadataModal, setIsOpenExportMetadataModal] =
+    useState(false);
+  const [isOpenDatabaseDeleteModal, setIsOpenDatabaseDeleteModal] =
+    useState(false);
   const { data: getDatabaseRes } = useGetDatabase(getAccessToken, {
     databaseId,
   });
@@ -109,24 +106,23 @@ export const ControlledDatabaseMenuButton = ({
       : undefined,
   ];
 
-  const onSelectMenu: ControlledDatabaseMenuButtonPresentationProps["onSelectMenu"] = (
-    targetName
-  ) => {
-    switch (targetName) {
-      case menu[0]?.value:
-        setIsOpenDatabaseConfigModal(true);
-        break;
-      case menu[1]?.value:
-        setIsOpenDatabaseEditModal(true);
-        break;
-      case menu[2]?.value:
-        setIsOpenExportMetadataModal(true);
-        break;
-      case menu[3]?.value:
-        setIsOpenDatabaseDeleteModal(true);
-        break;
-    }
-  };
+  const onSelectMenu: ControlledDatabaseMenuButtonPresentationProps["onSelectMenu"] =
+    (targetName) => {
+      switch (targetName) {
+        case menu[0]?.value:
+          setIsOpenDatabaseConfigModal(true);
+          break;
+        case menu[1]?.value:
+          setIsOpenDatabaseEditModal(true);
+          break;
+        case menu[2]?.value:
+          setIsOpenExportMetadataModal(true);
+          break;
+        case menu[3]?.value:
+          setIsOpenDatabaseDeleteModal(true);
+          break;
+      }
+    };
 
   return (
     <ControlledDatabaseMenuButtonPresentation
