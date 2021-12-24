@@ -40,7 +40,7 @@
     "@mui/lab": "^5.0.0-alpha.61",
     "@mui/material": "^5.2.4",
     "@mui/styles": "^5.2.3",
-    "@mui/x-data-grid": "^5.2.0",
+    "@mui/x-data-grid": "^5.2.1",
     "immer": "^9.0.7",
     "papaparse": "^5.3.1",
     "pigeon-maps": "^0.19.7",
