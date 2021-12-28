@@ -8,6 +8,7 @@ import { SwrOptions } from "../src/utils";
 import { userActionsState } from "../src/globalStates";
 import { databaseConfigState } from "../src/components/organisms/DatabaseConfigModal/DatabaseConfigState";
 import { RecoilRoot } from "recoil";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 export const parameters = {
   actions: { argTypesRegex: "^on[A-Z].*" },
@@ -84,7 +85,9 @@ export const decorators = [
                   set(databaseConfigState, initialDatabaseConfig);
                 }}
               >
-                <Story {...context} />
+                <BrowserRouter>
+                  <Story {...context} />
+                </BrowserRouter>
               </RecoilRoot>
             </SWRConfig>
           </ThemeProvider>
