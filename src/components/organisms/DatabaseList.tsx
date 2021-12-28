@@ -7,7 +7,7 @@ import {
 } from "@dataware-tools/app-common";
 import { DataGrid, GridColumns, DataGridProps } from "@mui/x-data-grid";
 import { useState, useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { DatabaseListItemProps } from "components/organisms/DatabaseListItem";
 import { ParamTypeListDatabases, useListDatabases } from "utils";
 
@@ -54,7 +54,7 @@ export const DatabaseList = ({
   search,
 }: DatabaseListProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
-  const history = useHistory();
+  const navigate = useNavigate();
   const [error, setError] = useState<
     DatabaseListPresentationProps["error"] | undefined
   >(undefined);
@@ -76,7 +76,7 @@ export const DatabaseList = ({
   const onSelectDatabase: DatabaseListPresentationProps["onSelectDatabase"] = (
     data
   ) => {
-    history.push(`/databases/${data.id}/records`);
+    navigate(`/databases/${data.id}/records`);
   };
 
   const columns: GridColumns = [

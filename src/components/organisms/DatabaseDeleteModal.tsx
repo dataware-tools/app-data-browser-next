@@ -18,7 +18,7 @@ import {
   Control,
   FieldErrors,
 } from "react-hook-form";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
 import { databasePaginateState } from "globalStates";
@@ -101,7 +101,7 @@ export const DatabaseDeleteModal = ({
   onClose: propsOnClose,
 }: DatabaseDeleteModalProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
-  const history = useHistory();
+  const navigate = useNavigate();
   const { page, perPage, search } = useRecoilValue(databasePaginateState);
   const {
     control,
@@ -162,7 +162,7 @@ export const DatabaseDeleteModal = ({
           cancelCloseModal = true;
         } else if (deleteDatabaseRes) {
           listDatabaseMutate();
-          history.push(APP_ROUTE.DATABASE_LIST);
+          navigate(APP_ROUTE.DATABASE_LIST);
         }
       },
       () => {

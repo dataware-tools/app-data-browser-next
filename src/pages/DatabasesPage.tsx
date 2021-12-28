@@ -19,7 +19,7 @@ import {
 import StorageIcon from "@mui/icons-material/Storage";
 import Pagination from "@mui/material/Pagination";
 import { useEffect } from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useRecoilState } from "recoil";
 import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
 import { Breadcrumbs } from "components/molecules/Breadcrumbs";
@@ -118,7 +118,7 @@ export const DatabasesPagePresentation = ({
 
 export const DatabasesPage = (): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
-  const history = useHistory();
+  const navigate = useNavigate();
   const [{ page, perPage, search }, setDatabasePaginateState] = useRecoilState(
     databasePaginateState
   );
@@ -157,7 +157,7 @@ export const DatabasesPage = (): JSX.Element => {
 
   const onAddDatabaseSucceeded: DatabasesPagePresentationProps["onAddDatabaseSucceeded"] =
     (newDatabase) => {
-      history.push(`/databases/${newDatabase.database_id}/records?new=true`);
+      navigate(`/databases/${newDatabase.database_id}/records?new=true`);
     };
 
   const error: DatabasesPagePresentationProps["error"] = listDatabasesError
