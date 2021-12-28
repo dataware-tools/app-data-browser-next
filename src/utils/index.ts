@@ -1,5 +1,6 @@
 import { metaStore } from "@dataware-tools/api-meta-store-client";
 import { AUTH_CONFIG } from "@dataware-tools/app-common";
+import { SWRConfig } from "swr";
 import { fetchMetaStore } from "utils";
 import { DatabaseConfigType, DatabaseColumnsConfigType } from "utils/utilTypes";
 
@@ -9,8 +10,9 @@ const APP_ROUTE = {
   RECORD_LIST: "/databases/:database_id/records",
 };
 
-const SwrOptions = {
+const SwrOptions: Parameters<typeof SWRConfig>[0]["value"] = {
   errorRetryCount: 1,
+  fetcher: (url) => fetch(url).then((res) => res.json()),
 };
 
 const authConfig = {
