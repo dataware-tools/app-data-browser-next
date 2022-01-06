@@ -61,6 +61,12 @@ export const RecordInfoPresentation = ({
               }}
               displayDataTypes={false}
               quotesOnKeys={false}
+              enableClipboard={async (copyContext) => {
+                console.log(JSON.stringify(copyContext.src));
+                await navigator.clipboard.writeText(
+                  JSON.stringify(copyContext.src)
+                );
+              }}
               collapseStringsAfterLength={80}
               collapsed={1}
             />
