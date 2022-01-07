@@ -28,6 +28,7 @@ export const MetadataInputFieldList = ({
         const displayName = field.display_name;
         const necessity = field.necessity;
         const required = necessity === "required";
+        const recommended = necessity === "recommended";
         const dataTypeMap = {
           string: "text" as const,
           str: "text" as const,
@@ -81,7 +82,11 @@ export const MetadataInputFieldList = ({
                       inputMode={inputModeMap[field.dtype]}
                       error={Boolean(validateError)}
                       helperText={
-                        validateError ? validateError.message : undefined
+                        validateError
+                          ? validateError.message
+                          : required || recommended
+                          ? `This is ${necessity}`
+                          : undefined
                       }
                     />
                   );
