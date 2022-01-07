@@ -1,24 +1,25 @@
 import { Spacer } from "@dataware-tools/app-common";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
+import { Control, Controller, ControllerProps } from "react-hook-form";
 import { DatabaseColumnsConfigType } from "utils";
 
-type MetadataType = Record<string, unknown>;
-
 type FieldType = DatabaseColumnsConfigType[number];
+type ValidateRuleType = ControllerProps["rules"];
+type FormType = { [name: string]: string | number };
 
 export type MetadataInputFieldListProps = {
-  currentMetadata?: MetadataType;
   fields: FieldType[];
-  nonFilledRequiredFieldNames: string[];
   prefixInputElementId: string;
+  formControl: Control<FormType>;
+  validateRules: Record<keyof FormType, ValidateRuleType>;
 };
 
 export const MetadataInputFieldList = ({
-  currentMetadata,
   fields,
-  nonFilledRequiredFieldNames,
   prefixInputElementId,
+  formControl,
+  validateRules,
 }: MetadataInputFieldListProps): JSX.Element => {
   return (
     <Box sx={{ display: "flex", flexDirection: "column" }}>
@@ -32,12 +33,23 @@ export const MetadataInputFieldList = ({
           string: "text" as const,
           str: "text" as const,
           text: "text" as const,
-          integer: "number" as const,
-          int: "number" as const,
-          float: "number" as const,
-          double: "number" as const,
-          number: "number" as const,
+          integer: "text" as const,
+          int: "text" as const,
+          float: "text" as const,
+          double: "text" as const,
+          number: "text" as const,
           datetime: "datetime-local" as const,
+        };
+        const inputModeMap = {
+          string: "text" as const,
+          str: "text" as const,
+          text: "text" as const,
+          integer: "numeric" as const,
+          int: "numeric" as const,
+          float: "decimal" as const,
+          double: "decimal" as const,
+          number: "decimal" as const,
+          datetime: "none" as const,
         };
         const id = `${prefixInputElementId}_${name.replace(/\s+/g, "")}`;
         return (
@@ -53,16 +65,32 @@ export const MetadataInputFieldList = ({
               {displayName}
             </Box>
             <Box sx={{ padding: "0 3vw" }}>
-              <TextField
-                fullWidth
-                key={field.name}
-                type={dataTypeMap[field.dtype]}
-                id={id}
-                defaultValue={currentMetadata?.[name]}
-                error={nonFilledRequiredFieldNames.includes(name)}
-                helperText={
-                  required || recommended ? `This is ${necessity}` : undefined
-                }
+              <Controller
+                name={name}
+                control={formControl}
+                rules={validateRules[name]}
+                render={({
+                  field: hookFormProps,
+                  fieldState: { error: validateError },
+                }) => {
+                  return (
+                    <TextField
+                      {...hookFormProps}
+                      id={id}
+                      fullWidth
+                      type={dataTypeMap[field.dtype]}
+                      inputMode={inputModeMap[field.dtype]}
+                      error={Boolean(validateError)}
+                      helperText={
+                        validateError
+                          ? validateError.message
+                          : required || recommended
+                          ? `This is ${necessity}`
+                          : undefined
+                      }
+                    />
+                  );
+                }}
               />
             </Box>
             <Spacer direction="vertical" size="3vh" />

@@ -15,23 +15,26 @@ import {
 } from "@dataware-tools/app-common";
 import LoadingButton from "@mui/lab/LoadingButton";
 import Dialog from "@mui/material/Dialog";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useForm } from "react-hook-form";
 import {
   MetadataInputFieldList,
   MetadataInputFieldListProps,
 } from "components/organisms/MetadataInputFieldList";
 
 export type MetadataEditModalPresentationProps = {
-  nonFilledRequiredFieldNames: MetadataInputFieldListProps["nonFilledRequiredFieldNames"];
   prefixInputElementId: MetadataInputFieldListProps["prefixInputElementId"];
   isSaving: boolean;
   onSave: () => void;
-} & Omit<MetadataEditModalProps, "onSubmit">;
+} & Omit<MetadataEditModalProps, "onSubmit"> &
+  Pick<MetadataInputFieldListProps, "formControl" | "validateRules">;
+
+type MetadataType = Record<string, string | number>;
 
 export type MetadataEditModalProps = {
   open: boolean;
   create?: boolean;
-  currentMetadata: MetadataInputFieldListProps["currentMetadata"];
+  currentMetadata?: MetadataType;
   fields: MetadataInputFieldListProps["fields"];
   error?: ErrorMessageProps;
   title: string;
@@ -39,18 +42,20 @@ export type MetadataEditModalProps = {
   onSubmit: (newMetadata: Record<string, unknown>) => Promise<boolean>;
 };
 
+type FormInput = MetadataType;
+
 export const MetadataEditModalPresentation = ({
   open,
   error,
   create,
   currentMetadata,
   fields,
-  nonFilledRequiredFieldNames,
   prefixInputElementId,
   isSaving,
   title,
   onClose,
   onSave,
+  ...delegated
 }: MetadataEditModalPresentationProps): JSX.Element => {
   return (
     <Dialog open={open} maxWidth="xl" onClose={onClose}>
@@ -65,10 +70,9 @@ export const MetadataEditModalPresentation = ({
               <DialogBody>
                 <DialogMain>
                   <MetadataInputFieldList
-                    currentMetadata={currentMetadata}
                     fields={fields}
-                    nonFilledRequiredFieldNames={nonFilledRequiredFieldNames}
                     prefixInputElementId={prefixInputElementId}
+                    {...delegated}
                   />
                 </DialogMain>
                 <DialogToolBar
@@ -95,16 +99,43 @@ export const MetadataEditModal = ({
   create,
   fields,
   onSubmit,
+  currentMetadata,
   ...delegated
 }: MetadataEditModalProps): JSX.Element => {
   const [isSaving, setIsSaving] = useState(false);
-  const [nonFilledRequiredFieldNames, setNonFilledRequiredFieldNames] =
-    useState<string[]>([]);
+
+  const filterCurrenMetadata = useCallback(
+    (metadata: MetadataType | undefined) => {
+      if (!metadata) {
+        return undefined;
+      }
+      const result = {};
+      const filteredKeys = Object.keys(metadata).filter((name) =>
+        fields.some((field) => field.name === name)
+      );
+      filteredKeys.forEach((key) => (result[key] = metadata[key]));
+      return result;
+    },
+    []
+  );
+
+  const {
+    control,
+    formState: { errors: validateErrors },
+    handleSubmit,
+    reset,
+    clearErrors,
+    setFocus,
+  } = useForm<FormInput>({
+    defaultValues: filterCurrenMetadata(currentMetadata),
+  });
 
   const initializeState = () => {
     setIsSaving(false);
-    setNonFilledRequiredFieldNames([]);
+    reset(filterCurrenMetadata(currentMetadata));
+    clearErrors();
   };
+
   const prevOpen = usePrevious(open);
   useEffect(() => {
     if (open && !prevOpen) {
@@ -112,24 +143,46 @@ export const MetadataEditModal = ({
     }
   }, [open, prevOpen]);
 
+  const prevCurrentMetadata = usePrevious(currentMetadata);
+  useEffect(() => {
+    if (currentMetadata && !prevCurrentMetadata) {
+      reset(filterCurrenMetadata(currentMetadata));
+    }
+  }, [reset, currentMetadata, prevCurrentMetadata, filterCurrenMetadata]);
+
+  const validateRules: MetadataEditModalPresentationProps["validateRules"] = {};
+  fields.forEach((field) => {
+    validateRules[field.name] = {
+      required: {
+        value: field.necessity === "required",
+        message: `${field.display_name} is required`,
+      },
+      pattern: ["integer", "int", "float", "double", "number"].includes(
+        field.dtype
+      )
+        ? {
+            value: /^-?\d{1,}\.?\d*$/,
+            message: `${field.display_name} should be number`,
+          }
+        : undefined,
+    };
+  });
+
   const prefixInputElementId = "MetadataEditModal";
-  const onSave = async () => {
+  const onSave = handleSubmit(async (values) => {
     if (fields) {
       setIsSaving(true);
-      const newMetadata = {};
 
       const nonFilledRequired: string[] = [];
       const nonFilledRecommends: string[] = [];
 
-      fields.forEach((config) => {
-        const inputEl = document.getElementById(
-          `${prefixInputElementId}_${config.name.replace(/\s+/g, "")}`
-        ) as HTMLInputElement;
-        if (config.necessity === "required" && !inputEl.value) {
-          nonFilledRequired.push(config.name);
+      fields.forEach((field) => {
+        const error = validateErrors[field.name];
+        if (error?.type === "required") {
+          nonFilledRequired.push(field.name);
         }
-        if (config.necessity === "recommended" && !inputEl.value) {
-          nonFilledRecommends.push(config.name);
+        if (field.necessity === "recommended" && !values[field.name]) {
+          nonFilledRecommends.push(field.name);
         }
       });
 
@@ -137,11 +190,9 @@ export const MetadataEditModal = ({
         await alert({
           title: `${JSON.stringify(nonFilledRequired)} is required`,
         });
-        setNonFilledRequiredFieldNames(nonFilledRequired);
+        setFocus(nonFilledRequired[0]);
         setIsSaving(false);
         return;
-      } else {
-        setNonFilledRequiredFieldNames([]);
       }
 
       if (nonFilledRecommends.length > 0) {
@@ -152,19 +203,13 @@ export const MetadataEditModal = ({
             )} is recommended. Are you sure to save?`,
           }))
         ) {
+          setFocus(nonFilledRecommends[0]);
           setIsSaving(false);
           return;
         }
       }
 
-      fields.forEach((config) => {
-        const inputEl = document.getElementById(
-          `${prefixInputElementId}_${config.name.replace(/\s+/g, "")}`
-        ) as HTMLInputElement;
-        newMetadata[config.name] = inputEl.value;
-      });
-
-      const isSubmitSucceed = await onSubmit(newMetadata);
+      const isSubmitSucceed = await onSubmit(values);
 
       setIsSaving(false);
       if (!isSubmitSucceed) {
@@ -173,19 +218,21 @@ export const MetadataEditModal = ({
       }
     }
     onClose();
-  };
+  });
 
   return (
     <MetadataEditModalPresentation
       {...delegated}
       fields={fields}
       isSaving={isSaving}
-      nonFilledRequiredFieldNames={nonFilledRequiredFieldNames}
       onClose={onClose}
       onSave={onSave}
       open={open}
       prefixInputElementId={prefixInputElementId}
       create={create}
+      formControl={control}
+      currentMetadata={currentMetadata}
+      validateRules={validateRules}
     />
   );
 };
