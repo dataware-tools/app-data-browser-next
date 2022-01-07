@@ -1,6 +1,6 @@
 import { AppState, Auth0Provider } from "@auth0/auth0-react";
 import { PageWrapper } from "@dataware-tools/app-common";
-import { BrowserRouter, Switch, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import packageInfo from "../package.json";
 import { authConfig, redirectUri } from "./utils/index";
 import { DatabasesPage } from "pages/DatabasesPage";
@@ -32,19 +32,16 @@ const Router = (): JSX.Element | null => {
           redirectUri={redirectUri}
           onRedirectCallback={onRedirectCallback}
         >
-          <Switch>
-            <PageWrapper repository={packageInfo.repository}>
-              <Route exact path="/">
-                <IndexPage />
-              </Route>
-              <Route exact path="/databases">
-                <DatabasesPage />
-              </Route>
-              <Route exact path="/databases/:databaseId/records">
-                <RecordsPage />
-              </Route>
-            </PageWrapper>
-          </Switch>
+          <PageWrapper repository={packageInfo.repository}>
+            <Routes>
+              <Route path="/" element={<IndexPage />} />
+              <Route path="/databases" element={<DatabasesPage />} />
+              <Route
+                path="/databases/:databaseId/records"
+                element={<RecordsPage />}
+              />
+            </Routes>
+          </PageWrapper>
         </Auth0Provider>
       </BrowserRouter>
     </>

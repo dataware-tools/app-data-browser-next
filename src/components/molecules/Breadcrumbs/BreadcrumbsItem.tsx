@@ -2,7 +2,7 @@ import Box from "@mui/material/Box";
 import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
 import React from "react";
-import { useHistory } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 export type BreadcrumbsItemProps = {
   link?: string;
@@ -15,13 +15,13 @@ export const BreadcrumbsItem = ({
   icon,
   text,
 }: BreadcrumbsItemProps): JSX.Element => {
-  const history = useHistory();
+  const navigate = useNavigate();
 
   const handleClick = (
     event: React.MouseEvent<HTMLAnchorElement, MouseEvent>
   ) => {
     event.preventDefault();
-    if (link) history.push(link);
+    if (link) navigate(link);
   };
 
   const Body = ({ icon, text }: { icon?: JSX.Element; text: string }) => (

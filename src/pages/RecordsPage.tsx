@@ -313,7 +313,7 @@ export const RecordsPage = (): JSX.Element => {
   return (
     <RecordsPagePresentation
       error={error}
-      databaseId={databaseId}
+      databaseId={databaseId || ""}
       databaseName={databaseName}
       isFetchComplete={isFetchComplete}
       onAddRecordSucceeded={onAddRecordSucceeded}
