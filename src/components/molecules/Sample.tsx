@@ -1,7 +1,7 @@
 import { useAuth0 } from "@auth0/auth0-react";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
-import { mutate } from "swr";
+import { useSWRConfig } from "swr";
 import { useListDatabases } from "utils/index";
 
 export type SamplePresentationProps = {
@@ -43,6 +43,7 @@ export const SamplePresentation = ({
 
 export const Sample = ({ ...delegated }: SampleProps): JSX.Element => {
   const { user, getAccessTokenSilently: getAccessToken } = useAuth0();
+  const { mutate } = useSWRConfig();
   const { data, error, cacheKey } = useListDatabases(getAccessToken, {});
   const onRevalidate = () => {
     mutate(cacheKey);
