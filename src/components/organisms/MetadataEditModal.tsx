@@ -161,7 +161,7 @@ export const MetadataEditModal = ({
         field.dtype
       )
         ? {
-            value: /^-?\d{1,}.?\d*$/,
+            value: /^-?\d{1,}\.?\d*$/,
             message: `${field.display_name} should be number`,
           }
         : undefined,
