@@ -15,7 +15,6 @@ const Template: Story<MetadataInputFieldListProps> = (args) => (
 
 export const Default = Template.bind({});
 Default.args = {
-  currentMetadata: { required: "required" },
   fields: [
     {
       name: "required",
@@ -40,5 +39,4 @@ Default.args = {
     },
   ],
   prefixInputElementId: "#",
-  nonFilledRequiredFieldNames: [],
 };
