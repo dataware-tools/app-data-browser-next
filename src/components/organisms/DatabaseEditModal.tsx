@@ -12,11 +12,13 @@ import {
   ErrorMessage,
   usePrevious,
   extractErrorMessageFromFetchError,
+  confirm,
 } from "@dataware-tools/app-common";
 import LoadingButton from "@mui/lab/LoadingButton";
 import Box from "@mui/material/Box";
 import Dialog, { DialogProps } from "@mui/material/Dialog";
 import TextField from "@mui/material/TextField";
+import equal from "fast-deep-equal";
 import { useEffect, useState } from "react";
 import {
   useForm,
@@ -40,9 +42,10 @@ export type DatabaseEditModalPresentationProps<T extends boolean> = {
   error?: ErrorMessageProps;
   formErrors: FieldErrors<FormInput>;
   control: Control<FormInput>;
+  onClose: (reason?: string) => void;
 } & Omit<
   DatabaseEditModalProps<T>,
-  "onSubmitSucceeded" | "databaseId" | "currentData"
+  "onSubmitSucceeded" | "databaseId" | "currentData" | "onClose"
 >;
 
 export type DatabaseEditModalProps<T extends boolean> = {
@@ -70,7 +73,7 @@ export const DatabaseEditModalPresentation = <T extends boolean>({
   ...delegated
 }: DatabaseEditModalPresentationProps<T>): JSX.Element => {
   return (
-    <Dialog {...delegated} onClose={onClose}>
+    <Dialog {...delegated} onClose={(_, reason) => onClose(reason)}>
       <DialogWrapper>
         <DialogCloseButton onClick={onClose} />
         <DialogTitle>{`${add ? "Add" : "Update"} database`}</DialogTitle>
@@ -164,7 +167,7 @@ export const DatabaseEditModalPresentation = <T extends boolean>({
 export const DatabaseEditModal = <T extends boolean>({
   onSubmitSucceeded,
   open,
-  onClose,
+  onClose: propsOnClose,
   databaseId,
   add,
   currentData,
@@ -175,6 +178,8 @@ export const DatabaseEditModal = <T extends boolean>({
     control,
     formState: { errors: formErrors },
     handleSubmit,
+    getValues,
+    reset,
   } = useForm<FormInput>({ defaultValues: currentData });
   const { page, perPage, search } = useRecoilValue(databasePaginateState);
   const [error, setError] = useState<ErrorMessageProps | undefined>(undefined);
@@ -189,6 +194,7 @@ export const DatabaseEditModal = <T extends boolean>({
   const initializeState = () => {
     setError(undefined);
     setIsSubmitting(false);
+    reset(currentData);
   };
   const prevOpen = usePrevious(open);
   useEffect(() => {
@@ -276,9 +282,44 @@ export const DatabaseEditModal = <T extends boolean>({
 
     getDatabaseMutate(saveDatabaseRes);
     setIsSubmitting(false);
-    onClose();
+    propsOnClose();
   };
 
+  const onClose = async (reason?: string) => {
+    const confirmClosingModal = async () => {
+      return await confirm({
+        title: "Are you sure you want close this dialog?",
+        body: "Changed data will not be saved",
+        confirmText: "Close",
+        confirmMode: "delete",
+      });
+    };
+
+    switch (reason) {
+      case "backdropClick":
+      case "escapeKeyDown":
+        if (
+          add &&
+          Object.values(getValues()).some(
+            (value) => value !== "" && value != null
+          )
+        ) {
+          if (!(await confirmClosingModal())) {
+            return;
+          }
+        } else if (!add && currentData && !equal(currentData, getValues())) {
+          if (!(await confirmClosingModal())) {
+            return;
+          }
+        }
+
+        propsOnClose();
+        break;
+
+      default:
+        propsOnClose();
+    }
+  };
   return (
     <DatabaseEditModalPresentation
       add={add}
