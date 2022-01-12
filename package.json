@@ -1,12 +1,11 @@
 {
   "name": "app-data-browser",
   "engines": {
-    "node": "16.10.0",
-    "engine": "^7.x"
+    "node": "16",
+    "engine": "8"
   },
   "volta": {
-    "node": "16.10.0",
-    "npm": "7.24.2"
+    "node": "16.13.1"
   },
   "version": "0.0.0",
   "basePath": "/data-browser/",
