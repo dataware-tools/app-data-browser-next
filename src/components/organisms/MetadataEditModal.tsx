@@ -15,6 +15,7 @@ import {
 } from "@dataware-tools/app-common";
 import LoadingButton from "@mui/lab/LoadingButton";
 import Dialog from "@mui/material/Dialog";
+import equal from "fast-deep-equal";
 import { useState, useEffect, useCallback } from "react";
 import { useForm } from "react-hook-form";
 import {
@@ -26,7 +27,8 @@ export type MetadataEditModalPresentationProps = {
   prefixInputElementId: MetadataInputFieldListProps["prefixInputElementId"];
   isSaving: boolean;
   onSave: () => void;
-} & Omit<MetadataEditModalProps, "onSubmit"> &
+  onClose: (reason?: string) => Promise<void> | void;
+} & Omit<MetadataEditModalProps, "onSubmit" | "onClose"> &
   Pick<MetadataInputFieldListProps, "formControl" | "validateRules">;
 
 type MetadataType = Record<string, string | number>;
@@ -58,7 +60,7 @@ export const MetadataEditModalPresentation = ({
   ...delegated
 }: MetadataEditModalPresentationProps): JSX.Element => {
   return (
-    <Dialog open={open} maxWidth="xl" onClose={onClose}>
+    <Dialog open={open} maxWidth="xl" onClose={(_, reason) => onClose(reason)}>
       <DialogWrapper>
         <DialogCloseButton onClick={onClose} />
         <DialogTitle>{title}</DialogTitle>
@@ -95,7 +97,7 @@ export const MetadataEditModalPresentation = ({
 
 export const MetadataEditModal = ({
   open,
-  onClose,
+  onClose: propsOnClose,
   create,
   fields,
   onSubmit,
@@ -126,6 +128,7 @@ export const MetadataEditModal = ({
     reset,
     clearErrors,
     setFocus,
+    getValues,
   } = useForm<FormInput>({
     defaultValues: filterCurrenMetadata(currentMetadata),
   });
@@ -223,8 +226,48 @@ export const MetadataEditModal = ({
         return;
       }
     }
-    onClose();
+    propsOnClose();
   });
+
+  const onClose = async (reason?: string) => {
+    const confirmClosingModal = async () => {
+      return await confirm({
+        title: "Are you sure you want close this dialog?",
+        body: "Changed data will not be saved",
+        confirmText: "Close",
+        confirmMode: "delete",
+      });
+    };
+
+    switch (reason) {
+      case "backdropClick":
+      case "escapeKeyDown":
+        if (
+          create &&
+          Object.values(getValues()).some(
+            (value) => value !== "" && value != null
+          )
+        ) {
+          if (!(await confirmClosingModal())) {
+            return;
+          }
+        } else if (
+          !create &&
+          currentMetadata &&
+          !equal(filterCurrenMetadata(currentMetadata), getValues())
+        ) {
+          if (!(await confirmClosingModal())) {
+            return;
+          }
+        }
+
+        propsOnClose();
+        break;
+
+      default:
+        propsOnClose();
+    }
+  };
 
   return (
     <MetadataEditModalPresentation

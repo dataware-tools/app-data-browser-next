@@ -14,9 +14,11 @@ import {
   LoadingIndicator,
   ErrorMessage,
   DialogToolBar,
+  confirm,
 } from "@dataware-tools/app-common";
 import LoadingButton, { LoadingButtonProps } from "@mui/lab/LoadingButton";
 import Dialog from "@mui/material/Dialog";
+import equal from "fast-deep-equal";
 import { useState, useEffect } from "react";
 import { useRecoilState } from "recoil";
 import { databaseConfigState } from "./DatabaseConfigState";
@@ -37,7 +39,8 @@ export type DatabaseConfigModalPresentationProps = {
   isDisableSaveButton: LoadingButtonProps["disabled"];
   isSaving: LoadingButtonProps["loading"];
   onSave: LoadingButtonProps["onClick"];
-} & DatabaseConfigModalProps;
+  onClose: (reason?: string) => void;
+} & Omit<DatabaseConfigModalProps, "onClose">;
 
 export type DatabaseConfigModalProps = {
   open: boolean;
@@ -58,7 +61,7 @@ export const DatabaseConfigModalPresentation = ({
   onSave,
 }: DatabaseConfigModalPresentationProps): JSX.Element => {
   return (
-    <Dialog open={open} maxWidth="xl" onClose={onClose}>
+    <Dialog open={open} maxWidth="xl" onClose={(_, reason) => onClose(reason)}>
       <DialogWrapper>
         <DialogCloseButton onClick={onClose} />
         <DialogTitle>
@@ -108,7 +111,7 @@ export const DatabaseConfigModalPresentation = ({
 
 export const DatabaseConfigModal = ({
   open,
-  onClose,
+  onClose: propsOnClose,
   databaseId,
 }: DatabaseConfigModalProps): JSX.Element => {
   const { getAccessTokenSilently: getAccessToken } = useAuth0();
@@ -180,12 +183,38 @@ export const DatabaseConfigModal = ({
       getConfigMutate(updateConfigRes);
     }
     setIsSaving(false);
-    onClose();
+    propsOnClose();
   };
 
   const isFetchComplete = Boolean(!fetchError && databaseConfig);
   const isDisableSaveButton = false;
 
+  const onClose = async (reason?: string) => {
+    const confirmClosingModal = async () => {
+      return await confirm({
+        title: "Are you sure you want close this dialog?",
+        body: "Changed data will not be saved",
+        confirmText: "Close",
+        confirmMode: "delete",
+      });
+    };
+
+    switch (reason) {
+      case "backdropClick":
+      case "escapeKeyDown":
+        if (!equal(databaseConfig, getDatabaseConfigRes)) {
+          if (!(await confirmClosingModal())) {
+            return;
+          }
+        }
+
+        propsOnClose();
+        break;
+
+      default:
+        propsOnClose();
+    }
+  };
   return (
     <DatabaseConfigModalPresentation
       databaseId={databaseId}
