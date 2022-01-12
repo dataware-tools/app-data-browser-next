@@ -65,7 +65,7 @@
     "@originjs/vite-plugin-commonjs": "^1.0.2",
     "@storybook/addon-actions": "^6.4.10",
     "@storybook/addon-essentials": "^6.4.12",
-    "@storybook/addon-links": "^6.4.9",
+    "@storybook/addon-links": "^6.4.12",
     "@storybook/react": "^6.4.9",
     "@testing-library/jest-dom": "^5.16.1",
     "@testing-library/react": "^12.1.2",
