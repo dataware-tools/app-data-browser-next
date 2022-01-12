@@ -209,7 +209,13 @@ export const MetadataEditModal = ({
         }
       }
 
-      const isSubmitSucceed = await onSubmit(values);
+      // convert empty string to Null
+      const fixedValues = {};
+      Object.entries(values).forEach(([key, value]) => {
+        fixedValues[key] = value === "" ? null : value;
+      });
+
+      const isSubmitSucceed = await onSubmit(fixedValues);
 
       setIsSaving(false);
       if (!isSubmitSucceed) {
