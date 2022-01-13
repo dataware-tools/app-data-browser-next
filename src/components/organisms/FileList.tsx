@@ -134,7 +134,9 @@ export const FileList = ({
   const onDelete = async (file: metaStore.FileModel) => {
     if (
       !(await confirm({
-        title: "Are you sure you want to delete file?",
+        title: `Are you sure you want to delete ${
+          file.displayPath || getFileName(file.path)
+        }?`,
         confirmMode: "delete",
       }))
     )

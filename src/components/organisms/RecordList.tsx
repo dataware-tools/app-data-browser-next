@@ -126,7 +126,9 @@ export const RecordList = ({
     if (listRecordsRes) {
       if (
         !(await confirm({
-          title: "Are you sure you want to delete record?",
+          title: `Are you sure you want to delete ${
+            record.row.record_name || record.row.record_id
+          }?`,
           confirmMode: "delete",
         }))
       ) {
