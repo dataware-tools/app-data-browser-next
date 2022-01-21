@@ -108,29 +108,31 @@ export const RecordsPagePresentation = ({
               />
             }
             right={
-              isFetchComplete ? (
-                <>
-                  <SearchForm
-                    onSearch={onChangeSearchText}
-                    defaultValue={searchText}
-                  />
-                  <Spacer direction="horizontal" size="15px" />
-                  <PerPageSelect
-                    perPage={perPage}
-                    setPerPage={onChangePerPage}
-                    values={perPageOptions}
-                  />
-                  <RenderToggleByAction required="metadata:write:add">
-                    <Spacer direction="horizontal" size="15px" />
-                    <RecordAddButton
-                      databaseId={databaseId}
-                      onAddRecordSucceeded={onAddRecordSucceeded}
+              <>
+                {isFetchComplete ? (
+                  <>
+                    <SearchForm
+                      onSearch={onChangeSearchText}
+                      defaultValue={searchText}
                     />
-                  </RenderToggleByAction>
-                  <Spacer direction="horizontal" size="15px" />
-                  <ControlledDatabaseMenuButton databaseId={databaseId} />
-                </>
-              ) : null
+                    <Spacer direction="horizontal" size="15px" />
+                    <PerPageSelect
+                      perPage={perPage}
+                      setPerPage={onChangePerPage}
+                      values={perPageOptions}
+                    />
+                    <RenderToggleByAction required="metadata:write:add">
+                      <Spacer direction="horizontal" size="15px" />
+                      <RecordAddButton
+                        databaseId={databaseId}
+                        onAddRecordSucceeded={onAddRecordSucceeded}
+                      />
+                    </RenderToggleByAction>
+                    <Spacer direction="horizontal" size="15px" />
+                  </>
+                ) : null}
+                <ControlledDatabaseMenuButton databaseId={databaseId} />
+              </>
             }
           />
           <PageMain>
