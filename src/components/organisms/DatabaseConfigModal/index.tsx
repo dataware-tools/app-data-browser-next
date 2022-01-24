@@ -15,6 +15,7 @@ import {
   ErrorMessage,
   DialogToolBar,
   confirm,
+  useConfirmClosingWindow,
 } from "@dataware-tools/app-common";
 import LoadingButton, { LoadingButtonProps } from "@mui/lab/LoadingButton";
 import Dialog from "@mui/material/Dialog";
@@ -146,6 +147,17 @@ export const DatabaseConfigModal = ({
     }
   }, [fetchError]);
 
+  const {
+    addEventListener: addEventListenerForConfirmClosingWindow,
+    removeEventListener: removeEventListenerForConfirmClosingWindow,
+  } = useConfirmClosingWindow(() => {
+    if (!equal(databaseConfig, getDatabaseConfigRes)) {
+      return true;
+    }
+
+    return false;
+  });
+
   const initializeState = () => {
     setTabIndex(0);
     setDatabaseConfig(getDatabaseConfigRes);
@@ -154,6 +166,7 @@ export const DatabaseConfigModal = ({
   useEffect(() => {
     if (open && !prevOpen) {
       initializeState();
+      addEventListenerForConfirmClosingWindow();
     }
   }, [open, prevOpen, initializeState]);
 
@@ -207,11 +220,12 @@ export const DatabaseConfigModal = ({
             return;
           }
         }
-
+        removeEventListenerForConfirmClosingWindow();
         propsOnClose();
         break;
 
       default:
+        removeEventListenerForConfirmClosingWindow();
         propsOnClose();
     }
   };
