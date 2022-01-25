@@ -13,6 +13,7 @@ import {
   usePrevious,
   extractErrorMessageFromFetchError,
   confirm,
+  useConfirmClosingWindow,
 } from "@dataware-tools/app-common";
 import LoadingButton from "@mui/lab/LoadingButton";
 import Box from "@mui/material/Box";
@@ -191,6 +192,22 @@ export const DatabaseEditModal = <T extends boolean>({
     databaseId,
   });
 
+  const {
+    addEventListener: addEventListenerForConfirmClosingWindow,
+    removeEventListener: removeEventListenerForConfirmClosingWindow,
+  } = useConfirmClosingWindow(() => {
+    if (
+      add &&
+      Object.values(getValues()).some((value) => value !== "" && value != null)
+    ) {
+      return true;
+    } else if (!add && currentData && !equal(currentData, getValues())) {
+      return true;
+    }
+
+    return false;
+  });
+
   const initializeState = () => {
     setError(undefined);
     setIsSubmitting(false);
@@ -200,6 +217,7 @@ export const DatabaseEditModal = <T extends boolean>({
   useEffect(() => {
     if (open && !prevOpen) {
       initializeState();
+      addEventListenerForConfirmClosingWindow();
     }
   }, [open, prevOpen]);
 
@@ -313,10 +331,12 @@ export const DatabaseEditModal = <T extends boolean>({
           }
         }
 
+        removeEventListenerForConfirmClosingWindow();
         propsOnClose();
         break;
 
       default:
+        removeEventListenerForConfirmClosingWindow();
         propsOnClose();
     }
   };

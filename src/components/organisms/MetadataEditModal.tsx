@@ -12,6 +12,7 @@ import {
   ErrorMessageProps,
   confirm,
   alert,
+  useConfirmClosingWindow,
 } from "@dataware-tools/app-common";
 import LoadingButton from "@mui/lab/LoadingButton";
 import Dialog from "@mui/material/Dialog";
@@ -133,6 +134,23 @@ export const MetadataEditModal = ({
     defaultValues: filterCurrenMetadata(currentMetadata),
   });
 
+  const {
+    addEventListener: addEventListenerForConfirmClosingWindow,
+    removeEventListener: removeEventListenerForConfirmClosingWindow,
+  } = useConfirmClosingWindow(() => {
+    if (
+      create &&
+      Object.values(getValues()).some((value) => value !== "" && value != null)
+    ) {
+      return true;
+    } else if (!create) {
+      // ! currentMetadata is undefined here, And I don't know why... So we can't check original metadata equal to updated metadata
+      return true;
+    }
+
+    return false;
+  });
+
   const initializeState = () => {
     setIsSaving(false);
     reset(filterCurrenMetadata(currentMetadata));
@@ -143,6 +161,7 @@ export const MetadataEditModal = ({
   useEffect(() => {
     if (open && !prevOpen) {
       initializeState();
+      addEventListenerForConfirmClosingWindow();
     }
   }, [open, prevOpen]);
 
@@ -261,10 +280,12 @@ export const MetadataEditModal = ({
           }
         }
 
+        removeEventListenerForConfirmClosingWindow();
         propsOnClose();
         break;
 
       default:
+        removeEventListenerForConfirmClosingWindow();
         propsOnClose();
     }
   };
