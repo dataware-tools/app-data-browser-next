@@ -166,7 +166,7 @@ export const ExportMetadataModal = ({
         let newValue = value;
 
         if (key === "path") {
-          if (value instanceof Array) {
+          if (Array.isArray(value)) {
             newValue = value.filter((element) => {
               return !["", "/", "./.", "./", "/.", "."].includes(element);
             });
@@ -207,7 +207,7 @@ export const ExportMetadataModal = ({
       const flatData = preprocessData(listRecordsRes.data).map((item) => {
         const metadata = {};
         for (const [key, value] of Object.entries(item)) {
-          if (value instanceof Object || value instanceof Array) {
+          if (value instanceof Object || Array.isArray(value)) {
             metadata[key] = `${JSON.stringify(value)}`;
           } else {
             metadata[key] = value;
