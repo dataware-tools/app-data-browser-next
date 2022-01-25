@@ -30,7 +30,7 @@
     "@auth0/auth0-react": "^1.8.0",
     "@dataware-tools/api-file-provider-client": "^1.7.1",
     "@dataware-tools/api-job-store-client": "^1.4.0",
-    "@dataware-tools/api-meta-store-client": "^0.5.2",
+    "@dataware-tools/api-meta-store-client": "^0.5.3",
     "@dataware-tools/api-permission-manager-client": "^0.2.2",
     "@dataware-tools/app-common": "^22.1.4",
     "@emotion/react": "^11.7.1",
