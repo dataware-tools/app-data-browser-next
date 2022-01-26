@@ -1,4 +1,5 @@
 import { useAuth0 } from "@auth0/auth0-react";
+import { RecordModel } from "@dataware-tools/api-meta-store-client/dist/browser/client";
 import {
   DialogBody,
   DialogContainer,
@@ -24,7 +25,7 @@ import { useState, useEffect } from "react";
 
 // See: https://github.com/dolezel/react-csv-downloader#get-csv-contents
 import downloadCSV from "react-csv-downloader/dist/cjs/lib/csv";
-import { useListRecords } from "utils/index";
+import { useGetConfig, useListRecords } from "utils/index";
 
 export type ConfigNameType = "export_metadata";
 
@@ -121,6 +122,13 @@ export const ExportMetadataModal = ({
     }
   }, [open, prevOpen]);
 
+  const { data: databaseConfig, error: databaseConfigError } = useGetConfig(
+    getAccessToken,
+    {
+      databaseId,
+    }
+  );
+
   const { data: listRecordsRes, error: listRecordsError } = useListRecords(
     getAccessToken,
     {
@@ -129,7 +137,7 @@ export const ExportMetadataModal = ({
     }
   );
 
-  const fetchError = listRecordsError;
+  const fetchError = listRecordsError || databaseConfigError;
   useEffect(() => {
     if (fetchError) {
       const { reason, instruction } =
@@ -140,12 +148,50 @@ export const ExportMetadataModal = ({
     }
   }, [fetchError]);
 
+  const preprocessData = (data: RecordModel[]): RecordModel[] => {
+    // This function applies the following pre-processes:
+    // - Map each column-name to display-name
+    // - Remove empty file paths
+
+    const mapper = {};
+    if (databaseConfig) {
+      for (const column of databaseConfig.columns) {
+        mapper[column.name] = column.display_name;
+      }
+    }
+
+    return data.map((item) => {
+      const newData = {};
+      for (const [key, value] of Object.entries(item)) {
+        let newValue = value;
+
+        if (key === "path") {
+          if (Array.isArray(value)) {
+            newValue = value.filter((element) => {
+              return !["", "/", "./.", "./", "/.", "."].includes(element);
+            });
+          }
+        }
+
+        if (Object.keys(mapper).includes(key)) {
+          newData[mapper[key]] = newValue;
+        } else {
+          newData[key] = newValue;
+        }
+      }
+      return newData;
+    });
+  };
+
   const exportAsJSON = () => {
     if (listRecordsRes) {
       const fileName = `metadata-${databaseId}.json`;
-      const data = new Blob([JSON.stringify(listRecordsRes.data)], {
-        type: "text/json",
-      });
+      const data = new Blob(
+        [JSON.stringify(preprocessData(listRecordsRes.data))],
+        {
+          type: "text/json",
+        }
+      );
       const jsonURL = window.URL.createObjectURL(data);
       const link = document.createElement("a");
       document.body.appendChild(link);
@@ -158,17 +204,21 @@ export const ExportMetadataModal = ({
 
   const exportAsCSV = () => {
     if (listRecordsRes) {
-      const flatData = listRecordsRes.data.map((item) => {
+      const flatData = preprocessData(listRecordsRes.data).map((item) => {
         const metadata = {};
         for (const [key, value] of Object.entries(item)) {
-          metadata[key] = `"${JSON.stringify(value)}"`;
+          if (value instanceof Object || Array.isArray(value)) {
+            metadata[key] = `${JSON.stringify(value)}`;
+          } else {
+            metadata[key] = value;
+          }
         }
         return metadata;
       });
 
-      // TODO: Support mapping column names to display-names
       downloadCSV({
         datas: flatData,
+        wrapColumnChar: '"',
       }).then((csv) => {
         const fileName = `metadata-${databaseId}.csv`;
         const data = new Blob([String(csv)], {
