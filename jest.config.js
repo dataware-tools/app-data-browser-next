@@ -1,11 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const baseConfig = require("@dataware-tools/dev-deps-for-apps/configs/jest.config");
 module.exports = {
-  preset: "ts-jest",
-  moduleDirectories: ["node_modules", "src"],
-  globals: {
-    "ts-jest": {
-      tsconfig: "./tsconfig-jest.json",
-    },
-  },
-  setupFilesAfterEnv: ["./src/setupTest.ts"],
-  testEnvironment: "jsdom",
+  ...baseConfig,
 };

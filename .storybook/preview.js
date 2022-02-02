@@ -8,10 +8,11 @@ import { SwrOptions } from "../src/utils";
 import { userActionsState } from "../src/globalStates";
 import { databaseConfigState } from "../src/components/organisms/DatabaseConfigModal/DatabaseConfigState";
 import { RecoilRoot } from "recoil";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
+import baseConfig from "@dataware-tools/dev-deps-for-apps/configs/.storybook/preview"
 
 export const parameters = {
-  actions: { argTypesRegex: "^on[A-Z].*" },
+  ...baseConfig.parameters
 };
 
 const initialDatabaseConfig = {
