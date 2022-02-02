@@ -57,4 +57,4 @@ jobs:
           docker build --target production -t app:production --secret id=npmrc,src=/tmp/.npmrc .
 
       - name: Scan production image
-        run: trivy --exit-code 0 --no-progress app:production
+        run: trivy image --exit-code 0 --no-progress app:production
