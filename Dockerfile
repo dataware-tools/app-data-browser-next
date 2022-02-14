@@ -18,7 +18,7 @@ WORKDIR /app
 COPY --from=deps /app .
 # Update loki config for dind
 # See: https://github.com/oblador/loki/issues/9#issuecomment-803197847
-RUN rm ./.lokirc.json && mv ./.lokirc-ci.json ./.lokirc.json
+RUN rm ./loki.config.js && mv ./loki.config-ci.js ./loki.config.js
 
 # Rebuild the source code only when needed
 FROM node:16.13.2 AS builder
