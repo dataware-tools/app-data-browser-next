@@ -55,7 +55,7 @@
     "react-router-dom": "^6.2.1",
     "react-syntax-highlighter": "^15.4.5",
     "recoil": "^0.5.2",
-    "serve": "^12.0.1",
+    "serve": "^13.0.2",
     "swr": "^1.1.2",
     "wavesurfer.js": "^5.2.0"
   },
