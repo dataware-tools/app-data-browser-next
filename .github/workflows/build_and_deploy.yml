@@ -6,7 +6,7 @@ jobs:
   hook:
     runs-on: ubuntu-latest
     timeout-minutes: 30
-    if: ! startsWith(github.ref_name,'renovate/')
+    if: "!(startsWith(github.ref_name,'renovate/'))"
     steps:
       - name: Repository Dispatch
         uses: peter-evans/repository-dispatch@v1
