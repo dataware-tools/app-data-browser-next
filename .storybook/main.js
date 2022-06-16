@@ -1,4 +1,4 @@
-const baseConfig = require("@dataware-tools/dev-deps-for-apps/configs/.storybook/main")
+const baseConfig = require("@dataware-tools/dev-tools-for-react/configs/.storybook/main")
 
 module.exports = {
   ...baseConfig

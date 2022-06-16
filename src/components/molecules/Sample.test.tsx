@@ -11,7 +11,7 @@ describe("SampleComponent", () => {
     );
     // Auth0 contain async logic, so you should use findBy~ not getBy~.
     // See: https://testing-library.com/docs/dom-testing-library/api-async/#findby-queries
-    expect(await screen.findByRole("button")).toHaveTextContent(
+    await expect(screen.findByRole("button")).resolves.toHaveTextContent(
       "revalidate API"
     );
   });

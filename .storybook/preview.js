@@ -9,7 +9,7 @@ import { userActionsState } from "../src/globalStates";
 import { databaseConfigState } from "../src/components/organisms/DatabaseConfigModal/DatabaseConfigState";
 import { RecoilRoot } from "recoil";
 import { BrowserRouter } from "react-router-dom";
-import baseConfig from "@dataware-tools/dev-deps-for-apps/configs/.storybook/preview"
+import baseConfig from "@dataware-tools/dev-tools-for-react/configs/.storybook/preview"
 
 export const parameters = {
   ...baseConfig.parameters
