@@ -1,5 +1,5 @@
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const baseConfig = require("@dataware-tools/dev-deps-for-apps/configs/loki.config");
+const baseConfig = require("@dataware-tools/dev-tools-for-react/configs/loki.config");
 module.exports = {
   ...baseConfig,
 };

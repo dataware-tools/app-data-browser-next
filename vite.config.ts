@@ -1,7 +1,7 @@
 /**
  * @type {import('vite').UserConfig}
  */
-import baseConfig from "@dataware-tools/dev-deps-for-apps/configs/vite.config";
+import baseConfig from "@dataware-tools/dev-tools-for-react/configs/vite.config";
 import { defineConfig } from "vite";
 
 // https://vitejs.dev/config/

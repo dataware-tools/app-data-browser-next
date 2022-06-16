@@ -1,5 +1,9 @@
 module.exports = {
   extends: [
-    "./node_modules/@dataware-tools/dev-deps-for-apps/configs/eslint.config.js",
+    "@dataware-tools/eslint-config",
+    "@dataware-tools/eslint-config/typescript",
+    "@dataware-tools/eslint-config/react",
+    "@dataware-tools/eslint-config/vite",
+    "prettier",
   ],
 };

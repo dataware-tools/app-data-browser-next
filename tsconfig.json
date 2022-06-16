@@ -1,5 +1,5 @@
 {
-  "extends": "./node_modules/@dataware-tools/dev-deps-for-apps/configs/tsconfig.json",
+  "extends": "./node_modules/@dataware-tools/dev-tools-for-typescript/configs/tsconfig.json",
   "include": ["src/**/*.ts", "src/**/*.tsx"],
   "exclude": ["node_modules"],
   "compilerOptions": { "baseUrl": "./src" }
