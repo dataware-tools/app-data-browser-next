@@ -39,13 +39,13 @@ export const JobSubmitter = ({
   const { data: getJobTemplateRes, error: getJobTemplateError } =
     useGetJobTemplate(getAccessToken, {
       jobTemplateId: jobTemplateId ? parseInt(jobTemplateId, 10) : undefined,
-      databaseId: databaseId,
+      databaseId,
     });
   const { data: getJobTypeRes, error: getJobTypeError } = useGetJobTypes(
     getAccessToken,
     {
       jobTypeUid: getJobTemplateRes?.job_template.job_type_uid,
-      databaseId: databaseId,
+      databaseId,
     }
   );
 
@@ -69,7 +69,7 @@ export const JobSubmitter = ({
       getAccessToken,
       jobStore.JobService.createJob,
       {
-        databaseId: databaseId,
+        databaseId,
         requestBody: {
           job_template_id: parseInt(getJobTemplateRes.job_template_id),
           database_id: databaseId,

@@ -8,7 +8,6 @@ import { useState } from "react";
 import { useRecoilState } from "recoil";
 import { databaseConfigState } from "./DatabaseConfigState";
 import { SoloSelect, SoloSelectProps } from "components/molecules/SoloSelect";
-
 import {
   OptionSharingSelects,
   OptionSharingSelectsProps,

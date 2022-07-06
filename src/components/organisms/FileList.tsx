@@ -146,7 +146,7 @@ export const FileList = ({
       getAccessToken,
       fileProvider.DeleteService.deleteFile,
       {
-        databaseId: databaseId,
+        databaseId,
         fileUuid: file.uuid,
       }
     );

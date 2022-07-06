@@ -132,7 +132,7 @@ const initializeDatabaseConfig = async (
     getAccessToken,
     metaStore.ConfigService.updateConfig,
     {
-      databaseId: databaseId,
+      databaseId,
       requestBody: {
         ...currentConfig,
         columns: [

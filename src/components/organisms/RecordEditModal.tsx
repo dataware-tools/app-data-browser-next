@@ -129,7 +129,7 @@ export const RecordEditModal = ({
       if (create) {
         listRecordsMutate({
           ...listRecordsRes,
-          data: [saveRecordRes, ...listRecordsRes?.data],
+          data: [saveRecordRes, ...(listRecordsRes?.data ?? [])],
         });
       } else {
         listRecordsMutate({

@@ -136,7 +136,7 @@ export const RecordListMapView = ({
         const lon = typeof rawLon === "number" ? rawLon : parseFloat(rawLon);
         return {
           ...record,
-          __dataBrowserRecordListMapView: { lat: lat, lon: lon },
+          __dataBrowserRecordListMapView: { lat, lon },
         };
       }) || [];
 
