@@ -257,7 +257,7 @@ export const DatabaseEditModal = <T extends boolean>({
       } else {
         const { reason, instruction } =
           extractErrorMessageFromFetchError(saveDatabaseError);
-        setError({ reason, instruction: instruction });
+        setError({ reason, instruction });
       }
       return;
     }

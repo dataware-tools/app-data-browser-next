@@ -300,7 +300,7 @@ const useListJobTemplate: UseAPI<
         jobStore.OpenAPI.TOKEN = token;
         jobStore.OpenAPI.BASE = API_ROUTE.JOB.BASE;
         const res = await jobStore.JobTemplateService.listJobTemplates({
-          databaseId: databaseId,
+          databaseId,
         });
         return res;
       }
@@ -385,7 +385,7 @@ const useCreateJwtToDownloadFile: UseAPIWithoutCache<
             setRes({ data: fetchRes, error: undefined });
           })
           .catch((error) => {
-            setRes({ data: undefined, error: error });
+            setRes({ data: undefined, error });
           });
       }
     },

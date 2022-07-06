@@ -1,5 +1,5 @@
 import { useAuth0 } from "@auth0/auth0-react";
-import { RecordModel } from "@dataware-tools/api-meta-store-client/dist/browser/client";
+import { metaStore } from "@dataware-tools/api-meta-store-client";
 import {
   DialogBody,
   DialogContainer,
@@ -148,7 +148,9 @@ export const ExportMetadataModal = ({
     }
   }, [fetchError]);
 
-  const preprocessData = (data: RecordModel[]): RecordModel[] => {
+  const preprocessData = (
+    data: metaStore.RecordModel[]
+  ): metaStore.RecordModel[] => {
     // This function applies the following pre-processes:
     // - Map each column-name to display-name
     // - Remove empty file paths
