@@ -14,7 +14,7 @@ export const authConfig = {
 };
 export const redirectUri = window.location.origin;
 
-export const onRedirectCallback = (appState: AppState): void => {
+export const onRedirectCallback = (appState?: AppState): void => {
   const nonQueryParamURL =
     appState && appState.returnTo ? appState.returnTo : window.location.origin;
   history.replaceState(null, "", nonQueryParamURL);
