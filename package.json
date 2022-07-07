@@ -57,7 +57,7 @@
     "recoil": "0.7.4",
     "serve": "12.0.1",
     "swr": "1.3.0",
-    "wavesurfer.js": "5.2.0"
+    "wavesurfer.js": "6.2.0"
   },
   "devDependencies": {
     "@dataware-tools/dev-tools-for-react": "0.0.2",
@@ -68,6 +68,6 @@
     "@types/react-beautiful-dnd": "13.1.2",
     "@types/react-dom": "17.0.17",
     "@types/react-router-dom": "5.3.3",
-    "@types/wavesurfer.js": "5.2.2"
+    "@types/wavesurfer.js": "6.0.3"
   }
 }
