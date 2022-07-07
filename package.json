@@ -52,7 +52,7 @@
     "react-json-view": "1.21.3",
     "react-markdown": "7.1.2",
     "react-player": "2.10.1",
-    "react-router-dom": "6.2.2",
+    "react-router-dom": "6.3.0",
     "react-syntax-highlighter": "15.5.0",
     "recoil": "0.5.2",
     "serve": "12.0.1",
