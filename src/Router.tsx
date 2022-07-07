@@ -8,7 +8,7 @@ import { IndexPage } from "pages/IndexPage";
 import { RecordsPage } from "pages/RecordsPage";
 
 const Router = (): JSX.Element | null => {
-  const onRedirectCallback = (appState: AppState): void => {
+  const onRedirectCallback = (appState?: AppState): void => {
     if (appState?.returnTo) {
       window.location.href = appState.returnTo;
     } else {
