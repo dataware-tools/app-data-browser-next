@@ -9,7 +9,7 @@ jobs:
     if: "!(startsWith(github.ref_name,'renovate/'))"
     steps:
       - name: Repository Dispatch
-        uses: peter-evans/repository-dispatch@v1
+        uses: peter-evans/repository-dispatch@v2
         with:
           token: ${{ secrets.REPO_ACCESS_TOKEN }}
           repository: dataware-tools/web-deployment
