@@ -11,7 +11,6 @@ import {
   ErrorMessageProps,
   ErrorMessage,
   usePrevious,
-  extractErrorMessageFromFetchError,
   confirm,
   useConfirmClosingWindow,
 } from "@dataware-tools/app-common";
@@ -35,6 +34,7 @@ import {
   initializeDatabaseConfig,
   useGetDatabase,
   useListDatabases,
+  enqueueErrorToastForFetchError,
 } from "utils";
 
 export type DatabaseEditModalPresentationProps<T extends boolean> = {
@@ -224,7 +224,7 @@ export const DatabaseEditModal = <T extends boolean>({
   const onSubmit: SubmitHandler<FormInput> = async (requestBody) => {
     setIsSubmitting(true);
 
-    const procAfterFailAdd = async (error: any) => {
+    const procAfterFailAdd = async () => {
       await fetchMetaStore(
         getAccessToken,
         metaStore.DatabaseService.deleteDatabase,
@@ -232,8 +232,6 @@ export const DatabaseEditModal = <T extends boolean>({
           databaseId: requestBody.database_id,
         }
       );
-      const { reason, instruction } = extractErrorMessageFromFetchError(error);
-      setError({ reason, instruction });
     };
 
     const [saveDatabaseRes, saveDatabaseError] =
@@ -253,12 +251,15 @@ export const DatabaseEditModal = <T extends boolean>({
 
     if (saveDatabaseError) {
       if (add) {
-        procAfterFailAdd(saveDatabaseError);
-      } else {
-        const { reason, instruction } =
-          extractErrorMessageFromFetchError(saveDatabaseError);
-        setError({ reason, instruction });
+        procAfterFailAdd();
       }
+      enqueueErrorToastForFetchError(
+        add
+          ? "Failed to create new database"
+          : "Failed to update database info",
+        saveDatabaseError
+      );
+      setIsSubmitting(false);
       return;
     }
 
@@ -271,7 +272,9 @@ export const DatabaseEditModal = <T extends boolean>({
         { databaseId: createdDatabaseId }
       );
       if (getConfigError) {
-        await procAfterFailAdd(getConfigError);
+        await procAfterFailAdd();
+        enqueueErrorToastForFetchError("Failed to get config", getConfigError);
+        setIsSubmitting(false);
         return;
       }
 
@@ -281,7 +284,12 @@ export const DatabaseEditModal = <T extends boolean>({
         getConfigRes || {}
       );
       if (initializeDatabaseError) {
-        await procAfterFailAdd(initializeDatabaseError);
+        await procAfterFailAdd();
+        enqueueErrorToastForFetchError(
+          "Failed to initialize config for database",
+          initializeDatabaseError
+        );
+        setIsSubmitting(false);
         return;
       }
     }
