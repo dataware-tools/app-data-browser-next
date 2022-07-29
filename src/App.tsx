@@ -1,5 +1,5 @@
 import "./scrollbar.global.css";
-import { theme } from "@dataware-tools/app-common";
+import { theme, Toaster } from "@dataware-tools/app-common";
 import CssBaseline from "@mui/material/CssBaseline";
 import { ThemeProvider } from "@mui/material/styles";
 import { StylesProvider } from "@mui/styles";
@@ -14,6 +14,7 @@ const App = () => {
       <StylesProvider injectFirst>
         <ThemeProvider theme={theme}>
           <CssBaseline />
+          <Toaster />
           <RecoilRoot>
             <Router />
           </RecoilRoot>
