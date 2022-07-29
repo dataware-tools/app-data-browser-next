@@ -8,8 +8,6 @@ import {
   DialogTitle,
   DialogToolBar,
   DialogWrapper,
-  ErrorMessageProps,
-  ErrorMessage,
   usePrevious,
   confirm,
   useConfirmClosingWindow,
@@ -40,7 +38,6 @@ import {
 export type DatabaseEditModalPresentationProps<T extends boolean> = {
   onSubmit: () => Promise<void>;
   isSubmitting: boolean;
-  error?: ErrorMessageProps;
   formErrors: FieldErrors<FormInput>;
   control: Control<FormInput>;
   onClose: (reason?: string) => void;
@@ -65,7 +62,6 @@ type FormInput = {
 
 export const DatabaseEditModalPresentation = <T extends boolean>({
   onClose,
-  error,
   onSubmit,
   isSubmitting,
   formErrors,
@@ -81,75 +77,69 @@ export const DatabaseEditModalPresentation = <T extends boolean>({
         <DialogContainer padding="0 0 20px">
           <DialogBody>
             <DialogMain>
-              {error ? (
-                <ErrorMessage {...error} />
-              ) : (
-                <>
-                  {add ? (
-                    <Box mt={1}>
-                      <label htmlFor="DatabaseAddModal_database_id">
-                        Database ID
-                      </label>
-                      <Controller
-                        name="database_id"
-                        control={control}
-                        defaultValue=""
-                        rules={{ required: true }}
-                        render={({ field }) => (
-                          <TextField
-                            {...field}
-                            error={formErrors.database_id?.type === "required"}
-                            helperText={
-                              formErrors.database_id?.type === "required" &&
-                              "Database ID is required"
-                            }
-                            fullWidth
-                            id="DatabaseAddModal_database_id"
-                          />
-                        )}
+              {add ? (
+                <Box mt={1}>
+                  <label htmlFor="DatabaseAddModal_database_id">
+                    Database ID
+                  </label>
+                  <Controller
+                    name="database_id"
+                    control={control}
+                    defaultValue=""
+                    rules={{ required: true }}
+                    render={({ field }) => (
+                      <TextField
+                        {...field}
+                        error={formErrors.database_id?.type === "required"}
+                        helperText={
+                          formErrors.database_id?.type === "required" &&
+                          "Database ID is required"
+                        }
+                        fullWidth
+                        id="DatabaseAddModal_database_id"
                       />
-                    </Box>
-                  ) : null}
-                  <Box mt={3}>
-                    <label htmlFor="DatabaseAddModal_name">Name</label>
-                    <Controller
-                      name="name"
-                      control={control}
-                      defaultValue=""
-                      rules={{ required: true }}
-                      render={({ field }) => (
-                        <TextField
-                          {...field}
-                          fullWidth
-                          id="DatabaseAddModal_name"
-                          error={formErrors.name?.type === "required"}
-                          helperText={
-                            formErrors.name?.type === "required" &&
-                            "Name is required"
-                          }
-                        />
-                      )}
+                    )}
+                  />
+                </Box>
+              ) : null}
+              <Box mt={3}>
+                <label htmlFor="DatabaseAddModal_name">Name</label>
+                <Controller
+                  name="name"
+                  control={control}
+                  defaultValue=""
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      id="DatabaseAddModal_name"
+                      error={formErrors.name?.type === "required"}
+                      helperText={
+                        formErrors.name?.type === "required" &&
+                        "Name is required"
+                      }
                     />
-                  </Box>
-                  <Box mt={3}>
-                    <label htmlFor="DatabaseAddModal_description">
-                      Description
-                    </label>
-                    <Controller
-                      name="description"
-                      control={control}
-                      defaultValue=""
-                      render={({ field }) => (
-                        <TextField
-                          {...field}
-                          fullWidth
-                          id="DatabaseAddModal_description"
-                        />
-                      )}
+                  )}
+                />
+              </Box>
+              <Box mt={3}>
+                <label htmlFor="DatabaseAddModal_description">
+                  Description
+                </label>
+                <Controller
+                  name="description"
+                  control={control}
+                  defaultValue=""
+                  render={({ field }) => (
+                    <TextField
+                      {...field}
+                      fullWidth
+                      id="DatabaseAddModal_description"
                     />
-                  </Box>
-                </>
-              )}
+                  )}
+                />
+              </Box>
             </DialogMain>
           </DialogBody>
         </DialogContainer>
@@ -183,7 +173,6 @@ export const DatabaseEditModal = <T extends boolean>({
     reset,
   } = useForm<FormInput>({ defaultValues: currentData });
   const { page, perPage, search } = useRecoilValue(databasePaginateState);
-  const [error, setError] = useState<ErrorMessageProps | undefined>(undefined);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const { data: listDatabasesRes, mutate: listDatabasesMutate } =
@@ -209,7 +198,6 @@ export const DatabaseEditModal = <T extends boolean>({
   });
 
   const initializeState = () => {
-    setError(undefined);
     setIsSubmitting(false);
     reset(currentData);
   };
@@ -355,7 +343,6 @@ export const DatabaseEditModal = <T extends boolean>({
       onClose={onClose}
       onSubmit={handleSubmit(onSubmit)}
       isSubmitting={isSubmitting}
-      error={error}
       formErrors={formErrors}
       control={control}
       {...delegated}
