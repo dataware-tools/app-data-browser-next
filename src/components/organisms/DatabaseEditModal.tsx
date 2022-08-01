@@ -212,16 +212,6 @@ export const DatabaseEditModal = <T extends boolean>({
   const onSubmit: SubmitHandler<FormInput> = async (requestBody) => {
     setIsSubmitting(true);
 
-    const procAfterFailAdd = async () => {
-      await fetchMetaStore(
-        getAccessToken,
-        metaStore.DatabaseService.deleteDatabase,
-        {
-          databaseId: requestBody.database_id,
-        }
-      );
-    };
-
     const [saveDatabaseRes, saveDatabaseError] =
       !add && databaseId
         ? await fetchMetaStore(
@@ -238,9 +228,6 @@ export const DatabaseEditModal = <T extends boolean>({
           );
 
     if (saveDatabaseError) {
-      if (add) {
-        procAfterFailAdd();
-      }
       enqueueErrorToastForFetchError(
         add
           ? "Failed to create new database"
@@ -260,7 +247,6 @@ export const DatabaseEditModal = <T extends boolean>({
         { databaseId: createdDatabaseId }
       );
       if (getConfigError) {
-        await procAfterFailAdd();
         enqueueErrorToastForFetchError("Failed to get config", getConfigError);
         setIsSubmitting(false);
         return;
@@ -272,7 +258,6 @@ export const DatabaseEditModal = <T extends boolean>({
         getConfigRes || {}
       );
       if (initializeDatabaseError) {
-        await procAfterFailAdd();
         enqueueErrorToastForFetchError(
           "Failed to initialize config for database",
           initializeDatabaseError
