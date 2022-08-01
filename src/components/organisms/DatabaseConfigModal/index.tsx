@@ -27,7 +27,11 @@ import { DisplayFieldsConfigBody } from "./DisplayFieldsConfigBody";
 import { InputFieldsConfigBody } from "./InputFieldsConfigBody";
 import { SearchFieldsConfigBody } from "./SearchFieldsConfigBody";
 import { SecretFieldsConfigBody } from "./SecretFieldsConfigBody";
-import { fetchMetaStore, useGetConfig } from "utils";
+import {
+  enqueueErrorToastForFetchError,
+  fetchMetaStore,
+  useGetConfig,
+} from "utils";
 
 export type ConfigNameType = "record_list_display_columns";
 
@@ -189,14 +193,15 @@ export const DatabaseConfigModal = ({
     );
 
     if (updateConfigError) {
-      const { reason, instruction } =
-        extractErrorMessageFromFetchError(updateConfigError);
-      setError({ reason, instruction });
+      enqueueErrorToastForFetchError(
+        "Failed to update configs for database",
+        updateConfigError
+      );
     } else {
       getConfigMutate(updateConfigRes);
+      propsOnClose();
     }
     setIsSaving(false);
-    propsOnClose();
   };
 
   const isFetchComplete = Boolean(!fetchError && databaseConfig);
