@@ -241,7 +241,6 @@ export const MetadataEditModal = ({
 
       setIsSaving(false);
       if (!isSubmitSucceed) {
-        await alert({ title: "save failed. please retry saving" });
         return;
       }
     }
