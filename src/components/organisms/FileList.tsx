@@ -2,7 +2,6 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { fileProvider } from "@dataware-tools/api-file-provider-client";
 import { metaStore } from "@dataware-tools/api-meta-store-client";
 import {
-  alert,
   API_ROUTE,
   confirm,
   ErrorMessage,
@@ -203,7 +202,7 @@ export const FileList = ({
           window.open(API_ROUTE.FILE.BASE + "/download/" + res.token, "_blank");
         })
         .catch((e) => {
-          alert({ title: "Failed to download the file: " + e });
+          enqueueErrorToastForFetchError("Failed to download file", e);
         });
     });
   };
