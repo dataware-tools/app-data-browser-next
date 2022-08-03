@@ -22,6 +22,7 @@ import {
   FilePreviewModalProps,
 } from "components/organisms/FilePreviewModal";
 import {
+  enqueueErrorToastForFetchError,
   useListFiles,
   fetchFileProvider,
   fetchMetaStore,
@@ -152,9 +153,10 @@ export const FileList = ({
     );
 
     if (deleteFileEntityError) {
-      await alert({
-        title: `Error occur! : ${JSON.stringify(deleteFileEntityError)}`,
-      });
+      enqueueErrorToastForFetchError(
+        "Failed to delete file",
+        deleteFileEntityError
+      );
       return;
     }
 
@@ -168,9 +170,10 @@ export const FileList = ({
     );
 
     if (deleteFileMetaError) {
-      await alert({
-        title: `Error occur! : ${JSON.stringify(deleteFileMetaError)}`,
-      });
+      enqueueErrorToastForFetchError(
+        "Failed to delete metdata of the file",
+        deleteFileMetaError
+      );
       return;
     }
 
