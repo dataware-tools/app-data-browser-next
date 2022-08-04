@@ -20,6 +20,7 @@ import { useRecoilState } from "recoil";
 import { RecordDetailModal } from "components/organisms/RecordDetailModal";
 import { useIsActionPermitted, recordPaginateState } from "globalStates";
 import {
+  enqueueErrorToastForFetchError,
   useGetConfig,
   fetchMetaStore,
   useListRecords,
@@ -143,7 +144,7 @@ export const RecordList = ({
       });
       listRecordsMutate(newRecordList, false);
 
-      const [deleteRecordRes, deleteRecordError] = await fetchMetaStore(
+      const [, deleteRecordError] = await fetchMetaStore(
         getAccessToken,
         metaStore.RecordService.deleteRecord,
         {
@@ -153,12 +154,13 @@ export const RecordList = ({
       );
 
       if (deleteRecordError) {
-        const { reason, instruction } =
-          extractErrorMessageFromFetchError(deleteRecordError);
-        setError({ reason, instruction });
-      } else if (deleteRecordRes) {
-        listRecordsMutate();
+        enqueueErrorToastForFetchError(
+          "Failed to delete record",
+          deleteRecordError
+        );
       }
+
+      listRecordsMutate();
     }
   };
 

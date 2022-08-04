@@ -2,7 +2,6 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { fileProvider } from "@dataware-tools/api-file-provider-client";
 import { metaStore } from "@dataware-tools/api-meta-store-client";
 import {
-  alert,
   API_ROUTE,
   confirm,
   ErrorMessage,
@@ -22,6 +21,7 @@ import {
   FilePreviewModalProps,
 } from "components/organisms/FilePreviewModal";
 import {
+  enqueueErrorToastForFetchError,
   useListFiles,
   fetchFileProvider,
   fetchMetaStore,
@@ -152,9 +152,10 @@ export const FileList = ({
     );
 
     if (deleteFileEntityError) {
-      await alert({
-        title: `Error occur! : ${JSON.stringify(deleteFileEntityError)}`,
-      });
+      enqueueErrorToastForFetchError(
+        "Failed to delete file",
+        deleteFileEntityError
+      );
       return;
     }
 
@@ -168,9 +169,10 @@ export const FileList = ({
     );
 
     if (deleteFileMetaError) {
-      await alert({
-        title: `Error occur! : ${JSON.stringify(deleteFileMetaError)}`,
-      });
+      enqueueErrorToastForFetchError(
+        "Failed to delete metdata of the file",
+        deleteFileMetaError
+      );
       return;
     }
 
@@ -200,7 +202,7 @@ export const FileList = ({
           window.open(API_ROUTE.FILE.BASE + "/download/" + res.token, "_blank");
         })
         .catch((e) => {
-          alert({ title: "Failed to download the file: " + e });
+          enqueueErrorToastForFetchError("Failed to download file", e);
         });
     });
   };

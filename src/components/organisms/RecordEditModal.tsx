@@ -13,6 +13,7 @@ import {
 import { recordPaginateState } from "globalStates";
 import {
   compInputFields,
+  enqueueErrorToastForFetchError,
   fetchMetaStore,
   useGetRecord,
   useGetConfig,
@@ -118,9 +119,7 @@ export const RecordEditModal = ({
         );
 
     if (saveRecordError) {
-      const { reason, instruction } =
-        extractErrorMessageFromFetchError(saveRecordError);
-      setError({ reason, instruction });
+      enqueueErrorToastForFetchError("Failed to save record", saveRecordError);
       return false;
     }
 

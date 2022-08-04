@@ -11,6 +11,7 @@ import {
 } from "components/organisms/MetadataEditModal";
 import {
   compInputFields,
+  enqueueErrorToastForFetchError,
   fetchMetaStore,
   useGetConfig,
   useListFiles,
@@ -98,9 +99,10 @@ export const FileEditModal = ({
     );
 
     if (saveFileError) {
-      const { reason, instruction } =
-        extractErrorMessageFromFetchError(saveFileError);
-      setError({ reason, instruction });
+      enqueueErrorToastForFetchError(
+        "Failed to update file metadata",
+        saveFileError
+      );
       return false;
     }
 

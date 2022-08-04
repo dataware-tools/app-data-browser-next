@@ -16,8 +16,6 @@ import {
   DialogTabBarProps,
   ErrorMessageProps,
   confirm,
-  alert,
-  extractErrorMessageFromFetchError,
 } from "@dataware-tools/app-common";
 import EditIcon from "@mui/icons-material/Edit";
 import UploadIcon from "@mui/icons-material/Upload";
@@ -33,6 +31,7 @@ import {
 } from "components/organisms/RecordEditModal";
 import { RecordInfo } from "components/organisms/RecordInfo";
 import {
+  enqueueErrorToastForFetchError,
   useGetRecord,
   useListFiles,
   uploadFileToFileProvider,
@@ -234,10 +233,7 @@ export const RecordDetailModal = ({
     );
 
     if (createFileError) {
-      await alert({
-        title: "Fail to upload",
-        body: extractErrorMessageFromFetchError(createFileError).reason,
-      });
+      enqueueErrorToastForFetchError("Failed to upload file", createFileError);
       setIsAddingFile(false);
       return;
     }
