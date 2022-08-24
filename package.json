@@ -32,7 +32,7 @@
     "@dataware-tools/api-job-store-client": "1.5.2",
     "@dataware-tools/api-meta-store-client": "0.5.4",
     "@dataware-tools/api-permission-manager-client": "0.2.3",
-    "@dataware-tools/app-common": "22.6.27",
+    "@dataware-tools/app-common": "22.8.29",
     "@emotion/react": "11.9.3",
     "@emotion/styled": "11.9.3",
     "@mui/icons-material": "5.8.4",
