@@ -11,7 +11,7 @@
   "basePath": "/data-browser/",
   "repository": "https://github.com/dataware-tools/app-data-browser-next",
   "scripts": {
-    "dev": "vite --open",
+    "dev": "vite --open --port 3000 --host",
     "build": "vite build; cp serve.json dist",
     "start": "serve dist -p 3000 -s",
     "test": "run-s lint test:unit test:build test:visual-regression",
@@ -60,7 +60,7 @@
     "wavesurfer.js": "6.2.0"
   },
   "devDependencies": {
-    "@dataware-tools/dev-tools-for-react": "0.0.2",
+    "@dataware-tools/dev-tools-for-react": "0.0.3",
     "@dataware-tools/dev-tools-for-typescript": "0.0.3",
     "@dataware-tools/eslint-config": "0.1.0",
     "@types/papaparse": "5.3.4",
@@ -68,6 +68,7 @@
     "@types/react-beautiful-dnd": "13.1.2",
     "@types/react-dom": "18.0.6",
     "@types/react-router-dom": "5.3.3",
+    "@types/react-syntax-highlighter": "15.5.5",
     "@types/wavesurfer.js": "6.0.3"
   }
 }
