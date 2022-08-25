@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.0.0-experimental
 
-FROM node:16.15.1 AS deps
+FROM node:16.17.0 AS deps
 WORKDIR /app
 RUN wget -O /bin/jq https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 && chmod +x /bin/jq
 COPY . .
@@ -21,14 +21,14 @@ COPY --from=deps /app .
 RUN rm ./loki.config.js && mv ./loki.config-ci.js ./loki.config.js
 
 # Rebuild the source code only when needed
-FROM node:16.15.1 AS builder
+FROM node:16.17.0 AS builder
 WORKDIR /app
 COPY . .
 COPY --from=deps /app/node_modules ./node_modules
 RUN npm run build
 
 # Production image, copy all the files and run next
-FROM node:16.15.1 AS production
+FROM node:16.17.0 AS production
 WORKDIR /app
 
 ENV NODE_ENV production
