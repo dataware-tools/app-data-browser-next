@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "@auth0/auth0-react": "1.10.2",
-    "@dataware-tools/api-file-provider-client": "1.7.2",
+    "@dataware-tools/api-file-provider-client": "1.7.3",
     "@dataware-tools/api-job-store-client": "1.5.2",
     "@dataware-tools/api-meta-store-client": "0.5.4",
     "@dataware-tools/api-permission-manager-client": "0.2.3",
