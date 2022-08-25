@@ -4,6 +4,7 @@ import {
   ConfirmModal,
   ConfirmModalProps,
   Spacer,
+  enqueueErrorToastForFetchError,
 } from "@dataware-tools/app-common";
 import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
@@ -18,12 +19,7 @@ import { useNavigate } from "react-router-dom";
 import { useRecoilValue } from "recoil";
 import { ElemCenteringFlexDiv } from "components/atoms/ElemCenteringFlexDiv";
 import { databasePaginateState } from "globalStates";
-import {
-  enqueueErrorToastForFetchError,
-  useListDatabases,
-  fetchMetaStore,
-  APP_ROUTE,
-} from "utils";
+import { useListDatabases, fetchMetaStore, APP_ROUTE } from "utils";
 
 type ConfirmInputType = { databaseId: string };
 type ValidateRuleType = ControllerProps["rules"];

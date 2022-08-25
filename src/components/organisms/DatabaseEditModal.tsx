@@ -10,6 +10,7 @@ import {
   DialogWrapper,
   usePrevious,
   confirm,
+  enqueueErrorToastForFetchError,
   useConfirmClosingWindow,
 } from "@dataware-tools/app-common";
 import LoadingButton from "@mui/lab/LoadingButton";
@@ -32,7 +33,6 @@ import {
   initializeDatabaseConfig,
   useGetDatabase,
   useListDatabases,
-  enqueueErrorToastForFetchError,
 } from "utils";
 
 export type DatabaseEditModalPresentationProps<T extends boolean> = {

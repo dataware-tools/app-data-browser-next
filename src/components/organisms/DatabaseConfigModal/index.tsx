@@ -15,6 +15,7 @@ import {
   ErrorMessage,
   DialogToolBar,
   confirm,
+  enqueueErrorToastForFetchError,
   useConfirmClosingWindow,
 } from "@dataware-tools/app-common";
 import LoadingButton, { LoadingButtonProps } from "@mui/lab/LoadingButton";
@@ -27,11 +28,7 @@ import { DisplayFieldsConfigBody } from "./DisplayFieldsConfigBody";
 import { InputFieldsConfigBody } from "./InputFieldsConfigBody";
 import { SearchFieldsConfigBody } from "./SearchFieldsConfigBody";
 import { SecretFieldsConfigBody } from "./SecretFieldsConfigBody";
-import {
-  enqueueErrorToastForFetchError,
-  fetchMetaStore,
-  useGetConfig,
-} from "utils";
+import { fetchMetaStore, useGetConfig } from "utils";
 
 export type ConfigNameType = "record_list_display_columns";
 

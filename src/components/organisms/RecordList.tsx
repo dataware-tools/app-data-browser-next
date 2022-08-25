@@ -4,6 +4,7 @@ import {
   confirm,
   ErrorMessage,
   ErrorMessageProps,
+  enqueueErrorToastForFetchError,
   extractErrorMessageFromFetchError,
 } from "@dataware-tools/app-common";
 import DeleteIcon from "@mui/icons-material/Delete";
@@ -20,7 +21,6 @@ import { useRecoilState } from "recoil";
 import { RecordDetailModal } from "components/organisms/RecordDetailModal";
 import { useIsActionPermitted, recordPaginateState } from "globalStates";
 import {
-  enqueueErrorToastForFetchError,
   useGetConfig,
   fetchMetaStore,
   useListRecords,
