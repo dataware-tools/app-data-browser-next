@@ -45,7 +45,7 @@
     "papaparse": "5.3.2",
     "pigeon-maps": "0.21.0",
     "react": "17.0.2",
-    "react-beautiful-dnd": "13.1.0",
+    "react-beautiful-dnd": "13.1.1",
     "react-csv-downloader": "2.8.0",
     "react-dom": "17.0.2",
     "react-hook-form": "7.34.2",
