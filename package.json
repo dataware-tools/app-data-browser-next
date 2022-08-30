@@ -64,7 +64,7 @@
     "@dataware-tools/dev-tools-for-typescript": "0.0.3",
     "@dataware-tools/eslint-config": "0.1.0",
     "@types/papaparse": "5.3.4",
-    "@types/react": "17.0.48",
+    "@types/react": "17.0.49",
     "@types/react-beautiful-dnd": "13.1.2",
     "@types/react-dom": "18.0.6",
     "@types/react-router-dom": "5.3.3",
