@@ -61,7 +61,7 @@
   },
   "devDependencies": {
     "@dataware-tools/dev-tools-for-react": "0.0.3",
-    "@dataware-tools/dev-tools-for-typescript": "0.0.3",
+    "@dataware-tools/dev-tools-for-typescript": "0.1.0",
     "@dataware-tools/eslint-config": "0.1.0",
     "@types/papaparse": "5.3.5",
     "@types/react": "17.0.49",
