@@ -7,7 +7,7 @@ COPY . .
 RUN npm -g config set user root && npm -g config set unsafe-perm true
 RUN --mount=type=secret,id=npmrc,target=/root/.npmrc npm install
 
-FROM docker:20.10.17-dind AS test
+FROM docker:20.10.18-dind AS test
 RUN apk update && apk add \
   bash \
   git \
