@@ -5,7 +5,7 @@
     "engine": "8"
   },
   "volta": {
-    "node": "16.17.0"
+    "node": "16.17.1"
   },
   "version": "0.0.0",
   "basePath": "/data-browser/",
