@@ -35,3 +35,38 @@
 //     }
 //   }
 // }
+declare global {
+  // eslint-disable-next-line @typescript-eslint/no-namespace
+  namespace Cypress {
+    interface Chainable {
+      loginByAuth0Api: () => void;
+    }
+  }
+}
+
+Cypress.Commands.add("loginByAuth0Api", () => {
+  const username = Cypress.env("auth0Username");
+  const password = Cypress.env("auth0Password");
+  const client_id = Cypress.env("auth0ClientId");
+  const client_secret = Cypress.env("auth0ClientSecret");
+  const audience = Cypress.env("auth0Audience");
+
+  cy.request({
+    method: "POST",
+    url: `https://${Cypress.env("auth0Domain")}/oauth/token`,
+    body: {
+      grant_type: "password",
+      username,
+      password,
+      audience,
+      client_id,
+      client_secret,
+    },
+  }).then(({ body }) => {
+    console.log(body);
+
+    window.localStorage.setItem("auth0TokenOnCypress", body.access_token);
+  });
+});
+
+export {};
