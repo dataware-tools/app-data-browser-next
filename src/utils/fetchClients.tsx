@@ -7,6 +7,12 @@ import { useState, useEffect } from "react";
 import useSWR, { SWRResponse } from "swr";
 import { AwaitType, DatabaseConfigType } from "utils/utilTypes";
 
+declare global {
+  interface Window {
+    Cypress: any;
+  }
+}
+
 type Data<T> = T extends void | undefined | null
   ? "__fetchSuccess__" | undefined
   : T | undefined;
@@ -30,7 +36,9 @@ const fetchMetaStore = async <T, U>(
   param: T
 ): Promise<[data: Data<U>, error: any]> => {
   metaStore.OpenAPI.BASE = API_ROUTE.META.BASE;
-  metaStore.OpenAPI.TOKEN = token;
+  metaStore.OpenAPI.TOKEN = window.Cypress
+    ? localStorage.getItem("auth0TokenOnCypress") || ""
+    : token;
   return await fetchAPI(fetcher, param);
 };
 
@@ -40,7 +48,9 @@ const fetchFileProvider = async <T, U>(
   param: T
 ): Promise<[data: Data<U>, error: any]> => {
   fileProvider.OpenAPI.BASE = API_ROUTE.FILE.BASE;
-  fileProvider.OpenAPI.TOKEN = token;
+  fileProvider.OpenAPI.TOKEN = window.Cypress
+    ? localStorage.getItem("auth0TokenOnCypress") || ""
+    : token;
   return await fetchAPI(fetcher, param);
 };
 
@@ -50,7 +60,9 @@ const fetchJobStore = async <T, U>(
   param: T
 ): Promise<[data: Data<U>, error: any]> => {
   jobStore.OpenAPI.BASE = API_ROUTE.JOB.BASE;
-  jobStore.OpenAPI.TOKEN = token;
+  jobStore.OpenAPI.TOKEN = window.Cypress
+    ? localStorage.getItem("auth0TokenOnCypress") || ""
+    : token;
   return await fetchAPI(fetcher, param);
 };
 
@@ -116,7 +128,9 @@ const useListPermittedActions: UseAPI<
   const cacheKey = `${API_ROUTE.PERMISSION.BASE}/actions${cacheQuery}`;
   const fetcher = databaseId
     ? async () => {
-        permissionManager.OpenAPI.TOKEN = token;
+        permissionManager.OpenAPI.TOKEN = window.Cypress
+          ? localStorage.getItem("auth0TokenOnCypress") || ""
+          : token;
         permissionManager.OpenAPI.BASE = API_ROUTE.PERMISSION.BASE;
         const res =
           await permissionManager.PermittedActionService.listPermittedActions({
@@ -136,7 +150,9 @@ const useListDatabases: UseAPI<
   const cacheQuery = objToQueryString({ ...query });
   const cacheKey = `${API_ROUTE.META.BASE}/databases/${cacheQuery}`;
   const fetcher = async () => {
-    metaStore.OpenAPI.TOKEN = token;
+    metaStore.OpenAPI.TOKEN = window.Cypress
+      ? localStorage.getItem("auth0TokenOnCypress") || ""
+      : token;
     metaStore.OpenAPI.BASE = API_ROUTE.META.BASE;
     const res = await metaStore.DatabaseService.listDatabases(query);
     return res;
@@ -153,7 +169,9 @@ const useGetDatabase: UseAPI<typeof metaStore.DatabaseService.getDatabase> = (
   const cacheKey = `${API_ROUTE.META.BASE}/databases/${databaseId}`;
   const fetcher = databaseId
     ? async () => {
-        metaStore.OpenAPI.TOKEN = token;
+        metaStore.OpenAPI.TOKEN = window.Cypress
+          ? localStorage.getItem("auth0TokenOnCypress") || ""
+          : token;
         metaStore.OpenAPI.BASE = API_ROUTE.META.BASE;
         const res = await metaStore.DatabaseService.getDatabase({ databaseId });
 
@@ -176,7 +194,9 @@ const useGetConfig: UseGetConfig<typeof metaStore.ConfigService.getConfig> = (
   const cacheKey = `${API_ROUTE.META.BASE}/databases/${databaseId}/config`;
   const fetcher = databaseId
     ? async () => {
-        metaStore.OpenAPI.TOKEN = token;
+        metaStore.OpenAPI.TOKEN = window.Cypress
+          ? localStorage.getItem("auth0TokenOnCypress") || ""
+          : token;
         metaStore.OpenAPI.BASE = API_ROUTE.META.BASE;
         const res = await metaStore.ConfigService.getConfig({
           databaseId,
@@ -201,7 +221,9 @@ const useGetRecord: UseAPI<typeof metaStore.RecordService.getRecord> = (
   const fetcher =
     databaseId && recordId
       ? async () => {
-          metaStore.OpenAPI.TOKEN = token;
+          metaStore.OpenAPI.TOKEN = window.Cypress
+            ? localStorage.getItem("auth0TokenOnCypress") || ""
+            : token;
           metaStore.OpenAPI.BASE = API_ROUTE.META.BASE;
           const res = await metaStore.RecordService.getRecord({
             databaseId,
@@ -227,7 +249,9 @@ const useListRecords: UseAPI<typeof metaStore.RecordService.listRecords> = (
   const cacheKey = `${API_ROUTE.META.BASE}/databases/${databaseId}/records${cacheQuery}`;
   const listRecords = databaseId
     ? async () => {
-        metaStore.OpenAPI.TOKEN = token;
+        metaStore.OpenAPI.TOKEN = window.Cypress
+          ? localStorage.getItem("auth0TokenOnCypress") || ""
+          : token;
         metaStore.OpenAPI.BASE = API_ROUTE.META.BASE;
         const listRecordsRes = await metaStore.RecordService.listRecords({
           databaseId,
@@ -251,7 +275,9 @@ const useListFiles: UseAPI<typeof metaStore.FileService.listFiles> = (
   const cacheKey = `${API_ROUTE.META.BASE}/databases/${databaseId}/records/${recordId}/files`;
   const fetcher = databaseId
     ? async () => {
-        metaStore.OpenAPI.TOKEN = token;
+        metaStore.OpenAPI.TOKEN = window.Cypress
+          ? localStorage.getItem("auth0TokenOnCypress") || ""
+          : token;
         metaStore.OpenAPI.BASE = API_ROUTE.META.BASE;
         const res = await metaStore.FileService.listFiles({
           databaseId,
@@ -274,7 +300,9 @@ const useGetFile: UseAPI<typeof metaStore.FileService.getFile> = (
   const fetcher =
     databaseId && uuid
       ? async () => {
-          metaStore.OpenAPI.TOKEN = token;
+          metaStore.OpenAPI.TOKEN = window.Cypress
+            ? localStorage.getItem("auth0TokenOnCypress") || ""
+            : token;
           metaStore.OpenAPI.BASE = API_ROUTE.META.BASE;
           const res = await metaStore.FileService.getFile({
             databaseId,
@@ -297,7 +325,9 @@ const useListJobTemplate: UseAPI<
   const cacheKey = `${API_ROUTE.JOB.BASE}/databases/${databaseId}/job-templates`;
   const fetcher = databaseId
     ? async () => {
-        jobStore.OpenAPI.TOKEN = token;
+        jobStore.OpenAPI.TOKEN = window.Cypress
+          ? localStorage.getItem("auth0TokenOnCypress") || ""
+          : token;
         jobStore.OpenAPI.BASE = API_ROUTE.JOB.BASE;
         const res = await jobStore.JobTemplateService.listJobTemplates({
           databaseId,
@@ -316,7 +346,9 @@ const useGetJobTemplate: UseAPI<
   const fetcher =
     jobTemplateId && databaseId
       ? async () => {
-          jobStore.OpenAPI.TOKEN = token;
+          jobStore.OpenAPI.TOKEN = window.Cypress
+            ? localStorage.getItem("auth0TokenOnCypress") || ""
+            : token;
           jobStore.OpenAPI.BASE = API_ROUTE.JOB.BASE;
           const res = await jobStore.JobTemplateService.getJobTemplate({
             jobTemplateId,
@@ -341,7 +373,9 @@ const useGetJobTypes: UseAPI<typeof jobStore.JobTypeService.getJobTypes> = (
   const fetcher =
     jobTypeUid && databaseId
       ? async () => {
-          jobStore.OpenAPI.TOKEN = token;
+          jobStore.OpenAPI.TOKEN = window.Cypress
+            ? localStorage.getItem("auth0TokenOnCypress") || ""
+            : token;
           jobStore.OpenAPI.BASE = API_ROUTE.JOB.BASE;
           const res = await jobStore.JobTypeService.getJobTypes({
             jobTypeUid,
@@ -376,7 +410,9 @@ const useCreateJwtToDownloadFile: UseAPIWithoutCache<
   useEffect(
     () => {
       if (shouldFetch) {
-        fileProvider.OpenAPI.TOKEN = token;
+        fileProvider.OpenAPI.TOKEN = window.Cypress
+          ? localStorage.getItem("auth0TokenOnCypress") || ""
+          : token;
         fileProvider.OpenAPI.BASE = API_ROUTE.FILE.BASE;
         fileProvider.DownloadService.createJwtToDownloadFile({
           requestBody,
