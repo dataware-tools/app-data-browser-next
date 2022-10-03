@@ -20,6 +20,15 @@ you need to set the following environment variables:
 - `DATAWARE_TOOLS_AUTH_CONFIG_API_URL`: Audience of auth0 (default: `https://demo.dataware-tools.com/`)
 - `DATAWARE_TOOLS_BACKEND_API_PREFIX`: Backend api url prefix(default: `/api/latest`)
 
+**_experiment env val for testing cypress_**
+DATAWARE_TOOLS_AUTH_CONFIG_CLIENT_SECRET: client Secret of auth0
+AUTH0_CYPRESS_USERNAME: username of auth0
+AUTH0_CYPRESS_PASSWORD: password of auth0
+
+If you want to test cypress on dev env, you should read below docs and enable some auth0 setting. (NOTICE: some settings decrease safety of authentication, so you should enable it temporarily) And, make symlink of app-common's [cypress-test-for-front-app branch](https://github.com/dataware-tools/app-common/tree/experiment/cypress-test-for-front-app) to node_modules/@dataware-tools/app-common
+
+https://docs.cypress.io/guides/end-to-end-testing/auth0-authentication#Auth0-Application-Setup
+
 Next, run the development server:
 
 ```bash
