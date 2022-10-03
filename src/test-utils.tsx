@@ -34,7 +34,7 @@ export const TestAuthProvider: React.FC = ({ children }) => {
   );
 };
 
-const AllTheProviders: React.FC = ({ children }) => {
+export const AllTheProviders: React.FC = ({ children }) => {
   return (
     <StylesProvider injectFirst>
       <ThemeProvider theme={theme}>
